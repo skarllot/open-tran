@@ -184,7 +184,7 @@ class MainWin:
 
     def load_suggestions(self):
         start = time.clock()
-        server = ServerProxy("http://localhost:8080")
+        server = ServerProxy("http://open-tran.eu")
         multicall = MultiCall(server)
         for unit in self.store.units[1:]:
             phrase = Phrase(str(unit.source), 'pl', False)
