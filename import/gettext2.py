@@ -1,4 +1,49 @@
-#!/usr/bin/env python2.4
+"""Internationalization and localization support.
+
+This module provides internationalization (I18N) and localization (L10N)
+support for your Python programs by providing an interface to the GNU gettext
+message catalog library.
+
+I18N refers to the operation by which a program is made aware of multiple
+languages.  L10N refers to the adaptation of your program, once
+internationalized, to the local language and cultural habits.
+
+"""
+
+# This module represents the integration of work, contributions, feedback, and
+# suggestions from the following people:
+#
+# Martin von Loewis, who wrote the initial implementation of the underlying
+# C-based libintlmodule (later renamed _gettext), along with a skeletal
+# gettext.py implementation.
+#
+# Peter Funk, who wrote fintl.py, a fairly complete wrapper around intlmodule,
+# which also included a pure-Python implementation to read .mo files if
+# intlmodule wasn't available.
+#
+# James Henstridge, who also wrote a gettext.py module, which has some
+# interesting, but currently unsupported experimental features: the notion of
+# a Catalog class and instances, and the ability to add to a catalog file via
+# a Python API.
+#
+# Barry Warsaw integrated these modules, wrote the .install() API and code,
+# and conformed all C and Python code to Python's coding standards.
+#
+# Francois Pinard and Marc-Andre Lemburg also contributed valuably to this
+# module.
+#
+# J. David Ibanez implemented plural forms. Bruno Haible fixed some bugs.
+#
+# TODO:
+# - Lazy loading of .mo files.  Currently the entire catalog is loaded into
+#   memory, but that's probably bad for large translated programs.  Instead,
+#   the lexical sort of original strings in GNU .mo files should be exploited
+#   to do binary searches and lazy initializations.  Or you might want to use
+#   the undocumented double-hash algorithm for .mo files with hash tables, but
+#   you'll need to study the GNU gettext code to do this.
+#
+# - Support Solaris .mo file formats.  Unfortunately, we've been unable to
+#   find this format documented anywhere.
 
 import locale, copy, os, re, struct, sys
 
