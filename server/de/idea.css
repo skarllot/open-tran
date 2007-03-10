@@ -1,0 +1,125 @@
+/* A BIG IDEA :: by Payal Dhar (http://writeside.net/) 
+Feel free to use or modify, but do keep the credit.*/
+
+body {
+        /* background: #FFF9FB url(images/bulb.jpg) top left no-repeat;*/
+	padding: 0;
+	margin: 0;
+	color: #454456;
+	text-align: center;
+	font: 1em Helvetica, Arial, sans-serif;
+	}
+
+/*Style for the page header */
+#header	{
+	position: relative;
+	margin: 20px auto auto 150px;
+	font-size: 5em;
+	color: #777688;
+	width: 750px;
+} 
+	
+#form input {
+        font-size: 1.5em;
+}
+
+/*Style for the nav menu */
+#nav {
+	position: relative;
+	margin: -18px 0 10px auto;
+	width: 750px;
+	line-height: 2em;
+	}
+	
+#nav ul { 
+	padding:5px; 
+	margin:0; 
+	padding:0; 
+} 
+
+#nav ul li { 
+	float:right; 
+	list-style:none; 
+	margin:0; 
+	padding:0; 
+	} 
+	
+#nav a, a:link	{
+	display:block; 
+	margin:0; 
+	padding: 2px 15px; 
+	text-align:center; 
+	background: #EFE9ED;
+	}
+
+#nav a:hover	{
+	color: #EFE9ED;
+	background: #5684BF;
+	text-decoration: none;
+}
+
+/* Styles for the text area */
+#text {
+    position: relative;
+    margin: 75px auto 50px auto;
+	padding: 0;
+	width: 750px;
+	text-align: left;
+	line-height: 1.25em;
+	border-top: 3px solid #5684BF;
+	}
+
+a, a:link	{
+	color: #5684BF;
+	background-color: inherit;
+	text-decoration: none;
+	display: inline;
+	padding: 0;
+	}
+	
+a:hover	{
+	color: #454456;
+	text-decoration: underline;
+	}
+	
+form {
+	margin: 0;
+	padding: 5px;
+	padding-left: 20px;
+	
+}
+
+p {
+	margin: 0;
+	padding: 5px;
+	padding-left: 20px;
+	
+}
+
+abbr {
+	cursor: help;
+}
+
+h1	{
+	font: 1.5em Garamond, serif;
+	color: #777688;
+	border-left: #777688 15px solid;
+	padding: 5px;
+	margin: 20px 0;
+	}
+	
+h2	{
+	font:1.25em Garamond, serif;
+	color: #777688;
+	margin: 0;
+	padding: 20px;
+	}
+
+/* Style for the footer */
+#footer	{
+	padding: 2px;
+	margin: auto; 
+	background-color: #EFE9ED;
+	font-size: 0.8em;
+	width: 750px;
+	}
