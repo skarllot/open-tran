@@ -32,20 +32,13 @@ import posixpath
 import os
 
 
-LANGUAGES = {
+SUGGESTIONS_TXT = {
     'de' : u'Übersetzungsvorschläge',
     'es' : u'Sugerencias de traducción',
-    'fr' : u'Translation suggestions',
-    'it' : u'Translation suggestions',
-    'ja' : u'Translation suggestions',
-    'nl' : u'Translation suggestions',
-    'pl' : u'Sugestie tłumaczeń',
-    'pt' : u'Translation suggestions',
-    'pt_br' : u'Translation suggestions',
-    'ru' : u'Translation suggestions',
-    'sv' : u'Translation suggestions',
-    'tr' : u'Translation suggestions'
+    'pl' : u'Sugestie tłumaczeń'
     }
+
+LANGUAGES = ['af','ar','az','be','bg','bn','br','bs','ca','cs','cy','da','de','el','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','he','hi','hr','hsb','hu','id','is','it','ja','kk','km','ko','ku','lb','lo','lt','lv','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
 
 
 def _replace_html(text):
@@ -79,7 +72,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
 
     def dump(self, responses):
-        body = u'<h1>%s</h1><table border="1">' % LANGUAGES[self.language]
+        body = u'<h1>%s</h1><table border="1">' % SUGGESTIONS_TXT.get(self.language, u'Translation suggestions')
         for key, suggs in responses:
             if len(suggs) == 0:
                 continue
