@@ -22,7 +22,7 @@ from TranServer import TranServer
 print "loading...",
 sys.stdout.flush()
 
-server = TranServer(("localhost", 8080))
+server = TranServer(("", 8080))
 
 print "done."
 sys.stdout.flush()
