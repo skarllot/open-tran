@@ -83,7 +83,7 @@ cursor = conn.cursor()
 
 cls = factory.getclass("kde.po")
 
-langs = ['af','ar','az','be','bg','bn','br','bs','ca','cs','cy','da','de','el','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','he','hi','hr','hsb','hu','id','is','it','ja','kk','km','ko','ku','lb','lo','lt','lv','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_BR','ro','ru','rw','se','sk','sl','sq','sr','sr@Latn','ss','sv','ta','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_CN','zh_HK','zh_TW','zu']
+langs = ['af','ar','az','be','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_BR','ro','ru','rw','se','sk','sl','sq','sr','sr@Latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_CN','zh_HK','zh_TW','zu']
 
 log("Dropping index...", True)
 cursor.execute("drop index if exists loc_lang_idx")
