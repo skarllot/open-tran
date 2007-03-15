@@ -78,7 +78,7 @@ def log(text, nonline=False):
     sys.stdout.flush()
 
 
-conn = sqlite.connect('../data/seventh.db')
+conn = sqlite.connect('../data/seventh-i.db')
 cursor = conn.cursor()
 
 cls = factory.getclass("kde.po")
