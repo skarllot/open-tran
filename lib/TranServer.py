@@ -38,7 +38,7 @@ SUGGESTIONS_TXT = {
     'pl' : u'Sugestie tłumaczeń'
     }
 
-LANGUAGES = ['af','ar','az','be','bg','bn','br','bs','ca','cs','cy','da','de','el','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','he','hi','hr','hsb','hu','id','is','it','ja','kk','km','ko','ku','lb','lo','lt','lv','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
+LANGUAGES = ['af','ar','az','be','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
 
 
 def _replace_html(text):
