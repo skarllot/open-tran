@@ -38,7 +38,7 @@ class Suggestion:
 
 class TranDB:
     def __init__ (self, srclang):
-        self.db = '../data/sixth.db'
+        self.db = '../data/seventh.db'
         self.srclang = srclang
         self.storage = tran.storage_create (srclang)
         tran.storage_read (self.storage, self.db)
