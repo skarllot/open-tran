@@ -78,8 +78,8 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
                 continue
             body += '<tr><td valign="top" rowspan="%d">%s</td><td>' % (len(suggs), _replace_html(key))
             for s in suggs[:-1]:
-                body += "%s</td></tr>\n<tr><td>" % _replace_html(s)
-            body += "%s</td></tr>\n" % _replace_html(suggs[len(suggs)-1])
+                body += "%s</td><td>%s</td></tr>\n<tr><td>" % (_replace_html(s.text), _replace_html(s.project))
+            body += "%s</td><td>%s</td></tr>\n" % (_replace_html(suggs[len(suggs)-1].text), _replace_html(suggs[len(suggs)-1].project))
         body += "</table>"
         return body
 

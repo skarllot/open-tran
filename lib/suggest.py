@@ -38,7 +38,7 @@ class Suggestion:
 
 class TranDB:
     def __init__ (self, srclang):
-        self.db = '../data/seventh.db'
+        self.db = '../data/sixth.db'
         self.srclang = srclang
         self.storage = tran.storage_create (srclang)
         tran.storage_read (self.storage, self.db)
@@ -54,16 +54,20 @@ class TranDB:
         cursor = conn.cursor ()
         for i in range (tran.suggestion_get_count (suggs)):
             idx = tran.suggestion_get_id (suggs, i)
-            cursor.execute ("SELECT phrase FROM phrases WHERE locationid = ? AND lang = ?", \
+            cursor.execute ("""
+SELECT p.phrase, l.project
+FROM phrases p JOIN locations l ON p.locationid = l.id
+WHERE p.locationid = ? AND p.lang = ?""",
                             (idx, dstlang))
             rows = cursor.fetchall ()
             if len (rows):
                 sug = Suggestion()
                 sug.text = rows[0][0]
+                sug.project = rows[0][1]
                 sug = result.setdefault (sug.text, sug)
                 sug.set_value (tran.suggestion_get_value (suggs, i))
         cursor.close ()
         tran.suggestion_destroy (suggs)
         result = result.values ()
         result.sort (lambda s1, s2: s1.compare (s2))
-        return map(lambda s: s.text, result)
+        return result
