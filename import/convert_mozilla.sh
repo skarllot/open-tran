@@ -1,0 +1,49 @@
+#!/bin/sh
+
+cd /home/sliwers
+
+moz2po -t l10n/en-US/ l10n/af/ mozilla-po/af/
+moz2po -t l10n/en-US/ l10n/ar/ mozilla-po/ar/
+moz2po -t l10n/en-US/ l10n/be/ mozilla-po/be/
+moz2po -t l10n/en-US/ l10n/bg/ mozilla-po/bg/
+moz2po -t l10n/en-US/ l10n/ca/ mozilla-po/ca/
+moz2po -t l10n/en-US/ l10n/cs/ mozilla-po/cs/
+moz2po -t l10n/en-US/ l10n/da/ mozilla-po/da/
+moz2po -t l10n/en-US/ l10n/de/ mozilla-po/de/
+moz2po -t l10n/en-US/ l10n/el/ mozilla-po/el/
+moz2po -t l10n/en-US/ l10n/es-ES/ mozilla-po/es/
+moz2po -t l10n/en-US/ l10n/eu/ mozilla-po/eu/
+moz2po -t l10n/en-US/ l10n/fi/ mozilla-po/fi/
+moz2po -t l10n/en-US/ l10n/fr/ mozilla-po/fr/
+moz2po -t l10n/en-US/ l10n/fy-NL/ mozilla-po/fy/
+moz2po -t l10n/en-US/ l10n/ga-IE/ mozilla-po/ga/
+moz2po -t l10n/en-US/ l10n/he/ mozilla-po/he/
+moz2po -t l10n/en-US/ l10n/hu/ mozilla-po/hu/
+moz2po -t l10n/en-US/ l10n/it/ mozilla-po/it/
+moz2po -t l10n/en-US/ l10n/ja/ mozilla-po/ja/
+moz2po -t l10n/en-US/ l10n/ka/ mozilla-po/ka/
+moz2po -t l10n/en-US/ l10n/ko/ mozilla-po/ko/
+moz2po -t l10n/en-US/ l10n/ku/ mozilla-po/ku/
+moz2po -t l10n/en-US/ l10n/lt/ mozilla-po/lt/
+moz2po -t l10n/en-US/ l10n/mk/ mozilla-po/mk/
+moz2po -t l10n/en-US/ l10n/mn/ mozilla-po/mn/
+moz2po -t l10n/en-US/ l10n/nb-NO/ mozilla-po/nb/
+moz2po -t l10n/en-US/ l10n/nl/ mozilla-po/nl/
+moz2po -t l10n/en-US/ l10n/nn-NO/ mozilla-po/nn/
+moz2po -t l10n/en-US/ l10n/pa-IN/ mozilla-po/pa/
+moz2po -t l10n/en-US/ l10n/pl/ mozilla-po/pl/
+moz2po -t l10n/en-US/ l10n/pt-BR/ mozilla-po/pt_br/
+moz2po -t l10n/en-US/ l10n/pt-PT/ mozilla-po/pt/
+moz2po -t l10n/en-US/ l10n/ro/ mozilla-po/ro/
+moz2po -t l10n/en-US/ l10n/ru/ mozilla-po/ru/
+moz2po -t l10n/en-US/ l10n/sk/ mozilla-po/sk/
+moz2po -t l10n/en-US/ l10n/sl/ mozilla-po/sl/
+moz2po -t l10n/en-US/ l10n/sq/ mozilla-po/sq/
+moz2po -t l10n/en-US/ l10n/ss/ mozilla-po/ss/
+moz2po -t l10n/en-US/ l10n/sv-SE/ mozilla-po/sv/
+moz2po -t l10n/en-US/ l10n/tr/ mozilla-po/tr/
+moz2po -t l10n/en-US/ l10n/ve/ mozilla-po/ven/
+moz2po -t l10n/en-US/ l10n/xh/ mozilla-po/xh/
+moz2po -t l10n/en-US/ l10n/zh-CN/ mozilla-po/zh_CN/
+moz2po -t l10n/en-US/ l10n/zh-TW/ mozilla-po/zh_TW/
+moz2po -t l10n/en-US/ l10n/zu/ mozilla-po/zu/
