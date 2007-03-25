@@ -73,16 +73,19 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
             self.copyfile(f, self.wfile)
 
 
+    def render_suggestions(self, suggs):
+        result = '<ol>\n'
+        for s in suggs:
+            result += '<li value="%d"><strong>%s</strong> (%s)</li>\n' % \
+            (s.value, _replace_html(s.text), _replace_html(", ".join(s.projects)))
+        result += '</ol>\n'
+        return result
+
     def dump(self, responses):
-        body = u'<h1>%s</h1><table border="1">' % SUGGESTIONS_TXT.get(self.language, u'Translation suggestions')
+        body = u'<h1>%s</h1><dl>' % SUGGESTIONS_TXT.get(self.language, u'Translation suggestions')
         for key, suggs in responses:
-            if len(suggs) == 0:
-                continue
-            body += '<tr><td valign="top" rowspan="%d">%s</td><td>' % (len(suggs), _replace_html(key))
-            for s in suggs[:-1]:
-                body += "%s</td><td>%s</td></tr>\n<tr><td>" % (_replace_html(s.text), _replace_html(s.project))
-            body += "%s</td><td>%s</td></tr>\n" % (_replace_html(suggs[len(suggs)-1].text), _replace_html(suggs[len(suggs)-1].project))
-        body += "</table>"
+            body += '<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>' % (_replace_html(key), self.render_suggestions(suggs))
+        body += "</dl>"
         return body
 
 
