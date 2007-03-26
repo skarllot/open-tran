@@ -34,7 +34,7 @@ def get_subdirs(dir):
     for r, dirs, files in os.walk(dir):
         if '.svn' in dirs:
             dirs.remove('.svn')
-        return ['pl', 'de']
+        return dirs
 
 
 class Importer(object):
@@ -42,6 +42,7 @@ class Importer(object):
         self.conn = conn
         self.parser_class = parser_class
     
+
     def store_phrase(self, lid, sentence, lang):
         phrase = Phrase(sentence, lang)
         if phrase.length() == 0:
@@ -96,8 +97,37 @@ class Importer(object):
                     log("Importing %s..." % f)
                     self.cursor = self.conn.cursor()
                     self.store_file(self.project_name(f, root), os.path.join(root, f))
-                if '.svn' in dirs:
-                    dirs.remove('.svn')
+            if '.svn' in dirs:
+                dirs.remove('.svn')
+
+
+    def load_project_file(self, phrases, project, project_file):
+        store = self.parser_class.parsefile(project_file)
+        lang = project[:-3].replace('@', '_').lower()
+        for unit in store.units:
+            if len(str(unit.target)) > 0:
+                l = phrases.setdefault(str(unit.source), {})
+                l[lang] = str(unit.target)
+        return len(store.units)
+
+
+    def run_projects(self, dir):
+        for proj in get_subdirs(dir):
+            log("Importing %s..." % proj)
+            self.cursor = self.conn.cursor()
+            phrases = {}
+            proj_file_name = os.path.join(dir, proj)
+            for lang in os.listdir(proj_file_name):
+                if not self.is_resource(lang):
+                    continue
+                log("  + %s..." % lang, True)
+                try:
+                    cnt = self.load_project_file(phrases, proj, os.path.join(proj_file_name, lang))
+                    log("ok (%d)" % cnt)
+                except:
+                    log("failed.")
+            log("  phrases: %d" % len(phrases))
+            self.store_phrases(self.project_name(proj), phrases)
 
 
 class KDE_Importer(Importer):
@@ -133,6 +163,16 @@ class Mozilla_Importer(Importer):
         Importer.run(self, '/home/sliwers/mozilla-po')
 
 
+class Gnome_Importer(Importer):
+    def project_name(self, proj):
+        return "Gnome " + proj
+    
+    def is_resource(self, fname):
+        return fname.endswith('.po')
+    
+    def run(self):
+        Importer.run_projects(self, '/home/sliwers/gnome-po')
+
 
 cls = factory.getclass("kde.po")
 conn = sqlite.connect('../data/seventh-i.db')
@@ -145,6 +185,8 @@ ki = KDE_Importer(conn, cls)
 ki.run()
 mi = Mozilla_Importer(conn, cls)
 mi.run()
+gi = Gnome_Importer(conn, cls)
+gi.run()
 
 log("Creating index...", True)
 cursor.execute("create index loc_lang_idx on phrases (locationid, lang)")
