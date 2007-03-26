@@ -125,6 +125,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
     def get_language(self):
         try:
             prefix = self.headers['Host'].split('.')[0]
+            prefix.replace('-', '_')
             if prefix in LANGUAGES:
                 self.language = prefix
         except:
