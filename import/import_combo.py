@@ -122,7 +122,7 @@ class Importer(object):
                     continue
                 log("  + %s..." % lang, True)
                 try:
-                    cnt = self.load_project_file(phrases, proj, os.path.join(proj_file_name, lang))
+                    cnt = self.load_project_file(phrases, lang, os.path.join(proj_file_name, lang))
                     log("ok (%d)" % cnt)
                 except:
                     log("failed.")
@@ -168,7 +168,7 @@ class Gnome_Importer(Importer):
         return "Gnome " + proj
     
     def is_resource(self, fname):
-        return fname.endswith('.po')
+        return fname.endswith('.po') and not fname.startswith('en')
     
     def run(self):
         Importer.run_projects(self, '/home/sliwers/gnome-po')
