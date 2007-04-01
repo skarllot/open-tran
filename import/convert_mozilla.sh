@@ -11,6 +11,7 @@ moz2po -t l10n/en-US/ l10n/cs/ mozilla-po/cs/
 moz2po -t l10n/en-US/ l10n/da/ mozilla-po/da/
 moz2po -t l10n/en-US/ l10n/de/ mozilla-po/de/
 moz2po -t l10n/en-US/ l10n/el/ mozilla-po/el/
+moz2po -t l10n/en-US/ l10n/en-GB/ mozilla-po/en_GB/
 moz2po -t l10n/en-US/ l10n/es-ES/ mozilla-po/es/
 moz2po -t l10n/en-US/ l10n/eu/ mozilla-po/eu/
 moz2po -t l10n/en-US/ l10n/fi/ mozilla-po/fi/
@@ -32,7 +33,7 @@ moz2po -t l10n/en-US/ l10n/nl/ mozilla-po/nl/
 moz2po -t l10n/en-US/ l10n/nn-NO/ mozilla-po/nn/
 moz2po -t l10n/en-US/ l10n/pa-IN/ mozilla-po/pa/
 moz2po -t l10n/en-US/ l10n/pl/ mozilla-po/pl/
-moz2po -t l10n/en-US/ l10n/pt-BR/ mozilla-po/pt_br/
+moz2po -t l10n/en-US/ l10n/pt-BR/ mozilla-po/pt_BR/
 moz2po -t l10n/en-US/ l10n/pt-PT/ mozilla-po/pt/
 moz2po -t l10n/en-US/ l10n/ro/ mozilla-po/ro/
 moz2po -t l10n/en-US/ l10n/ru/ mozilla-po/ru/
