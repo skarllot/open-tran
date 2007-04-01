@@ -165,7 +165,7 @@ class Mozilla_Importer(Importer):
 
 class Gnome_Importer(Importer):
     def project_name(self, proj):
-        return "Gnome " + proj
+        return "GNOME " + proj
     
     def is_resource(self, fname):
         return fname.endswith('.po') and not fname.startswith('en')
