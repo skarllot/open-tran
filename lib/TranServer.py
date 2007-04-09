@@ -34,6 +34,7 @@ import os
 
 SUGGESTIONS_TXT = {
     'csb': u'Sugerowóny dolmaczënczi',
+    'da' : u'Oversćttelsesforslag',
     'de' : u'Übersetzungsvorschläge',
     'es' : u'Sugerencias de traducción',
     'fr' : u'Traductions suggérées',
