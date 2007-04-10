@@ -18,6 +18,10 @@
 </UserPref> 
 <Content type="html"><![CDATA[
 <script>
+function formsubmit(){
+     location.href = "http://pl.open-tran.eu/suggest/" + document.search_form.q.value;
+     return false;
+}
 
 function displaySearchBar (prefs) {
      var html =
