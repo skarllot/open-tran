@@ -9,6 +9,7 @@
       author_email="rzyj@o2.pl" 
       author_location="Dresden, Germany" 
       author_link="http://sliwerski.net"
+      screenshot="http://open-tran.eu/images/gadget-shot.png"
       title_url="http://open-tran.eu">
     <Require feature="analytics"/>
   </ModulePrefs>
