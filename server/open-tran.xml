@@ -18,18 +18,6 @@
 </UserPref> 
 <Content type="html"><![CDATA[
 <script>
-function geturl(){
-     var lang = prefs.getString("lang");
-     if (lang == "") {
-       lang = prefs.getString(".lang");
-     }
-     return 'http://' + lang + '.open-tran.eu';
-}
-
-function formsubmit(){
-     location.href = geturl() + "/suggest/" + document.search_form.q.value;
-     return false;
-}
 
 function displaySearchBar (prefs) {
      var html =
