@@ -13,6 +13,7 @@
     <Require feature="analytics"/>
   </ModulePrefs>
   <UserPref name="lang" display_name="Language" default_value="" datatype="enum">
+   <EnumValue display_value="German" value="de"/>
    <EnumValue display_value="Polish" value="pl"/>
 </UserPref> 
 <Content type="html"><![CDATA[
