@@ -110,6 +110,9 @@ function displaySearchBar (prefs) {
      if (lang == "") {
        lang = prefs.getString(".lang");
      }
+     if (lang == "") {
+       lang = "en-gb";
+     }
      var html =
          '<form target="_parent" name="search_form" method="get"' +
               ' action="http://' + lang + '.open-tran.eu/suggest"' +
