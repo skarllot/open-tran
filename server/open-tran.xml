@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <ModulePrefs 
+      title="Open-Tran.eu" 
+      description="Open-Tran.eu - easy access to the translations of open source projects" 
+      height="40" 
+      author="Jacek Śliwerski" 
+      author_affiliation="Open-Tran.eu"
+      author_email="rzyj@o2.pl" 
+      author_location="Dresden, Germany" 
+      author_link="http://sliwerski.net"
+      title_url="http://open-tran.eu">
+    <Require feature="analytics"/>
+  </ModulePrefs>
+  <UserPref name="lang" display_name="Language" default_value="" datatype="enum">
+   <EnumValue display_value="Polish" value="pl"/>
+</UserPref> 
+<Content type="html"><![CDATA[
+<script>
+function formsubmit(){
+     location.href = "/suggest/" + document.search_form.q.value;
+     return false;
+}
+
+function displaySearchBar (prefs) {
+     var lang = prefs.getString("lang");
+     if (lang == "") {
+       lang = prefs.getString(".lang");
+     }
+     var html =
+         '<form name="search_form" method="get" action="http://' + lang +
+           '.open-tran.eu/suggest" onsubmit="return formsubmit();">' +
+	   '<input type="text" name="q" maxlength="450" />' +
+	   '<input type="submit" value="Translate" />' +
+         '<form>';
+     document.write(html);
+}
+   displaySearchBar(new _IG_Prefs(__MODULE_ID__));
+   _IG_Analytics("UA-664123-3", "/google-gadget");
+</script>
+ ]]>
+</Content>
+</Module>
