@@ -18,19 +18,24 @@
 </UserPref> 
 <Content type="html"><![CDATA[
 <script>
-function formsubmit(){
-     location.href = "/suggest/" + document.search_form.q.value;
-     return false;
-}
-
-function displaySearchBar (prefs) {
+function geturl(){
      var lang = prefs.getString("lang");
      if (lang == "") {
        lang = prefs.getString(".lang");
      }
+     return 'http://' + lang + '.open-tran.eu';
+}
+
+function formsubmit(){
+     location.href = geturl() + "/suggest/" + document.search_form.q.value;
+     return false;
+}
+
+function displaySearchBar (prefs) {
      var html =
-         '<form name="search_form" method="get" action="http://' + lang +
-           '.open-tran.eu/suggest" onsubmit="return formsubmit();">' +
+         '<form target="_parent" name="search_form" method="get"' +
+              ' action="' + geturl() + '/suggest"' +
+              ' onsubmit="return formsubmit();">' +
 	   '<input type="text" name="q" maxlength="450" />' +
 	   '<input type="submit" value="Translate" />' +
          '<form>';
