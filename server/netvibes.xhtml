@@ -17,11 +17,12 @@
   </script>
 </head>
 <body>
-    <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">
-      <p>
-	<input type="text" name="q" maxlength="450" />
+    <form method="get" action="/suggest">
+      <fieldset>
+	<label for="q">Phrase</label>
+	<input type="text" name="q" />
 	<input type="submit" value="Translate" />
-      </p>
+      </fieldset>
     </form>
 </body>
 </html>
