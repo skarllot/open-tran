@@ -7,13 +7,13 @@
     </p>
     <form enctype="multipart/form-data" action="suggest" method="post">
       File: <input type="file" name="file"/><br/>
-      <input type="submit" value="Translate"/>
+      <input type="submit" value="Traduci"/>
     </form>
 
     <h1>Traduzione di frasi singole</h1>
     <ol>
       <li>
-        Puoi aggiungere un motore di ricerca, in inglese "search engine"
+        Puoi aggiungere un motore di ricerca, in inglese si dice "search engine"
         (<a href="/suggest/search engine">vedi la traduzione suggerita</a>), a qualsiasi browser web moderno.
       </li>
       <li>
@@ -23,8 +23,8 @@
       <li>
         Se sei un utente di Firefox poi aggiungere un segnalibro con parola chiave. Per
 	poterlo fare devi aprire la finestra "Gestione segnalibri..." dal menu
-        "Segnalibri" e premere il pulsante "Nuovo segnalibro":<br/><br/>
-        <img src="images/addbookmark.png" alt="schermata"/><br/><br/>
+        "Segnalibri" e premere il pulsante "Nuovo segnalibro". Poi compila i campi come segue:<br/><br/>
+        <img src="images/segnalibro.png" alt="Coma aggiungere un segnalibro"/><br/><br/>
         D'ora in poi digitando <code>tran frase_da_tradurre</code> nella barra dell'indirizzo
         inizierà automaticamente la ricerca nella nostra banca dati delle traduzioni.
       </li>
@@ -35,7 +35,7 @@
     <p>
       Puoi usare questo servizio con qualsiasi programma che sia in grado di effettuare una
       chiamata a procedura remota attraverso il protocollo <a href="http://www.xmlrpc.com">XML RPC</a>.
-      Dovresti utilizzare il metodo <code>suggest</code>, che prende due argomenti: una frase da tradurre e il
+      Dovresti utilizzare il metodo <code>suggest</code>, che prende due argomenti: una frase da tradurre ed il
       codice di due lettere della lingua nella quale vuoi tradurre (ovvero "it" nel caso dell'italiano).
     </p>
     <p>
