@@ -33,6 +33,7 @@ import os
 
 
 SUGGESTIONS_TXT = {
+    'ca' : u'Possibles traduccions',
     'csb': u'Sugerowóny dolmaczënczi',
     'da' : u'Oversćttelsesforslag',
     'de' : u'Übersetzungsvorschläge',
