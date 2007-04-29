@@ -73,12 +73,15 @@ class TranDB:
         cursor = conn.cursor ()
         for i in range (tran.suggestion_get_count (suggs)):
             try:
-                idx = tran.suggestion_get_id (suggs, i)
+                pid = tran.suggestion_get_project_id (suggs, i)
+                lid = tran.suggestion_get_location_id (suggs, i)
                 cursor.execute ("""
-SELECT p.phrase, l.project
-FROM phrases p JOIN locations l ON p.locationid = l.id
-WHERE p.locationid = ? AND p.lang = ?""",
-                                (idx, dstlang))
+SELECT p.phrase, l.path
+FROM phrases p JOIN projects l ON p.projectid = l.id
+WHERE p.locationid = ?
+  AND p.projectid = ?
+  AND p.lang = ?""",
+                                (lid, pid, dstlang))
                 rows = cursor.fetchall ()
                 if len (rows):
                     sug = Suggestion(rows[0][0])

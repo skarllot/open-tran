@@ -35,7 +35,8 @@ typedef struct storage storage_t;
 typedef struct
 {
         int count;
-        unsigned *ids;
+        unsigned short *project_ids;
+        unsigned short *location_ids;
         int *values;
 } suggestion_t;
 
@@ -49,12 +50,14 @@ typedef struct
 extern storage_t *storage_create (const char *lang);
 extern void storage_destroy (storage_t *storage);
 
-extern void storage_add (storage_t *storage, const char *text, int location_id);
+extern void storage_add (storage_t *storage, const char *text, int project_id,
+                         int location_id);
 extern void storage_read (storage_t *storage, const char *dbname);
 extern suggestion_t *storage_suggest (storage_t *storage, const char *text);
 
 extern int suggestion_get_count (suggestion_t *suggestion);
-extern unsigned suggestion_get_id (suggestion_t *suggestion, int idx);
+extern unsigned short suggestion_get_project_id (suggestion_t *suggestion, int idx);
+extern unsigned short suggestion_get_location_id (suggestion_t *suggestion, int idx);
 extern int suggestion_get_value (suggestion_t *suggestion, int idx);
 extern void suggestion_destroy (suggestion_t *suggestion);
 

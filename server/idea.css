@@ -89,7 +89,7 @@ form {
 	
 }
 
-p, table {
+p {
 	margin: 0;
 	padding: 5px;
 	padding-left: 20px;
@@ -123,3 +123,7 @@ h2	{
 	font-size: 0.8em;
 	width: 750px;
 	}
+
+img {
+	border-style: none;
+}

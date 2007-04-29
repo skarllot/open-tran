@@ -13,15 +13,16 @@
 --  along with this program; if not, write to the Free Software Foundation,
 --  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
-create table locations (
+create table projects (
 	id integer primary key,
-	project text not null
+	path text not null
 );
 
 create table phrases (
 	id integer primary key,
 	phrase text not null,
 	lang text not null,
+	projectid int,
 	locationid int
 );
 
@@ -29,6 +30,7 @@ create table canonical (
 	id integer primary key,
 	phrase text not null,
 	lang text not null,
+	projectid int,
 	locationid int
 );
 

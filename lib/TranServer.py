@@ -48,6 +48,100 @@ SUGGESTIONS_TXT = {
 LANGUAGES = ['af','ar','az','be','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
 
 
+class renderer(object):
+    def __init__(self):
+        self.projects = []
+    
+    def clear(self):
+        self.projects = []
+
+    def feed(self, path):
+        if self.may_render(path):
+            self.projects.append(path)
+
+    def render_icon(self, needplus):
+        cnt = len(self.projects)
+        if cnt == 0:
+            return ""
+        if needplus:
+            result = " + "
+        else:
+            result = ""
+        if cnt > 1:
+            result += "%d&times;" % cnt
+        return result + '<img src="%s" alt="%s"/>' % (self.icon_path, self.name)
+
+    def render_links(self, lang):
+        result = ""
+        for path in self.projects:
+            result += self.render_link(path, lang)
+        return result
+
+
+class gnome_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "GNOME"
+        self.icon_path = "http://www.gnome.org/img/logo/foot-16.png"
+    
+    def may_render(self, project):
+        return project[0] == 'G'
+
+    def render_link(self, path, lang):
+        path = path[2:]
+        fname = os.path.basename(path)
+        while len(path):
+            path, rest = os.path.split(path)
+        return '<a href="http://svn.gnome.org/svn/%s/trunk/po/%s.po">GNOME %s</a><br/>\n' % (rest, lang, rest)
+    
+
+class kde_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "KDE"
+        self.icon_path = "http://kde.org/favicon.ico"
+        self.langs = { 'en-gb' : 'en_GB',
+                       'pt-br' : 'pt_BR',
+                       'pt_br' : 'pt_BR',
+                       'sr-latn' : 'sr@Latn',
+                       'sr_latn' : 'sr@Latn',
+                       'zh-cn' : 'zh_CN',
+                       'zh_cn' : 'zh_CN',
+                       'zh-hk' : 'zh_HK',
+                       'zh_hk' : 'zh_HK',
+                       'zh-tw' : 'zh_TW',
+                       'zh_tw' : 'zh_TW' }
+
+    def may_render(self, project):
+        return project[0] == 'K'
+
+    def render_link(self, path, lang):
+        fname = os.path.basename(path)
+        if lang in self.langs:
+            lang = self.langs[lang]
+        return '<a href="http://websvn.kde.org/trunk/l10n/%s/%s?view=markup">KDE %s</a><br/>\n' % (lang, path[2:], fname[:-3])
+
+
+class mozilla_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "Mozilla"
+        self.icon_path = "http://www.mozilla.org/images/mozilla-16.png"
+
+    def may_render(self, project):
+        return project[0] == 'M'
+
+    def render_link(self, path, lang):
+        path = path[2:]
+        fname, ext = os.path.splitext(os.path.basename(path))
+        while len(ext):
+            fname, ext = os.path.splitext(fname)
+        folder, rest = os.path.split(os.path.dirname(path))
+        while len(folder):
+            folder, rest = os.path.split(folder)
+        return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla %s %s</a><br/>\n' % (rest, fname)
+
+
 def _replace_html(text):
     return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
@@ -62,6 +156,7 @@ class Suggestion:
 
 class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
     language = None
+    renderers = [gnome_renderer(), kde_renderer(), mozilla_renderer()]
 
     def send_error(self, code, message=None):
         try:
@@ -78,11 +173,39 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
             self.copyfile(f, self.wfile)
 
 
+    def render_all(self):
+        needplus = False
+        result = ""
+        for r in TranRequestHandler.renderers:
+            icon = r.render_icon(needplus)
+            if icon != "":
+                needplus = True
+            result += icon
+        return result
+
+
+    def render_div(self, idx):
+        result = '<div id="sug%d">' % idx
+        for r in TranRequestHandler.renderers:
+            result += r.render_links(self.language)
+        return result + "</div>\n"
+
+
     def render_suggestions(self, suggs):
         result = '<ol>\n'
+        idx = 1
         for s in suggs:
-            result += '<li value="%d"><strong>%s</strong> (%s)</li>\n' % \
-            (s.value, _replace_html(s.text), _replace_html(", ".join(s.projects)))
+            result += '<li value="%d"><a href="#" onclick="return blocking(\'sug%d\')">%s (' % (s.value, idx, _replace_html(s.text))
+            for r in TranRequestHandler.renderers:
+                r.clear()
+            for p in s.projects:
+                for r in TranRequestHandler.renderers:
+                    r.feed(p)
+            result += self.render_all()
+            result += ')</a>'
+            result += self.render_div(idx)
+            result += '</li>\n'
+            idx += 1
         result += '</ol>\n'
         return result
 

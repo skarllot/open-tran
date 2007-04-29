@@ -38,7 +38,7 @@
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-#define SELECT_QUERY "SELECT phrase, locationid " \
+#define SELECT_QUERY "SELECT phrase, projectid, locationid " \
                      "FROM canonical " \
                      "WHERE lang = '%s'"
 #define QUERY_LEN(storage) (strlen (SELECT_QUERY) - 2 \
@@ -65,7 +65,8 @@ typedef struct list
 {
         struct list *next;
         phrase_t *phrase;
-        unsigned location_id;
+        unsigned short location_id;
+        unsigned short project_id;
         int destroy_phrase;
 } list_t;
 
@@ -93,13 +94,14 @@ typedef struct hit
  ****************************************************************************/
 
 static void
-add_word (htable_t *words, word_t *word, phrase_t *phrase, int location_id,
-          int destroy_phrase)
+add_word (htable_t *words, word_t *word, phrase_t *phrase, int project_id,
+          int location_id, int destroy_phrase)
 {
         entry_t *entry;
         list_t *node = xmalloc (sizeof (list_t));
         node->next = NULL;
         node->phrase = phrase;
+        node->project_id = project_id;
         node->location_id = location_id;
         node->destroy_phrase = destroy_phrase;
 
@@ -126,8 +128,10 @@ node_cmp (void *n1, void *n2)
         list_t *node1 = (list_t *) n1;
         list_t *node2 = (list_t *) n2;
 
-        return (node1->location_id > node2->location_id)
-                - (node1->location_id < node2->location_id);
+        unsigned id1 = node1->project_id | (node1->location_id << 16);
+        unsigned id2 = node2->project_id | (node2->location_id << 16);
+
+        return (id1 > id2) - (id1 < id2);
 }
 
 
@@ -219,13 +223,15 @@ extract_and_sort (storage_t *storage, htable_t *hits)
         qsort (entries, hits->count, sizeof (entry_t *), entries_compare);
         
         result->count = MIN (storage->top, hits->count);
-        result->ids = xmalloc (result->count * sizeof (unsigned));
+        result->project_ids = xmalloc (result->count * sizeof (unsigned short));
+        result->location_ids = xmalloc (result->count * sizeof (unsigned short));
         result->values = xmalloc (result->count * sizeof (int));
 
         for (i = 0; i < result->count; i++){
                 list_t *node = (list_t *) entries[i]->key;
                 hit_t *hit = (hit_t *) entries[i]->value;
-                result->ids[i] = node->location_id;
+                result->project_ids[i] = node->project_id;
+                result->location_ids[i] = node->location_id;
                 result->values[i] = node->phrase->word_count
                         - hit->query_hits - hit->storage_hits;
         }
@@ -246,7 +252,7 @@ static int
 read_callback (void *vstorage, int argc, char **argv, char **col_names)
 {
         storage_t *storage = (storage_t *) vstorage;
-        storage_add (storage, argv[0], atoi (argv[1]));
+        storage_add (storage, argv[0], atoi (argv[1]), atoi (argv[2]));
         return 0;
 }
 
@@ -311,7 +317,8 @@ storage_destroy (storage_t *storage)
 
 
 void
-storage_add (storage_t *storage, const char *text, int location_id)
+storage_add (storage_t *storage, const char *text, int project_id,
+             int location_id)
 {
         int i;
         phrase_t *phrase = phrase_create (text);
@@ -323,7 +330,7 @@ storage_add (storage_t *storage, const char *text, int location_id)
         
         for (i = 0; i < phrase->word_count; i++){
                 add_word (storage->words, phrase->words[i], phrase,
-                          location_id, i == 0);
+                          project_id, location_id, i == 0);
         }
 }
 
@@ -388,13 +395,23 @@ suggestion_get_count (suggestion_t *suggestion)
 }
 
 
-unsigned
-suggestion_get_id (suggestion_t *suggestion, int idx)
+unsigned short
+suggestion_get_project_id (suggestion_t *suggestion, int idx)
 {
         if (idx >= suggestion->count)
                 return 0;
 
-        return suggestion->ids[idx];
+        return suggestion->project_ids[idx];
+}
+
+
+unsigned short
+suggestion_get_location_id (suggestion_t *suggestion, int idx)
+{
+        if (idx >= suggestion->count)
+                return 0;
+
+        return suggestion->location_ids[idx];
 }
 
 
@@ -411,7 +428,8 @@ suggestion_get_value (suggestion_t *suggestion, int idx)
 void
 suggestion_destroy (suggestion_t *suggestion)
 {
-        xfree (suggestion->ids);
+        xfree (suggestion->project_ids);
+        xfree (suggestion->location_ids);
         xfree (suggestion->values);
         xfree (suggestion);
 }

@@ -97,23 +97,24 @@ main_storage (void)
         storage_t *storage = storage_create ("C");
 
         start = clock ();
-        storage_read (storage, "../data/fourth.db");
+        storage_read (storage, "../data/seventh.db");
         end = clock ();
 
         printf ("time: %lf\n", ((double) (end - start)) / CLOCKS_PER_SEC);
 
 
         start = clock ();
-        sugg = storage_suggest (storage, "couldn't convert %s to %s");
+        sugg = storage_suggest (storage, "file");
         end = clock ();
 
         printf ("time: %lf\n", ((double) (end - start)) / CLOCKS_PER_SEC);
 
         for (i = 0; i < sugg->count; i++){
-                printf (" -> %d: %d\n", sugg->ids[i], sugg->values[i]);
+                printf (" -> %d-%d: %d\n", sugg->project_ids[i], sugg->location_ids[i], sugg->values[i]);
         }
 
-        xfree (sugg->ids);
+        xfree (sugg->project_ids);
+        xfree (sugg->location_ids);
         xfree (sugg->values);
         xfree (sugg);
 

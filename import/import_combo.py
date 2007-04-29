@@ -43,26 +43,28 @@ class Importer(object):
         self.parser_class = parser_class
     
 
-    def store_phrase(self, lid, sentence, lang):
+    def store_phrase(self, pid, lid, sentence, lang):
         phrase = Phrase(sentence, lang)
         if phrase.length() == 0:
             return
-        self.cursor.execute(u"insert into phrases(locationid, lang, phrase) values (?, ?, ?)", \
-                            (lid, lang, sentence))
-        self.cursor.execute(u"insert into canonical(locationid, lang, phrase) values (?, ?, ?)", \
-                            (lid, lang, phrase.canonical ()))
+        self.cursor.execute(u"insert into phrases(projectid, locationid, lang, phrase) values (?, ?, ?, ?)", \
+                            (pid, lid, lang, sentence))
+        self.cursor.execute(u"insert into canonical(projectid, locationid, lang, phrase) values (?, ?, ?, ?)", \
+                            (pid, lid, lang, phrase.canonical ()))
 
 
     def store_phrases(self, project, phrases):
+        self.cursor.execute(u"insert into projects (path) values (?)", (project,))
+        self.cursor.execute("select max (rowid) from projects")
+        pid = self.cursor.fetchone()[0]
+        lid = 0
         for source, ls in phrases.iteritems():
             if len(source) < 2:
                 continue
-            self.cursor.execute(u"insert into locations (project) values (?)", (project,))
-            self.cursor.execute("select max (rowid) from locations")
-            lid = self.cursor.fetchone()[0]
-            self.store_phrase(lid, source, "C")
+            lid += 1
+            self.store_phrase(pid, lid, source, "C")
             for lang, target in ls.iteritems():
-                self.store_phrase(lid, target, lang)
+                self.store_phrase(pid, lid, target, lang)
 
 
     def load_file(self, phrases, fname, lang):
@@ -90,6 +92,7 @@ class Importer(object):
         
 
     def run(self, dir):
+        #self.langs = ["pl"]
         self.langs = get_subdirs(dir)
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
             for f in files:
@@ -127,51 +130,44 @@ class Importer(object):
                 except:
                     log("failed.")
             log("  phrases: %d" % len(phrases))
-            self.store_phrases(self.project_name(proj), phrases)
+            self.store_phrases(self.project_name(os.path.join(proj_file_name, lang)), phrases)
 
 
 class KDE_Importer(Importer):
     def project_name(self, fname, root):
-        return "KDE " + fname[:-3]
+        return "K" + os.path.join(root[self.pathlen:], fname)
     
     def is_resource(self, fname):
         return fname.endswith('.po')
     
-    def run(self):
-        Importer.run(self, '/home/sliwers/kde-l10n')
+    def run(self, path):
+        self.pathlen = len(path) + 3
+        Importer.run(self, path)
 
 
 
 class Mozilla_Importer(Importer):
-    def get_idx(self, fname):
-        if not hasattr(self, 'index'):
-            self.index = fname.index('/fr/') + 4
-        return self.index
-    
     def project_name(self, fname, root):
-        root = root[self.get_idx(root):]
-        idx = root.find('/')
-        if idx > 0:
-            root = root[:idx]
-        fname = fname[:fname.index('.')]
-        return "Mozilla " + root + " " + fname
+        return "M" + os.path.join(root[self.pathlen:], fname)
     
     def is_resource(self, fname):
         return fname.endswith('.dtd.po') or fname.endswith('.properties.po')
     
-    def run(self):
-        Importer.run(self, '/home/sliwers/mozilla-po')
+    def run(self, path):
+        self.pathlen = len(path) + 3
+        Importer.run(self, path)
 
 
 class Gnome_Importer(Importer):
-    def project_name(self, proj):
-        return "GNOME " + proj
+    def project_name(self, filename):
+        return "G" + filename[self.pathlen:]
     
     def is_resource(self, fname):
         return fname.endswith('.po') and not fname.startswith('en')
     
-    def run(self):
-        Importer.run_projects(self, '/home/sliwers/gnome-po')
+    def run(self, path):
+        self.pathlen = len(path)
+        Importer.run_projects(self, path)
 
 
 cls = factory.getclass("kde.po")
@@ -182,13 +178,13 @@ cursor.execute("drop index if exists loc_lang_idx")
 log("done.")
 
 ki = KDE_Importer(conn, cls)
-ki.run()
+ki.run('/home/sliwers/kde-l10n')
 mi = Mozilla_Importer(conn, cls)
-mi.run()
+mi.run('/home/sliwers/mozilla-po')
 gi = Gnome_Importer(conn, cls)
-gi.run()
+gi.run('/home/sliwers/gnome-po')
 
 log("Creating index...", True)
-cursor.execute("create index loc_lang_idx on phrases (locationid, lang)")
+cursor.execute("create index loc_lang_idx on phrases (projectid, locationid, lang)")
 log("done.")
 conn.close()
