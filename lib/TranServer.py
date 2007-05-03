@@ -124,7 +124,7 @@ class kde_renderer(renderer):
         fname = os.path.basename(path)
         if lang in self.langs:
             lang = self.langs[lang]
-        return '<a href="http://websvn.kde.org/trunk/l10n/%s/%s?view=markup">KDE %s</a>' % (lang, path[2:], fname[:-3])
+        return '<a href="http://websvn.kde.org/branches/stable/l10n/%s/messages/%s?view=markup">KDE %s</a>' % (lang, path[2:], fname[:-3])
 
 
 class mozilla_renderer(renderer):
