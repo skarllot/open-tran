@@ -48,6 +48,11 @@ SUGGESTIONS_TXT = {
 LANGUAGES = ['af','ar','az','be','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
 
 
+def _replace_html(text):
+    return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+
+
 class renderer(object):
     def __init__(self):
         self.projects = []
@@ -73,8 +78,8 @@ class renderer(object):
 
     def render_links(self, lang):
         result = ""
-        for path in self.projects:
-            result += self.render_link(path, lang)
+        for project in self.projects:
+            result += "%s / %s<br/>\n" % (self.render_link(project.path, lang), _replace_html(project.orig_phrase))
         return result
 
 
@@ -85,14 +90,14 @@ class gnome_renderer(renderer):
         self.icon_path = "http://www.gnome.org/img/logo/foot-16.png"
     
     def may_render(self, project):
-        return project[0] == 'G'
+        return project.path[0] == 'G'
 
     def render_link(self, path, lang):
         path = path[2:]
         fname = os.path.basename(path)
         while len(path):
             path, rest = os.path.split(path)
-        return '<a href="http://svn.gnome.org/svn/%s/trunk/po/%s.po">GNOME %s</a><br/>\n' % (rest, lang, rest)
+        return '<a href="http://svn.gnome.org/svn/%s/trunk/po/%s.po">GNOME %s</a>' % (rest, lang, rest)
     
 
 class kde_renderer(renderer):
@@ -113,13 +118,13 @@ class kde_renderer(renderer):
                        'zh_tw' : 'zh_TW' }
 
     def may_render(self, project):
-        return project[0] == 'K'
+        return project.path[0] == 'K'
 
     def render_link(self, path, lang):
         fname = os.path.basename(path)
         if lang in self.langs:
             lang = self.langs[lang]
-        return '<a href="http://websvn.kde.org/trunk/l10n/%s/%s?view=markup">KDE %s</a><br/>\n' % (lang, path[2:], fname[:-3])
+        return '<a href="http://websvn.kde.org/trunk/l10n/%s/%s?view=markup">KDE %s</a>' % (lang, path[2:], fname[:-3])
 
 
 class mozilla_renderer(renderer):
@@ -129,7 +134,7 @@ class mozilla_renderer(renderer):
         self.icon_path = "http://www.mozilla.org/images/mozilla-16.png"
 
     def may_render(self, project):
-        return project[0] == 'M'
+        return project.path[0] == 'M'
 
     def render_link(self, path, lang):
         path = path[2:]
@@ -139,12 +144,7 @@ class mozilla_renderer(renderer):
         folder, rest = os.path.split(os.path.dirname(path))
         while len(folder):
             folder, rest = os.path.split(folder)
-        return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla %s %s</a><br/>\n' % (rest, fname)
-
-
-def _replace_html(text):
-    return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-
+        return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla %s %s</a>' % (rest, fname)
 
 
 class Suggestion:

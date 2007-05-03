@@ -19,6 +19,9 @@ import tran, sys
 from pysqlite2 import dbapi2 as sqlite
 from xml.sax.saxutils import escape, quoteattr
 
+class Project:
+    pass
+
 class Suggestion:
     def __init__ (self, text):
         self.count = 0
@@ -31,6 +34,12 @@ class Suggestion:
         if self.value > value:
             self.value = value
 
+    def append_project(self, project, orig_phrase):
+        x = Project()
+        x.path = project
+        x.orig_phrase = orig_phrase
+        self.projects.append(x)
+    
     def compare (self, sug):
         ret = (self.value > sug.value) - (self.value < sug.value)
         if ret != 0:
@@ -72,24 +81,29 @@ class TranDB:
         conn = sqlite.connect (self.db)
         cursor = conn.cursor ()
         for i in range (tran.suggestion_get_count (suggs)):
-            try:
+#            try:
                 pid = tran.suggestion_get_project_id (suggs, i)
                 lid = tran.suggestion_get_location_id (suggs, i)
                 cursor.execute ("""
-SELECT p.phrase, l.path
-FROM phrases p JOIN projects l ON p.projectid = l.id
-WHERE p.locationid = ?
-  AND p.projectid = ?
-  AND p.lang = ?""",
-                                (lid, pid, dstlang))
+SELECT t.phrase, o.phrase, p.path
+FROM phrases t
+JOIN phrases o  ON o.locationid = t.locationid
+               AND o.projectid = t.projectid
+JOIN projects p ON o.projectid = p.id
+WHERE o.locationid = ?
+  AND o.projectid = ?
+  AND o.lang = ?
+  AND t.lang = ?
+""",
+                                (lid, pid, self.srclang, dstlang))
                 rows = cursor.fetchall ()
                 if len (rows):
                     sug = Suggestion(rows[0][0])
                     res = result.setdefault (sug.text, sug)
-                    res.projects.append(rows[0][1])
+                    res.append_project(rows[0][2], rows[0][1])
                     res.set_value (tran.suggestion_get_value (suggs, i))
-            except:
-                pass
+#            except:
+#                pass
         cursor.close ()
         tran.suggestion_destroy (suggs)
         result = result.values ()
