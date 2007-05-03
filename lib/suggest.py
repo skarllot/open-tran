@@ -81,7 +81,7 @@ class TranDB:
         conn = sqlite.connect (self.db)
         cursor = conn.cursor ()
         for i in range (tran.suggestion_get_count (suggs)):
-#            try:
+            try:
                 pid = tran.suggestion_get_project_id (suggs, i)
                 lid = tran.suggestion_get_location_id (suggs, i)
                 cursor.execute ("""
@@ -102,8 +102,8 @@ WHERE o.locationid = ?
                     res = result.setdefault (sug.text, sug)
                     res.append_project(rows[0][2], rows[0][1])
                     res.set_value (tran.suggestion_get_value (suggs, i))
-#            except:
-#                pass
+            except:
+                pass
         cursor.close ()
         tran.suggestion_destroy (suggs)
         result = result.values ()
