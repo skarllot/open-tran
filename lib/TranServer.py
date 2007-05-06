@@ -47,6 +47,8 @@ SUGGESTIONS_TXT = {
 
 LANGUAGES = ['af','ar','az','be','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
 
+RTL_LANGUAGES = ['ar', 'fa', 'ha', 'he']
+
 
 def _replace_html(text):
     return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
@@ -105,16 +107,11 @@ class kde_renderer(renderer):
         renderer.__init__(self)
         self.name = "KDE"
         self.icon_path = "http://kde.org/favicon.ico"
-        self.langs = { 'en-gb' : 'en_GB',
-                       'pt-br' : 'pt_BR',
+        self.langs = { 'en_gb' : 'en_GB',
                        'pt_br' : 'pt_BR',
-                       'sr-latn' : 'sr@Latn',
                        'sr_latn' : 'sr@Latn',
-                       'zh-cn' : 'zh_CN',
                        'zh_cn' : 'zh_CN',
-                       'zh-hk' : 'zh_HK',
                        'zh_hk' : 'zh_HK',
-                       'zh-tw' : 'zh_TW',
                        'zh_tw' : 'zh_TW' }
 
     def may_render(self, project):
@@ -210,7 +207,10 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         return result
 
     def dump(self, responses):
-        body = u'<h1>%s</h1><dl>' % SUGGESTIONS_TXT.get(self.language, u'Translation suggestions')
+        rtl = ''
+        if self.language in RTL_LANGUAGES:
+            rtl = ' dir="rtl"'
+        body = u'<h1>%s</h1><dl%s>' % (SUGGESTIONS_TXT.get(self.language, u'Translation suggestions'), rtl)
         for key, suggs in responses:
             body += '<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>' % (_replace_html(key), self.render_suggestions(suggs))
         body += "</dl>"
