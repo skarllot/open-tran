@@ -209,7 +209,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
     def dump(self, responses):
         rtl = ''
         if self.language in RTL_LANGUAGES:
-            rtl = ' dir="rtl"'
+            rtl = ' dir="rtl" style="text-align: right"'
         body = u'<h1>%s</h1><dl%s>' % (SUGGESTIONS_TXT.get(self.language, u'Translation suggestions'), rtl)
         for key, suggs in responses:
             body += '<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>' % (_replace_html(key), self.render_suggestions(suggs))
