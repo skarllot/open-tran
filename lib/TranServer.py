@@ -182,7 +182,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
 
     def render_div(self, idx):
-        result = '<div id="sug%d">' % idx
+        result = '<div id="sug%d" dir="ltr">' % idx
         for r in TranRequestHandler.renderers:
             result += r.render_links(self.language)
         return result + "</div>\n"
