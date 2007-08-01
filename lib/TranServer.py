@@ -33,6 +33,7 @@ import os
 
 
 SUGGESTIONS_TXT = {
+    'be_latin' : u'Prapanavanyja pierakłady',
     'ca' : u'Possibles traduccions',
     'csb': u'Sugerowóny dolmaczënczi',
     'da' : u'Oversćttelsesforslag',
@@ -46,7 +47,7 @@ SUGGESTIONS_TXT = {
     'uk' : u'Запропоновані переклади'
     }
 
-LANGUAGES = ['af','ar','az','be','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
+LANGUAGES = ['af','ar','az','be','be_latin','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
 
 RTL_LANGUAGES = ['ar', 'fa', 'ha', 'he']
 
@@ -59,6 +60,13 @@ def _replace_html(text):
 class renderer(object):
     def __init__(self):
         self.projects = []
+        self.langs = { 'be_latin' : 'be@latin',
+                       'en_gb' : 'en_GB',
+                       'pt_br' : 'pt_BR',
+                       'sr_latn' : 'sr@Latn',
+                       'zh_cn' : 'zh_CN',
+                       'zh_hk' : 'zh_HK',
+                       'zh_tw' : 'zh_TW' }
     
     def clear(self):
         self.projects = []
@@ -100,6 +108,8 @@ class gnome_renderer(renderer):
         fname = os.path.basename(path)
         while len(path):
             path, rest = os.path.split(path)
+        if lang in self.langs:
+            lang = self.langs[lang]
         return '<a href="http://svn.gnome.org/svn/%s/trunk/po/%s.po">GNOME %s</a>' % (rest, lang, rest)
     
 
@@ -108,12 +118,6 @@ class kde_renderer(renderer):
         renderer.__init__(self)
         self.name = "KDE"
         self.icon_path = "http://kde.org/favicon.ico"
-        self.langs = { 'en_gb' : 'en_GB',
-                       'pt_br' : 'pt_BR',
-                       'sr_latn' : 'sr@Latn',
-                       'zh_cn' : 'zh_CN',
-                       'zh_hk' : 'zh_HK',
-                       'zh_tw' : 'zh_TW' }
 
     def may_render(self, project):
         return project.path[0] == 'K'
