@@ -18,24 +18,17 @@ create table projects (
 	path text not null
 );
 
+create table words (
+	word text not null,
+	phraseid integer not null,
+	count integer not null
+);
+
 create table phrases (
 	id integer primary key,
 	phrase text not null,
 	lang text not null,
+	length int,
 	projectid int,
 	locationid int
-);
-
-create table canonical (
-	id integer primary key,
-	phrase text not null,
-	lang text not null,
-	projectid int,
-	locationid int
-);
-
-create table words (
-	word text not null,
-	canonicalid integer not null,
-	count integer not null
 );

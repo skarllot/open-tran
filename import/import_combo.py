@@ -43,14 +43,31 @@ class Importer(object):
         self.parser_class = parser_class
     
 
+    def store_words(self, phraseid, words):
+        cnt = 1
+        last = words[0]
+        for word in words[1:]:
+            if word == last:
+                cnt += 1
+            else:
+                self.cursor.execute(u"insert into words(word, phraseid, count) values (?, ?, ?)", \
+                                    (last, phraseid, cnt))
+                last = word
+                cnt = 1
+        self.cursor.execute(u"insert into words(word, phraseid, count) values (?, ?, ?)", \
+                            (last, phraseid, cnt))
+                
+
     def store_phrase(self, pid, lid, sentence, lang):
-        phrase = Phrase(sentence, lang)
-        if phrase.length() == 0:
+        phrase = Phrase(sentence, lang[:2])
+        length = phrase.length()
+        if length == 0:
             return
-        self.cursor.execute(u"insert into phrases(projectid, locationid, lang, phrase) values (?, ?, ?, ?)", \
-                            (pid, lid, lang, sentence))
-        self.cursor.execute(u"insert into canonical(projectid, locationid, lang, phrase) values (?, ?, ?, ?)", \
-                            (pid, lid, lang, phrase.canonical ()))
+        self.cursor.execute(u"insert into phrases(projectid, locationid, lang, length, phrase) values (?, ?, ?, ?, ?)", \
+                            (pid, lid, lang, length, sentence))
+        self.cursor.execute("select max(rowid) from phrases")
+        phraseid = self.cursor.fetchone()[0]
+        self.store_words(phraseid, phrase.canonical_list())
 
 
     def store_phrases(self, project, phrases):
@@ -74,7 +91,7 @@ class Importer(object):
         for unit in store.units:
             if len(str(unit.target)) > 0:
                 l = phrases.setdefault(str(unit.source), {})
-                l[mlang] = str(unit.target)
+                l[mlang] = unit.target
         return len(store.units)
 
 
@@ -171,7 +188,7 @@ class Gnome_Importer(Importer):
 
 
 cls = factory.getclass("kde.po")
-conn = sqlite.connect('../data/seventh-i.db')
+conn = sqlite.connect('../data/eigth-i.db')
 cursor = conn.cursor()
 log("Dropping index...", True)
 cursor.execute("drop index if exists loc_lang_idx")
@@ -186,5 +203,6 @@ gi.run('/home/sliwers/gnome-po')
 
 log("Creating index...", True)
 cursor.execute("create index loc_lang_idx on phrases (projectid, locationid, lang)")
+cursor.execute("create index word_idx on words(word)")
 log("done.")
 conn.close()
