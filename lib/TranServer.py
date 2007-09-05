@@ -264,11 +264,17 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
             if langone in LANGUAGES and langtwo in LANGUAGES:
                 self.srclang = langone
                 self.dstlang = langtwo
+                self.ifacelang = 'xx'
             elif langone in LANGUAGES:
                 self.srclang = 'en'
                 self.dstlang = langone
+                self.ifacelang = langone
+            else:
+                self.ifacelang = None
         except:
             pass
+        if self.ifacelang != 'xx':
+            return
         try:
             langs = map(lambda x: x[:2], self.headers['Accept-Language'].split(','))
             for lang in langs + [self.dstlang, self.srclang]:
