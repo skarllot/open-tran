@@ -47,7 +47,7 @@ SUGGESTIONS_TXT = {
     'uk' : u'Запропоновані переклади'
     }
 
-LANGUAGES = ['af','ar','az','be','be_latin','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
+LANGUAGES = ['af','ar','az','be','be_latin','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
 
 RTL_LANGUAGES = ['ar', 'fa', 'ha', 'he']
 
@@ -155,10 +155,13 @@ class Suggestion:
         self.target = target
 
 
+RENDERERS = [gnome_renderer(), kde_renderer(), mozilla_renderer()]
+
 
 class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
-    language = None
-    renderers = [gnome_renderer(), kde_renderer(), mozilla_renderer()]
+    srclang = None
+    dstlang = None
+    ifacelang = None
 
     def send_error(self, code, message=None):
         try:
@@ -178,7 +181,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
     def render_all(self):
         needplus = False
         result = ""
-        for r in TranRequestHandler.renderers:
+        for r in RENDERERS:
             icon = r.render_icon(needplus)
             if icon != "":
                 needplus = True
@@ -186,39 +189,39 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         return result
 
 
-    def render_div(self, idx):
+    def render_div(self, idx, dstlang):
         result = '<div id="sug%d" dir="ltr">' % idx
-        for r in TranRequestHandler.renderers:
-            result += r.render_links(self.language)
+        for r in RENDERERS:
+            result += r.render_links(dstlang)
         return result + "</div>\n"
 
 
-    def render_suggestions(self, suggs):
+    def render_suggestions(self, suggs, dstlang):
         result = '<ol>\n'
         idx = 1
         for s in suggs:
             result += '<li value="%d"><a href="#" onclick="return blocking(\'sug%d\')">%s (' % (s.value, idx, _replace_html(s.text))
-            for r in TranRequestHandler.renderers:
+            for r in RENDERERS:
                 r.clear()
             for p in s.projects:
-                for r in TranRequestHandler.renderers:
+                for r in RENDERERS:
                     r.feed(p)
             result += self.render_all()
             result += ')</a>'
-            result += self.render_div(idx)
+            result += self.render_div(idx, dstlang)
             result += '</li>\n'
             idx += 1
         result += '</ol>\n'
         return result
 
-    def dump(self, responses):
+    def dump(self, responses, srclang, dstlang):
         rtl = ''
-        if self.language in RTL_LANGUAGES:
+        if dstlang in RTL_LANGUAGES:
             rtl = ' dir="rtl" style="text-align: right"'
-        body = u'<h1>%s</h1><dl%s>' % (SUGGESTIONS_TXT.get(self.language, u'Translation suggestions'), rtl)
+        body = u'<h1>%s (%s &rarr; %s)</h1><dl%s>' % (SUGGESTIONS_TXT.get(self.ifacelang, u'Translation suggestions'), srclang, dstlang, rtl)
         for key, suggs in responses:
-            body += '<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>' % (_replace_html(key), self.render_suggestions(suggs))
-        body += "</dl>"
+            body += u'<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>' % (_replace_html(key), self.render_suggestions(suggs, dstlang))
+        body += u"</dl>"
         return body
 
 
@@ -232,20 +235,19 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         return cls.parsestring(part.get_payload(decode=1))
 
     
-    def suggest(self, text):
-        phrase = Phrase(text, self.language, False)
-        suggs = self.server.storage.suggest(phrase.canonical(), self.language)
+    def suggest(self, text, srclang, dstlang):
+        suggs = self.server.storage.suggest2(text, srclang, dstlang)
         return (text, suggs)
 
 
     def suggest_unit(self, unit):
-        return self.suggest(str(unit.source))
+        return self.suggest(str(unit.source), self.srclang, self.dstlang)
 
 
     def translate(self):
         storage = self.get_file()
         suggs = map(self.suggest_unit, storage.units)
-        return self.dump(suggs).encode('utf-8')
+        return self.dump(suggs, self.srclang, self.dstlang).encode('utf-8')
 
 
     def shutdown(self, errcode):
@@ -257,10 +259,22 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
     def get_language(self):
         try:
-            prefix = self.headers['Host'].split('.')[0]
-            prefix = prefix.replace('-', '_')
-            if prefix in LANGUAGES:
-                self.language = prefix
+            langone = self.headers['Host'].split('.')[0].replace('-', '_')
+            langtwo = self.headers['Host'].split('.')[1].replace('-', '_')
+            if langone in LANGUAGES and langtwo in LANGUAGES:
+                self.srclang = langone
+                self.dstlang = langtwo
+            elif langone in LANGUAGES:
+                self.srclang = 'en'
+                self.dstlang = langone
+        except:
+            pass
+        try:
+            langs = map(lambda x: x[:2], self.headers['Accept-Language'].split(','))
+            for lang in langs + [self.dstlang, self.srclang]:
+                if lang in LANGUAGES:
+                    self.ifacelang = lang
+                    break
         except:
             pass
     
@@ -273,10 +287,10 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
 
     def find_template(self):
-        if self.language == None:
+        if self.ifacelang == None:
             path = self.translate_path('/template.html')
         else:
-            path = self.translate_path('/' + self.language + '/template.html')
+            path = self.translate_path('/' + self.ifacelang + '/template.html')
         return open(path, 'rb')
 
 
@@ -307,11 +321,12 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         elif plen > 8 and self.path[8:11] == '?q=':
             query = urllib.unquote(self.path[11:])
 
-        if query == None or self.language == None:
+        if query == None or self.dstlang == None:
             return self.shutdown(404)
 
-        query = query.replace('+', ' ')
-        response = self.dump([self.suggest(query)]).encode('utf-8')
+        query = query.replace('+', ' ').decode('utf-8')
+        response = self.dump([self.suggest(query, self.srclang, self.dstlang)], self.srclang, self.dstlang).encode('utf-8')
+        response += self.dump([self.suggest(query, self.dstlang, self.srclang)], self.dstlang, self.srclang).encode('utf-8')
         return self.embed_in_template(response)
         
 
@@ -319,10 +334,10 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         if self.path.startswith('/suggest'):
             return self.send_search_head()
 
-        if self.language == None:
+        if self.ifacelang == None:
             path = self.translate_path(self.path)
         else:
-            path = self.translate_path('/' + self.language + '/' + self.path)
+            path = self.translate_path('/' + self.ifacelang + '/' + self.path)
         f = None
         if os.path.isdir(path):
             index = os.path.join(path, "index.html")
@@ -375,7 +390,8 @@ class TranServer(ThreadingMixIn, SimpleXMLRPCServer):
     def __init__(self, addr):
         signal(SIGPIPE, SIG_IGN)
         SimpleXMLRPCServer.__init__(self, addr, TranRequestHandler)
-        self.storage = TranDB("C")
+        self.storage = TranDB()
         self.register_function(lambda phrase, lang: self.storage.suggest(phrase, lang), 'suggest')
+        self.register_function(lambda phrase, srclang, dstlang: self.storage.suggest2(phrase, srclang, dstlang), 'suggest2')
         self.register_introspection_functions()
         self.register_multicall_functions()

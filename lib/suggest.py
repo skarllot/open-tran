@@ -18,6 +18,7 @@
 import tran, sys
 from pysqlite2 import dbapi2 as sqlite
 from xml.sax.saxutils import escape, quoteattr
+from phrase import Phrase
 
 class Project:
     pass
@@ -51,15 +52,9 @@ class Suggestion:
     
 
 class TranDB:
-    def __init__ (self, srclang):
-        self.db = '../data/seventh.db'
-        self.srclang = srclang
-        self.storage = tran.storage_create (srclang)
-        tran.storage_read (self.storage, self.db)
+    def __init__ (self):
+        self.db = '../data/eigth.db'
 
-    def __del__ (self):
-        tran.storage_destroy (self.storage)
-    
     def renumerate(self, suggs):
         if len(suggs) < 2:
             return suggs
@@ -74,38 +69,50 @@ class TranDB:
         next.value = value
         return suggs
 
+    def qmarks_string(self, words):
+        result = "(?"
+        for w in words[1:]:
+            result += ", ?"
+        return result + ")"
+
     def suggest (self, text, dstlang):
+        return self.suggest2(text, "C", dstlang)
+
+    def suggest2 (self, text, srclang, dstlang):
         sys.stdout.flush()
-        suggs = tran.storage_suggest (self.storage, text)
         result = {}
+        phrase = Phrase(text, srclang, False)
+        if phrase.length() < 1:
+            return result
+        words = phrase.canonical_list()
+        qmarks = self.qmarks_string(words)
+        words = words + [srclang, dstlang]
         conn = sqlite.connect (self.db)
         cursor = conn.cursor ()
-        for i in range (tran.suggestion_get_count (suggs)):
-            try:
-                pid = tran.suggestion_get_project_id (suggs, i)
-                lid = tran.suggestion_get_location_id (suggs, i)
-                cursor.execute ("""
-SELECT t.phrase, o.phrase, p.path
+        cursor.execute ("""
+SELECT t.phrase, o.phrase, p.path, val.value
 FROM phrases t
-JOIN phrases o  ON o.locationid = t.locationid
-               AND o.projectid = t.projectid
+JOIN phrases o ON o.locationid = t.locationid
+              AND o.projectid = t.projectid
 JOIN projects p ON o.projectid = p.id
-WHERE o.locationid = ?
-  AND o.projectid = ?
-  AND o.lang = ?
+JOIN (
+    SELECT id, MAX(length) - SUM(count) - COUNT(*) AS value
+    FROM words JOIN phrases on id = phraseid
+    WHERE word IN %s
+    GROUP BY id
+    ORDER BY value
+    LIMIT 50
+) AS val ON o.id = val.id
+WHERE o.lang = ?
   AND t.lang = ?
-""",
-                                (lid, pid, self.srclang, dstlang))
-                rows = cursor.fetchall ()
-                if len (rows):
-                    sug = Suggestion(rows[0][0])
-                    res = result.setdefault (sug.text, sug)
-                    res.append_project(rows[0][2], rows[0][1])
-                    res.set_value (tran.suggestion_get_value (suggs, i))
-            except:
-                pass
+""" % qmarks, tuple(words))
+        rows = cursor.fetchall()
+        for row in rows:
+            sug = Suggestion(row[0])
+            res = result.setdefault(sug.text, sug)
+            res.append_project(row[2], row[1])
+            res.set_value(row[3])
         cursor.close ()
-        tran.suggestion_destroy (suggs)
         result = result.values ()
         result.sort (lambda s1, s2: s1.compare (s2))
         return self.renumerate(result)

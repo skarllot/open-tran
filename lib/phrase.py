@@ -20,6 +20,8 @@ import re
 class GenericHandler:
     def __init__(self, connectors):
         self._connectors = set()
+        self._connectors.add("s")
+        self._connectors.add("d")
         for word in connectors:
             self._connectors.add(word)
 
@@ -27,31 +29,47 @@ class GenericHandler:
         return word in self._connectors
         
 
-class PLHandler(GenericHandler):
-    def __init__(self):
-        GenericHandler.__init__(self, ["by"])
-#["albo", "ale", "bądź", "bo", "bowiem", "by", "chociaż", "choć", "czy", "do", "jednak", "lecz", "li", "lub", "na", "nad", "niech", "od", "oraz", "po", "pod", "ponieważ", "poza", "przed", "przy", "również", "toteż", "we", "za", "zatem", "ze", "że"])
-
 class DEHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["das", "dem", "den", "der", "deren", "des", "dessen", "die", "ein", "eine", "einem", "einen"])
-#["aber", "als", "auch", "bevor", "da", "dann", "das", "dass", "dem", "den", "denn", "der", "deren", "des", "dessen", "die", "ein", "eine", "einem", "einen", "doch", "hinter", "jedoch", "mit", "nach", "neben", "noch", "ob", "obwohl", "oder", "seit", "so", "sowohl", "sondern", "trotz", "trotzdem", "und", "unter", "űber", "vor", "weder", "weil", "werden", "zwar"])
 
 class ENHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["a", "an", "the"])
-#["above", "also", "although", "an", "and", "as", "away", "because", "behind", "below", "but", "for", "from", "in", "if", "of", "off", "on", "over", "since", "so", "that", "the", "then", "though", "through", "to", "too", "under", "up", "with"])
-
     
+class ESHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["el", "la", "las", "los", "una", "uno", "unas", "unos"])
+
+class FRHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["la", "le", "les", "un", "une"])
+
+class ITHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["i", "il", "lo", "gli", "la", "le", "un", "uno", "una"])
+
+class PLHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["by"])
+
+class PTHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["o", "os", "a", "as", "um", "uns", "uma", "umas"])
+
 
 class Phrase:
     wre = re.compile('\w(?:[\-&\']?\w)*', re.UNICODE)
     dre = re.compile('^\d+$', re.UNICODE)
 
     __handlers = { "C"  : ENHandler (),
+                   "de" : DEHandler (),
                    "en" : ENHandler (),
+                   "es" : ESHandler (),
+                   "fr" : FRHandler (),
+                   "it" : ITHandler (),
                    "pl" : PLHandler (),
-                   "de" : DEHandler () }
+                   "pt" : PTHandler () }
     __def_handler = GenericHandler ([])
 
     def __resolve(self, lang):
