@@ -79,7 +79,7 @@ class Importer(object):
             if len(source) < 2:
                 continue
             lid += 1
-            self.store_phrase(pid, lid, source, "C")
+            self.store_phrase(pid, lid, source, "en")
             for lang, target in ls.iteritems():
                 self.store_phrase(pid, lid, target, lang)
 
@@ -89,9 +89,11 @@ class Importer(object):
         store = self.parser_class.parsefile(fname)
         mlang = lang.replace('@', '_').lower()
         for unit in store.units:
-            if len(str(unit.target)) > 0:
-                l = phrases.setdefault(str(unit.source), {})
-                l[mlang] = unit.target
+            src = unit.source.encode('utf-8')
+            dst = unit.target.encode('utf-8')
+            if len(src) > 0:
+                l = phrases.setdefault(src, {})
+                l[mlang] = dst
         return len(store.units)
 
 
@@ -109,7 +111,7 @@ class Importer(object):
         
 
     def run(self, dir):
-        #self.langs = ["pl"]
+        #self.langs = ["pl", 'de']
         self.langs = get_subdirs(dir)
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
             for f in files:
@@ -125,18 +127,22 @@ class Importer(object):
         store = self.parser_class.parsefile(project_file)
         lang = project[:-3].replace('@', '_').lower()
         for unit in store.units:
-            if len(str(unit.target)) > 0:
-                l = phrases.setdefault(str(unit.source), {})
-                l[lang] = str(unit.target)
+            src = unit.source.encode('utf-8')
+            dst = unit.target.encode('utf-8')
+            if len(src) > 0:
+                l = phrases.setdefault(src, {})
+                l[lang] = dst
         return len(store.units)
 
 
     def run_projects(self, dir):
+        #for proj in ['gtop']:
         for proj in get_subdirs(dir):
             log("Importing %s..." % proj)
             self.cursor = self.conn.cursor()
             phrases = {}
             proj_file_name = os.path.join(dir, proj)
+            #for lang in ["pl.po", "de.po"]:
             for lang in os.listdir(proj_file_name):
                 if not self.is_resource(lang):
                     continue
@@ -192,6 +198,7 @@ conn = sqlite.connect('../data/eigth-i.db')
 cursor = conn.cursor()
 log("Dropping index...", True)
 cursor.execute("drop index if exists loc_lang_idx")
+cursor.execute("drop index if exists word_idx")
 log("done.")
 
 ki = KDE_Importer(conn, cls)
