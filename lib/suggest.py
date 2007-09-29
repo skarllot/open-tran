@@ -101,10 +101,10 @@ JOIN (
     WHERE word IN %s
     GROUP BY id
     ORDER BY value
-    LIMIT 50
 ) AS val ON o.id = val.id
 WHERE o.lang = ?
   AND t.lang = ?
+LIMIT 50
 """ % qmarks, tuple(words))
         rows = cursor.fetchall()
         for row in rows:
@@ -113,6 +113,7 @@ WHERE o.lang = ?
             res.append_project(row[2], row[1])
             res.set_value(row[3])
         cursor.close ()
+        conn.close()
         result = result.values ()
         result.sort (lambda s1, s2: s1.compare (s2))
         return self.renumerate(result)
