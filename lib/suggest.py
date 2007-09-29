@@ -76,7 +76,7 @@ class TranDB:
         return result + ")"
 
     def suggest (self, text, dstlang):
-        return self.suggest2(text, "C", dstlang)
+        return self.suggest2(text, "en", dstlang)
 
     def suggest2 (self, text, srclang, dstlang):
         sys.stdout.flush()
