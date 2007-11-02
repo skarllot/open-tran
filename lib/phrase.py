@@ -85,7 +85,7 @@ class Phrase:
         handler = self.__resolve (lang)
         self._phrase = phrase
         self._wordlist = filter(lambda x: self.__filterfun(x, handler), \
-                                map(lambda x: x.lower(), \
+                                map(lambda x: x.strip('_').lower(), \
                                     self.wre.findall(phrase)))
         if sort:
             self._wordlist.sort()

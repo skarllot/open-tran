@@ -148,6 +148,33 @@ class mozilla_renderer(renderer):
             folder, rest = os.path.split(folder)
         return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla %s %s</a>' % (rest, fname)
 
+class fy_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "FY"
+        self.icon_path = "images/pompelyts.png"
+
+    def may_render(self, project):
+        return project.path[0] == 'F'
+
+    def render_link(self, path, lang):
+        return '<a href="http://members.chello.nl/~s.hiemstra/kompjtr.htm">Cor Jousma</a>'
+
+
+class di_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "DI"
+        self.icon_path = "http://www.us.debian.org/favicon.ico"
+
+    def may_render(self, project):
+        return project.path[0] == 'D'
+    
+    def render_link(self, path, lang):
+        if lang in self.langs:
+            lang = self.langs[lang]
+        return '<a href="http://d-i.alioth.debian.org/l10n-stats/level1/master/%s.po">Debian Installer</a>' % lang
+
 
 class Suggestion:
     def __init__(self, source, target):
@@ -162,6 +189,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
     srclang = None
     dstlang = None
     ifacelang = None
+    idx = 1
 
     def send_error(self, code, message=None):
         try:
@@ -198,9 +226,8 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
     def render_suggestions(self, suggs, dstlang):
         result = '<ol>\n'
-        idx = 1
         for s in suggs:
-            result += '<li value="%d"><a href="#" onclick="return blocking(\'sug%d\')">%s (' % (s.value, idx, _replace_html(s.text))
+            result += '<li value="%d"><a href="#" onclick="return blocking(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
             for r in RENDERERS:
                 r.clear()
             for p in s.projects:
@@ -208,9 +235,9 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
                     r.feed(p)
             result += self.render_all()
             result += ')</a>'
-            result += self.render_div(idx, dstlang)
+            result += self.render_div(self.idx, dstlang)
             result += '</li>\n'
-            idx += 1
+            self.idx += 1
         result += '</ol>\n'
         return result
 
