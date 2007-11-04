@@ -182,7 +182,7 @@ class Suggestion:
         self.target = target
 
 
-RENDERERS = [gnome_renderer(), kde_renderer(), mozilla_renderer()]
+RENDERERS = [gnome_renderer(), kde_renderer(), mozilla_renderer(), fy_renderer(), di_renderer()]
 
 
 class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
