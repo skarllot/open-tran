@@ -152,7 +152,7 @@ class fy_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
         self.name = "FY"
-        self.icon_path = "images/pompelyts.png"
+        self.icon_path = "/images/pompelyts.png"
 
     def may_render(self, project):
         return project.path[0] == 'F'
