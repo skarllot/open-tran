@@ -59,7 +59,7 @@ class PTHandler(GenericHandler):
 
 
 class Phrase:
-    wre = re.compile('\w(?:[\-&\']?\w)*', re.UNICODE)
+    wre = re.compile('\w(?:[\-&\'_]?\w)*', re.UNICODE)
     dre = re.compile('^\d+$', re.UNICODE)
 
     __handlers = { "C"  : ENHandler (),
@@ -85,7 +85,7 @@ class Phrase:
         handler = self.__resolve (lang)
         self._phrase = phrase
         self._wordlist = filter(lambda x: self.__filterfun(x, handler), \
-                                map(lambda x: x.strip('_').lower(), \
+                                map(lambda x: x.replace('_', '').lower(), \
                                     self.wre.findall(phrase)))
         if sort:
             self._wordlist.sort()
