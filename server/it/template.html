@@ -4,39 +4,78 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Open-Tran.eu in italiano</title>
   <link rel="stylesheet" type="text/css" href="/idea.css" />
-  <link rel="icon" type="image/x-ico" href="/favicon.ico" />
-  <link rel="search" type="application/opensearchdescription+xml" title="Open-Tran.eu in italiano" href="/search.xml" />
+<!--  <link rel="icon" type="image/x-ico" href="/favicon.ico" />-->
+<!--  <link rel="search" type="application/opensearchdescription+xml" title="Open-Tran.eu in italiano" href="/search.xml" />-->
   <script language="JavaScript" type="text/javascript" src="/script.js"></script>
 </head>
+
 <body onload="return block_all();">
-  <div id="header">Open-Tran.eu</div>
+  <div id="container">
+  <div id="header">
+    <a href="http://open-tran.eu"><h1>Open-Tran.eu</h1></a>
+  </div>
 	
+  <div id="nav">
+    <div id="global">
+      <ul> 
+	<li><a href="http://open-tran.blogspot.com">Blog</a></li> 
+	<li><a href="http://code.google.com/p/open-tran/issues/list">Bugs</a></li>
+	<li><a href="http://open-tran.eu/dev.html">Developers</a></li>
+	<li><a href="http://open-tran.eu/hof.html">Hall of Fame</a></li>
+      </ul>
+    </div>
+    <div id="local">
+      <ul> 
+	<li><a href="/index.html">Inizio</a></li> 
+	<li><a href="/info.html">Che cos'è?</a></li>
+        <li><a href="/contatti.html">Contatti</a></li>
+      </ul>
+      <ifacelang/>
+    </div>
+  </div>
+
+  <div id="lang_choice">
+    <ul>
+      <li><img src="/images/flag-be_latin.png" alt="be_latin"/>&nbsp;<a href="/setlang?lang=be_latin" class="jslink">Biełaruskaja</a></li>
+      <li><img src="/images/flag-ca.png" alt="ca"/>&nbsp;<a href="/setlang?lang=ca" class="jslink">Català</a></li>
+      <li><img src="/images/flag-csb.png" alt="csb"/>&nbsp;<a href="/setlang?lang=csb" class="jslink">Kaszëbsczi</a></li>
+      <li><img src="/images/flag-da.png" alt="da"/>&nbsp;<a href="/setlang?lang=da" class="jslink">Dansk</a></li>
+      <li><img src="/images/flag-de.png" alt="de"/>&nbsp;<a href="/setlang?lang=de" class="jslink">Deutsch</a></li>
+      <li><img src="/images/flag-en.png" alt="en"/>&nbsp;<a href="/setlang?lang=en" class="jslink">English</a></li>
+      <li><img src="/images/flag-es.png" alt="es"/>&nbsp;<a href="/setlang?lang=es" class="jslink">Español</a></li>
+      <li><img src="/images/flag-fi.png" alt="fi"/>&nbsp;<a href="/setlang?lang=fi" class="jslink">Suomi</a></li>
+      <li><img src="/images/flag-fr.png" alt="fr"/>&nbsp;<a href="/setlang?lang=fr" class="jslink">Français</a></li>
+      <li><img src="/images/flag-fy.png" alt="fy"/>&nbsp;<a href="/setlang?lang=fy" class="jslink">Frysk</a></li>
+      <li><img src="/images/flag-gl.png" alt="gl"/>&nbsp;<a href="/setlang?lang=gl" class="jslink">Galego</a></li>
+      <li><img src="/images/flag-it.png" alt="it"/>&nbsp;<a href="/setlang?lang=it" class="jslink">Italiano</a></li>
+      <li><img src="/images/flag-pl.png" alt="pl"/>&nbsp;<a href="/setlang?lang=pl" class="jslink">Polski</a></li>
+      <li><img src="/images/flag-uk.png" alt="uk"/>&nbsp;<a href="/setlang?lang=uk" class="jslink">Українська</a></li>
+    </ul>
+  </div>
+
+  <div class="clear">
+  </div>
+  
+  <div id="text">
+
   <div id="form">
     <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">
-      <input type="text" name="q" maxlength="450" />
-      <input type="submit" value="Traduci" />
+      <select name="src" size="1">
+	<srclang/>
+      </select>
+       	&harr;
+      <select name="dst" size="1">
+	<dstlang/>
+      </select>
+      <input name="q" maxlength="450" type="text"/>
+      <input value="Traduci" type="submit"/>
     </form>
   </div>
 
-  <div id="text">
-    <div id="nav"> 
-    <!-- The navigation menu. Do remember to list the links in reverse
-         order (because of the right alignment, the first item in the
-         list will end up to the far right and so on) 
-     -->
-      <ul> 
-        <li><a href="/contatti.html">Contatti</a></li>
-	<li><a href="/info.html">Che cos'è?</a></li>
-	<li><a href="/index.html">Inizio</a></li> 
-      </ul>
-    </div>
-<content/>
-  </div>
-
+<content/>		
   <div id="footer">
-    <a href="http://validator.w3.org/check?uri=referer" title="Valid XHTML">XHTML Valido</a> |
-    &copy; <a href="http://sliwerski.net">Jacek Śliwerski</a> | 
-    Progetto grafico di <a href="http://writeside.net/" title="Payal Dhar">Payal Dhar</a>
+    <a href="http://sliwerski.net/">Jacek Śliwerski</a>
+  </div>
   </div>
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>
