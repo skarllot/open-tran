@@ -1,5 +1,5 @@
 function formsubmit(){
-	 location.href = "/suggest/" + document.search_form.q.value;
+	 location.href = "http://" + document.search_form.src.value + "." + document.search_form.dst.value + ".localhost:8080/suggest/" + document.search_form.q.value;
 	 return false;
 }
 
@@ -25,7 +25,8 @@ function blocking(nr)
 
 function block_all()
 {
-	blocking('sug1');
+	blocking('lang_choice');
+        blocking('sug1');
 	blocking('sug2');
 	blocking('sug3');
 	blocking('sug4');
@@ -75,4 +76,5 @@ function block_all()
 	blocking('sug48');
 	blocking('sug49');
 	blocking('sug50');
+        return false;
 }
