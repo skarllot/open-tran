@@ -1,5 +1,5 @@
 function formsubmit(){
-	 location.href = "http://" + document.search_form.src.value + "." + document.search_form.dst.value + ".ope-tran.eu/suggest/" + document.search_form.q.value;
+	 location.href = "http://" + document.search_form.src.value + "." + document.search_form.dst.value + ".open-tran.eu/suggest/" + document.search_form.q.value;
 	 return false;
 }
 
