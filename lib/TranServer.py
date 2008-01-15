@@ -24,6 +24,8 @@ from translate.storage import factory
 from tempfile import NamedTemporaryFile
 from phrase import Phrase
 from StringIO import StringIO
+from urlparse import urlparse
+from Cookie import SmartCookie
 
 import email
 import xmlrpclib
@@ -47,7 +49,99 @@ SUGGESTIONS_TXT = {
     'uk' : u'Запропоновані переклади'
     }
 
-LANGUAGES = ['af','ar','az','be','be_latin','bg','bn','br','bs','ca','cs','csb','cy','da','de','el','en','en_gb','eo','es','et','eu','fa','fi','fo','fr','fy','ga','gl','ha','he','hi','hr','hsb','hu','id','is','it','ja','ka','kk','km','ko','ku','lb','lo','lt','lv','mg','mi','mk','mn','ms','mt','nb','nds','ne','nl','nn','oc','pa','pl','pt','pt_br','ro','ru','rw','se','sk','sl','sq','sr','sr_latn','ss','sv','ta','te','tg','th','tr','tt','uk','uz','ven','vi','wa','xh','zh_cn','zh_hk','zh_tw','zu']
+LANGUAGES = {
+    'af' : u'Afrikaans',
+    'ar' : u'العربية',
+    'az' : u'Azərbaycan',
+    'be' : u'Беларуская',
+    'be-latin' : u'Biełaruskaja',
+    'bg' : u'Български',
+    'bn' : u'বাংলা',
+    'br' : u'Brezhoneg',
+    'bs' : u'Bosanski',
+    'ca' : u'Català',
+    'cs' : u'Čeština',
+    'csb' : u'Kaszëbsczi',
+    'cy' : u'Cymraeg',
+    'da' : u'Dansk',
+    'de' : u'Deutsch',
+    'el' : u'Ελληνικά',
+    'en' : u'English',
+    'en-gb' : u'English',
+    'eo' : u'Esperanto',
+    'es' : u'Español',
+    'et' : u'Eesti',
+    'eu' : u'Euskara',
+    'fa' : u'فارسی',
+    'fi' : u'Suomi',
+    'fo' : u'Føroyskt',
+    'fr' : u'Français',
+    'fy' : u'Frysk',
+    'ga' : u'Gaeilge',
+    'gl' : u'Galego',
+    'ha' : u'هَوُسَ',
+    'he' : u'‫עברית‬',
+    'hi' : u'हिन्दी',
+    'hr' : u'Hrvatski',
+    'hsb' : u'Hornjoserbsce',
+    'hu' : u'Magyar',
+    'id' : u'Bahasa Indonesia',
+    'is' : u'Íslenska',
+    'it' : u'Italiano',
+    'ja' : u'日本語',
+    'ka' : u'ქართული',
+    'kk' : u'Қазақша',
+    'km' : u'ភាសាខ្មែរ',
+    'ko' : u'한국어',
+    'ku' : u'Kurdî/كوردی',
+    'lb' : u'Lëtzebuergesch',
+    'lo' : u'ລາວ',
+    'lt' : u'Lietuvių',
+    'lv' : u'Latviešu',
+    'mg' : u'Malagasy',
+    'mi' : u'Māori',
+    'mk' : u'Македонски',
+    'mn' : u'Монгол',
+    'ms' : u'Bahasa Melayu',
+    'mt' : u'bil-Malti',
+    'nb' : u'Norsk bokmål',
+    'nds' : u'Plattdüütsch',
+    'ne' : u'नेपाली',
+    'nl' : u'Nederlands',
+    'nn' : u'Norsk nynorsk',
+    'oc' : u'Occitan',
+    'pa' : u'ਪਜਾਬੀ/पंजाबी/پنجابي',
+    'pl' : u'Polski',
+    'pt' : u'Português',
+    'pt-br' : u'Português',
+    'ro' : u'Română',
+    'ru' : u'Руccкий',
+    'rw' : u'Ikinyarwanda',
+    'se' : u'Sámegiella',
+    'sk' : u'Slovenčina',
+    'sl' : u'Slovenščina',
+    'sq' : u'Shqip',
+    'sr' : u'Српски',
+    'sr-latn' : u'Srpski',
+    'ss' : u'SiSwati',
+    'sv' : u'Svenska',
+    'ta' : u'தமிழ்',
+    'te' : u'తెలుగు',
+    'tg' : u'Тоҷикӣ',
+    'th' : u'ไทย',
+    'tr' : u'Türkçe',
+    'tt' : u'Tatarça/Татарча',
+    'uk' : u'Українська',
+    'uz' : u'Ўзбек',
+    'ven' : u'Tshivenda',
+    'vi' : u'Tiếng Việt',
+    'wa' : u'Walon',
+    'xh' : u'isiXhosa',
+    'zh-cn' : u'古文/文言文',
+    'zh-hk' : u'古文/文言文',
+    'zh-tw' : u'古文/文言文',
+    'zu' : u'isiZulu'
+    }
 
 RTL_LANGUAGES = ['ar', 'fa', 'ha', 'he']
 
@@ -98,7 +192,7 @@ class gnome_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
         self.name = "GNOME"
-        self.icon_path = "http://www.gnome.org/img/logo/foot-16.png"
+        self.icon_path = "/images/gnome-logo.png"
     
     def may_render(self, project):
         return project.path[0] == 'G'
@@ -110,14 +204,14 @@ class gnome_renderer(renderer):
             path, rest = os.path.split(path)
         if lang in self.langs:
             lang = self.langs[lang]
-        return '<a href="http://svn.gnome.org/svn/%s/trunk/po/%s.po">GNOME %s</a>' % (rest, lang, rest)
+        return '<a href="http://svn.gnome.org/viewvc/%s/trunk/po/%s.po">GNOME %s</a>' % (rest, lang, rest)
     
 
 class kde_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
         self.name = "KDE"
-        self.icon_path = "http://kde.org/favicon.ico"
+        self.icon_path = "/images/kde-logo.png"
 
     def may_render(self, project):
         return project.path[0] == 'K'
@@ -133,7 +227,7 @@ class mozilla_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
         self.name = "Mozilla"
-        self.icon_path = "http://www.mozilla.org/images/mozilla-16.png"
+        self.icon_path = "/images/mozilla-logo.png"
 
     def may_render(self, project):
         return project.path[0] == 'M'
@@ -165,7 +259,7 @@ class di_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
         self.name = "DI"
-        self.icon_path = "http://www.us.debian.org/favicon.ico"
+        self.icon_path = "/images/debian-logo.png"
 
     def may_render(self, project):
         return project.path[0] == 'D'
@@ -271,12 +365,6 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         return self.suggest(str(unit.source), self.srclang, self.dstlang)
 
 
-    def translate(self):
-        storage = self.get_file()
-        suggs = map(self.suggest_unit, storage.units)
-        return self.dump(suggs, self.srclang, self.dstlang).encode('utf-8')
-
-
     def shutdown(self, errcode):
         self.send_error(errcode)
         self.wfile.flush()
@@ -285,33 +373,43 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
 
     def get_language(self):
+        self.ifacelang = "en"
         try:
             langone = self.headers['Host'].split('.')[0].replace('-', '_')
             langtwo = self.headers['Host'].split('.')[1].replace('-', '_')
             if langone in LANGUAGES and langtwo in LANGUAGES:
                 self.srclang = langone
                 self.dstlang = langtwo
-                self.ifacelang = 'xx'
             elif langone in LANGUAGES:
                 self.srclang = 'en'
                 self.dstlang = langone
                 self.ifacelang = langone
-            else:
-                self.ifacelang = None
         except:
             pass
-        if self.ifacelang != 'xx':
-            return
         try:
             langs = map(lambda x: x[:2], self.headers['Accept-Language'].split(','))
             for lang in langs + [self.dstlang, self.srclang]:
                 if lang in LANGUAGES:
                     self.ifacelang = lang
                     break
+            c = SmartCookie(self.headers['Cookie'])
+            self.ifacelang = c['lang'].value
         except:
             pass
     
     
+    def set_language(self):
+        query = urlparse(self.path).query
+        idx = query.find('lang=')
+        if idx < 0:
+            lang = 'en'
+        else:
+            lang = query[idx + 5:]
+        self.send_response(302)
+        self.send_header('Location', '/')
+        self.send_header('Set-Cookie', 'lang=%s; domain=.open-tran.eu' % lang)
+        self.end_headers()
+
     def send_plain_headers(self, code, ctype, length):
         self.send_response(code)
         self.send_header("Content-type", ctype)
@@ -320,12 +418,29 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
 
     def find_template(self):
-        if self.ifacelang == None:
-            path = self.translate_path('/template.html')
-        else:
+        if self.ifacelang != None and self.ifacelang in LANGUAGES:
             path = self.translate_path('/' + self.ifacelang + '/template.html')
+        else:
+            path = self.translate_path('/template.html')
         return open(path, 'rb')
 
+
+    def write_flag(self, f):
+        lang = self.ifacelang
+        if lang not in SUGGESTIONS_TXT:
+            lang = "en"
+        f.write("""
+      <a href="javascript:;" class="jslink" onclick="return blocking('lang_choice');">Locale: <img src="/images/flag-%s.png" alt="%s"/></a>
+""" % (lang, lang))
+
+
+    def write_language_select(self, f, chosen):
+        for code in sorted(LANGUAGES.keys()):
+            f.write('<option value="%s"' % code)
+            if code == chosen:
+                f.write(' selected="selected"')
+            f.write('>%s: %s</option>' % (code, LANGUAGES[code].encode('utf-8')))
+        
 
     def embed_in_template(self, text, code=200):
         template = self.find_template()
@@ -336,6 +451,18 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
                     self.copyfile(text, f)
                 else:
                     f.write(text)
+            elif line.find('<ifacelang/>') != -1:
+                self.write_flag(f)
+            elif line.find('<srclang/>') != -1:
+                lang = self.srclang
+                if lang == None:
+                    lang = self.ifacelang
+                self.write_language_select(f, lang)
+            elif line.find('<dstlang/>') != -1:
+                lang = self.dstlang
+                if lang == None:
+                    lang = "en"
+                self.write_language_select(f, lang)
             else:
                 f.write(line)
 
@@ -364,13 +491,13 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         
 
     def send_head(self):
+        if self.path.startswith('/setlang'):
+            return self.set_language()
+
         if self.path.startswith('/suggest'):
             return self.send_search_head()
 
-        if self.ifacelang == None:
-            path = self.translate_path(self.path)
-        else:
-            path = self.translate_path('/' + self.ifacelang + '/' + self.path)
+        path = self.translate_path('/' + self.ifacelang + '/' + self.path)
         f = None
         if os.path.isdir(path):
             index = os.path.join(path, "index.html")
@@ -402,12 +529,8 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
         
         if self.path == '/RPC2':
             return SimpleXMLRPCRequestHandler.do_POST(self)
-        try:
-            response = self.translate()
-        except:
+        else:
             return self.shutdown(403)
-        f = self.embed_in_template(response)
-        self.copyfile(f, self.wfile)
 
 
     def do_GET(self):
