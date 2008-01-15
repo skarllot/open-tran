@@ -399,7 +399,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
     
     
     def set_language(self):
-        query = urlparse(self.path).query
+        query = urlparse(self.path)[4]
         idx = query.find('lang=')
         if idx < 0:
             lang = 'en'
