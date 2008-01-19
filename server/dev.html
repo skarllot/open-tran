@@ -1,0 +1,30 @@
+<h1>Developers</h1>
+<p>
+  You can query Open-Tran with your own custom software.  Open-Tran
+  exports its API through the <a href="http://www.xmlrpc.com">XML-RPC</a>
+  protocol.  Check <a href="/RPC2">the list of exported
+  functions</a>.
+</p>
+
+<h2>Python</h2>
+<p>
+Below is an example of a very simple python script that searches for
+translations of the phrase "<em>save as</em>" from English to
+Brazilian Portugese.
+</p>
+    <pre>
+      from xmlrpclib import ServerProxy
+
+      lang = "pt_br" # replace with your language code
+      server = ServerProxy("http://open-tran.eu/RPC2")
+      for sugg in server.suggest("save as", lang):
+          print sugg
+    </pre>
+
+<h2>C</h2>
+<p>
+Ignacio Casal Quinteiro has contributed
+an <a href="http://bugzilla.gnome.org/attachment.cgi?id=101873">example
+implementation in C</a>.
+</p>
+
