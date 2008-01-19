@@ -15,7 +15,7 @@
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
+from DocXMLRPCServer import DocXMLRPCRequestHandler, DocXMLRPCServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import ThreadingMixIn
 from signal import signal, SIGPIPE, SIG_IGN
@@ -55,7 +55,7 @@ LANGUAGES = {
     'ar' : u'العربية',
     'az' : u'Azərbaycan',
     'be' : u'Беларуская',
-    'be-latin' : u'Biełaruskaja',
+    'be_latin' : u'Biełaruskaja',
     'bg' : u'Български',
     'bn' : u'বাংলা',
     'br' : u'Brezhoneg',
@@ -68,7 +68,7 @@ LANGUAGES = {
     'de' : u'Deutsch',
     'el' : u'Ελληνικά',
     'en' : u'English',
-    'en-gb' : u'English',
+    'en_gb' : u'English',
     'eo' : u'Esperanto',
     'es' : u'Español',
     'et' : u'Eesti',
@@ -114,7 +114,7 @@ LANGUAGES = {
     'pa' : u'ਪਜਾਬੀ/पंजाबी/پنجابي',
     'pl' : u'Polski',
     'pt' : u'Português',
-    'pt-br' : u'Português',
+    'pt_br' : u'Português',
     'ro' : u'Română',
     'ru' : u'Руccкий',
     'rw' : u'Ikinyarwanda',
@@ -123,7 +123,7 @@ LANGUAGES = {
     'sl' : u'Slovenščina',
     'sq' : u'Shqip',
     'sr' : u'Српски',
-    'sr-latn' : u'Srpski',
+    'sr_latn' : u'Srpski',
     'ss' : u'SiSwati',
     'sv' : u'Svenska',
     'ta' : u'தமிழ்',
@@ -138,9 +138,9 @@ LANGUAGES = {
     'vi' : u'Tiếng Việt',
     'wa' : u'Walon',
     'xh' : u'isiXhosa',
-    'zh-cn' : u'古文/文言文',
-    'zh-hk' : u'古文/文言文',
-    'zh-tw' : u'古文/文言文',
+    'zh_cn' : u'古文/文言文',
+    'zh_hk' : u'古文/文言文',
+    'zh_tw' : u'古文/文言文',
     'zu' : u'isiZulu'
     }
 
@@ -280,7 +280,7 @@ class Suggestion:
 RENDERERS = [gnome_renderer(), kde_renderer(), mozilla_renderer(), fy_renderer(), di_renderer()]
 
 
-class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
+class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     srclang = None
     dstlang = None
     ifacelang = None
@@ -536,19 +536,26 @@ class TranRequestHandler(SimpleHTTPRequestHandler, SimpleXMLRPCRequestHandler):
 
     def do_GET(self):
         self.get_language()
+        if self.path == '/RPC2':
+            return DocXMLRPCRequestHandler.do_GET(self)
         return SimpleHTTPRequestHandler.do_GET(self)
 
         
 
 
-class TranServer(ThreadingMixIn, SimpleXMLRPCServer):
+class TranServer(ThreadingMixIn, DocXMLRPCServer):
     allow_reuse_address = True
 
     def __init__(self, addr):
         signal(SIGPIPE, SIG_IGN)
-        SimpleXMLRPCServer.__init__(self, addr, TranRequestHandler)
+        DocXMLRPCServer.__init__(self, addr, TranRequestHandler)
+        self.set_server_title('Open-Tran.eu')
+        self.set_server_name('Open-Tran.eu XML-RPC API documentation')
+        self.set_server_documentation('''
+This server exports the following methods through the XML-RPC protocol.
+''')
         self.storage = TranDB()
-        self.register_function(lambda phrase, lang: self.storage.suggest(phrase, lang), 'suggest')
-        self.register_function(lambda phrase, srclang, dstlang: self.storage.suggest2(phrase, srclang, dstlang), 'suggest2')
+        self.register_function(self.storage.suggest2, 'suggest2')
+        self.register_function(self.storage.suggest, 'suggest')
+
         self.register_introspection_functions()
-        self.register_multicall_functions()
