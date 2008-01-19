@@ -378,15 +378,21 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         try:
             langone = self.headers['Host'].split('.')[0].replace('-', '_')
             langtwo = self.headers['Host'].split('.')[1].replace('-', '_')
-            if langone in LANGUAGES and langtwo in LANGUAGES:
-                self.srclang = langone
-                self.dstlang = langtwo
-            elif langone in LANGUAGES:
-                self.srclang = 'en'
-                self.dstlang = langone
-                self.ifacelang = langone
         except:
-            pass
+            try:
+                query = urlparse(self.path)[4]
+                vars = [x.strip().split('=') for x in query.split('&')]
+                langone = filter(lambda x: x[0] == 'src', vars)[0][1]
+                langtwo = filter(lambda x: x[0] == 'dst', vars)[0][1]
+            except:
+                pass
+        if langone in LANGUAGES and langtwo in LANGUAGES:
+            self.srclang = langone
+            self.dstlang = langtwo
+        elif langone in LANGUAGES:
+            self.srclang = 'en'
+            self.dstlang = langone
+            self.ifacelang = langone
         try:
             langs = map(lambda x: x[:2], self.headers['Accept-Language'].split(','))
             for lang in langs + [self.dstlang, self.srclang]:
@@ -479,8 +485,14 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         plen = len(self.path)
         if plen > 8 and self.path[8] == '/':
             query = urllib.unquote(self.path[9:])
-        elif plen > 8 and self.path[8:11] == '?q=':
-            query = urllib.unquote(self.path[11:])
+        elif plen > 8 and self.path[8] == '?':
+            try:
+                urlquery = urlparse(self.path)[4]
+                vars = [x.strip().split('=') for x in urlquery.split('&')]
+                query = filter(lambda x: x[0] == 'q', vars)[0][1]
+                query = urllib.unquote(query)
+            except:
+                pass
 
         if query == None or self.dstlang == None:
             return self.shutdown(404)
