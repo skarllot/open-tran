@@ -15,7 +15,7 @@
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
-import tran, sys
+import sys
 from pysqlite2 import dbapi2 as sqlite
 from xml.sax.saxutils import escape, quoteattr
 from phrase import Phrase
@@ -53,7 +53,7 @@ class Suggestion:
 
 class TranDB:
     def __init__ (self):
-        self.db = '../data/eigth.db'
+        self.db = '../data/eight.db'
 
     def renumerate(self, suggs):
         if len(suggs) < 2:
@@ -76,9 +76,44 @@ class TranDB:
         return result + ")"
 
     def suggest (self, text, dstlang):
+        '''
+Is equivalent to calling suggest2(text, "en", dstlang)
+'''
         return self.suggest2(text, "en", dstlang)
 
     def suggest2 (self, text, srclang, dstlang):
+        '''
+Translates text from srclang to dstlang.  Each language code must be one
+of those displayed in the drop-down list in the search form.
+
+Server sends back a result in the following form:
+ * count: integer
+ * text: string
+ * value: integer
+ * projects: list
+   * path: string
+   * original phrase: string
+
+Identical translations are grouped together as one suggestion - the 'count'
+tells, how many of them there are.  The value indicates, how good the result
+is - the lower, the better.  And the list contains pairs: path and original
+phrase.
+
+As an example consider a call: suggest2("save", "en", "pl").  The server would
+send a list of elements containing the following one:
+ * count: 23
+ * text: Zapisz
+ * value: 1
+ * projects[1]:
+   * path: K/kdebase/kcmcolors.po
+   * original phrase: Save
+ * projects[3]:
+   * path: M/editor/ui/chrome/composer/editor.properties.po
+   * original phrase: Save
+ * projects[9]:
+   * path: G/anjuta/oc.po
+   * original phrase: Save
+'''
         sys.stdout.flush()
         result = {}
         phrase = Phrase(text, srclang, False)
