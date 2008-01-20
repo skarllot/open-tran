@@ -541,7 +541,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.get_language()
         
         if self.path == '/RPC2':
-            return SimpleXMLRPCRequestHandler.do_POST(self)
+            return DocXMLRPCRequestHandler.do_POST(self)
         else:
             return self.shutdown(403)
 
