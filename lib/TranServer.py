@@ -35,6 +35,7 @@ import os
 
 
 SUGGESTIONS_TXT = {
+    'ar': u'﻿ترجمات مُقتَرَحة',
     'be_latin' : u'Prapanavanyja pierakłady',
     'ca' : u'Possibles traduccions',
     'csb': u'Sugerowóny dolmaczënczi',
