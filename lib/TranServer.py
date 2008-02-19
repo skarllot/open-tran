@@ -559,6 +559,13 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 class TranServer(ThreadingMixIn, DocXMLRPCServer):
     allow_reuse_address = True
 
+    def supported(self, lang):
+        """
+Checks if the service is capable of suggesting translations from or to
+'lang' and returns True if it is.
+"""
+        return lang in LANGUAGES
+
     def __init__(self, addr):
         signal(SIGPIPE, SIG_IGN)
         DocXMLRPCServer.__init__(self, addr, TranRequestHandler)
@@ -570,5 +577,5 @@ This server exports the following methods through the XML-RPC protocol.
         self.storage = TranDB()
         self.register_function(self.storage.suggest2, 'suggest2')
         self.register_function(self.storage.suggest, 'suggest')
-
+        self.register_function(self.supported, 'supported')
         self.register_introspection_functions()
