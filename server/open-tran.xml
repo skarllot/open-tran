@@ -37,6 +37,7 @@
     <EnumValue display_value="Czech" value="cs"/>
     <EnumValue display_value="Danish" value="da"/>
     <EnumValue display_value="Dutch" value="nl"/>
+    <EnumValue display_value="English" value="en"/>
     <EnumValue display_value="English (British)" value="en-gb"/>
     <EnumValue display_value="Esperanto" value="eo"/>
     <EnumValue display_value="Estonian" value="et"/>
@@ -129,6 +130,7 @@
     <EnumValue display_value="Czech" value="cs"/>
     <EnumValue display_value="Danish" value="da"/>
     <EnumValue display_value="Dutch" value="nl"/>
+    <EnumValue display_value="English" value="en"/>
     <EnumValue display_value="English (British)" value="en-gb"/>
     <EnumValue display_value="Esperanto" value="eo"/>
     <EnumValue display_value="Estonian" value="et"/>
