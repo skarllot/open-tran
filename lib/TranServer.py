@@ -323,7 +323,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     def render_suggestions(self, suggs, dstlang):
         result = '<ol>\n'
         for s in suggs:
-            result += '<li value="%d"><a href="#" onclick="return blocking(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
+            result += '<li value="%d"><a href="#" class="jslink" onclick="return blocking(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
             for r in RENDERERS:
                 r.clear()
             for p in s.projects:
