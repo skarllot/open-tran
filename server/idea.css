@@ -17,6 +17,10 @@ body{
     color: #FFF;
 }
 
+#nav img {
+    border: 1px solid #DDD;
+}
+
 #nav {
     float: right;
 }
@@ -93,9 +97,13 @@ body{
 }
 
 #lang_choice ul li {
-    padding: 0 5px 0 5px;
+    padding: 0 4px 0 4px;
     display: inline;
     font-size:0.9em;
+}
+
+#lang_choice img {
+    border: 1px solid #DDD;
 }
 
 #form select {
@@ -131,7 +139,7 @@ a.jslink:hover {
 	border-bottom: 1px dotted #0000FF;
 }
 
-img{
+#text img{
 	border: none;
 }
 
