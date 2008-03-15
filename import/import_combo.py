@@ -1,6 +1,6 @@
 #!/usr/bin/python2.4
 # -*- coding: utf-8 -*-
-#  Copyright (C) 2007 Jacek Śliwerski (rzyjontko)
+#  Copyright (C) 2007, 2008 Jacek Śliwerski (rzyjontko)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -82,6 +82,7 @@ class Importer(object):
             self.store_phrase(pid, lid, source, "en")
             for lang, target in ls.iteritems():
                 self.store_phrase(pid, lid, target, lang)
+        self.conn.commit()
 
 
     def load_file(self, phrases, fname, lang):
@@ -110,7 +111,7 @@ class Importer(object):
         self.store_phrases(project, phrases)
         
 
-    def run(self, dir):
+    def run_langs(self, dir):
         #self.langs = ["pl", 'de']
         self.langs = get_subdirs(dir)
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
@@ -125,7 +126,7 @@ class Importer(object):
 
     def load_project_file(self, phrases, project, project_file):
         store = self.parser_class.parsefile(project_file)
-        lang = project[:-3].replace('@', '_').lower()
+        lang = self.get_language(project)
         for unit in store.units:
             src = unit.source.encode('utf-8')
             dst = unit.target.encode('utf-8')
@@ -165,7 +166,7 @@ class KDE_Importer(Importer):
     
     def run(self, path):
         self.pathlen = len(path) + 3
-        Importer.run(self, path)
+        Importer.run_langs(self, path)
 
 
 
@@ -178,7 +179,8 @@ class Mozilla_Importer(Importer):
     
     def run(self, path):
         self.pathlen = len(path) + 3
-        Importer.run(self, path)
+        Importer.run_langs(self, path)
+
 
 
 class Gnome_Importer(Importer):
@@ -188,28 +190,55 @@ class Gnome_Importer(Importer):
     def is_resource(self, fname):
         return fname.endswith('.po') and not fname.startswith('en')
     
+    def get_language(self, project):
+        return project[:-3].replace('@', '_').lower()
+    
     def run(self, path):
         self.pathlen = len(path)
         Importer.run_projects(self, path)
 
 
-cls = factory.getclass("kde.po")
-conn = sqlite.connect('../data/eigth-i.db')
+
+class FY_Importer(Importer):
+    def run(self, path):
+        items = {}
+        f = open(path)
+        self.cursor = self.conn.cursor()
+        for line in f:
+            en, fy = line.rstrip().split(" | ")
+            items[en] = { "fy" : fy }
+        self.store_phrases("FY", items)
+
+        
+class DI_Importer(Importer):
+    def project_name(self, filename):
+        return "D" + filename[self.pathlen:]
+    
+    def is_resource(self, fname):
+        return fname.endswith('.po')
+    
+    def get_language(self, project):
+        return project[:-3].replace('@', '_').lower()
+    
+    def run(self, path):
+        self.pathlen = len(path)
+        Importer.run_projects(self, path)
+
+
+root = '/home/sliwers/projekty'
+pocls = factory.getclass("kde.po")
+conn = sqlite.connect('../data/eight-i.db')
 cursor = conn.cursor()
-log("Dropping index...", True)
-cursor.execute("drop index if exists loc_lang_idx")
-cursor.execute("drop index if exists word_idx")
-log("done.")
 
-ki = KDE_Importer(conn, cls)
-ki.run('/home/sliwers/kde-l10n')
-mi = Mozilla_Importer(conn, cls)
-mi.run('/home/sliwers/mozilla-po')
-gi = Gnome_Importer(conn, cls)
-gi.run('/home/sliwers/gnome-po')
+di = DI_Importer(conn, pocls)
+di.run(root + '/debian-installer')
+fi = FY_Importer(conn, pocls)
+fi.run(root + '/fy/kompjtr2.txt')
+ki = KDE_Importer(conn, pocls)
+ki.run(root + '/kde-l10n')
+mi = Mozilla_Importer(conn, pocls)
+mi.run(root + '/mozilla-po')
+gi = Gnome_Importer(conn, pocls)
+gi.run(root + '/gnome-po')
 
-log("Creating index...", True)
-cursor.execute("create index loc_lang_idx on phrases (projectid, locationid, lang)")
-cursor.execute("create index word_idx on words(word)")
-log("done.")
 conn.close()
