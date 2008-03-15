@@ -24,4 +24,4 @@ dbname=$1
 
 touch $dbname
 rm $dbname
-sqlite3 $dbname < db_sqlite.sql
+sqlite3 $dbname < step1.sql
