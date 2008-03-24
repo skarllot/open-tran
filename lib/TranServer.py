@@ -375,6 +375,8 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
 
     def get_language(self):
+        langone = ""
+        langtwo = ""
         self.ifacelang = "en"
         try:
             langone = self.headers['Host'].split('.')[0].replace('-', '_')
@@ -401,7 +403,8 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
                     self.ifacelang = lang
                     break
             c = SmartCookie(self.headers['Cookie'])
-            self.ifacelang = c['lang'].value
+            if c['lang'].value in LANGUAGES:
+                self.ifacelang = c['lang'].value
         except:
             pass
     
@@ -540,7 +543,6 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
     def do_POST(self):
         self.get_language()
-        
         if self.path == '/RPC2':
             return DocXMLRPCRequestHandler.do_POST(self)
         else:
