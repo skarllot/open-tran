@@ -20,18 +20,31 @@ from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
 
+# for lang in sorted(LANGUAGES):
+#     conn = sqlite.connect('../data/nine-' + lang + '.db')
+#     cur = conn.cursor()
+#     print "Cleaning %s locations..." % lang,
+#     sys.stdout.flush()
+#     cur.execute("""
+# INSERT INTO locations (projectid, phraseid, lang, count)
+# SELECT projectid, phraseid, ?, count(*)
+# FROM tlocations
+# GROUP BY projectid, phraseid
+# """, (lang,))
+#     cur.execute("DROP TABLE tlocations")
+#     cur.execute("VACUUM")
+#     print "done."
+#     sys.stdout.flush()
+#     conn.commit()
+#     cur.close()
+#     conn.close()
+
 for lang in sorted(LANGUAGES):
     conn = sqlite.connect('../data/nine-' + lang + '.db')
     cur = conn.cursor()
     print "Cleaning %s locations..." % lang,
     sys.stdout.flush()
-    cur.execute("""
-INSERT INTO locations (projectid, phraseid, lang, count)
-SELECT projectid, phraseid, ?, count(*)
-FROM tlocations
-GROUP BY projectid, phraseid
-""", (lang,))
-    cur.execute("DROP TABLE tlocations")
+    cur.execute ("VACUUM")
     print "done."
     sys.stdout.flush()
     conn.commit()
