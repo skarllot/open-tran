@@ -1,4 +1,4 @@
---  Copyright (C) 2007 Jacek Śliwerski (rzyjontko)
+--  Copyright (C) 2007, 2008 Jacek Śliwerski (rzyjontko)
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
@@ -13,17 +13,39 @@
 --  along with this program; if not, write to the Free Software Foundation,
 --  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
+
 create table projects (
-	id integer primary key,
+        id integer primary key,
 	name text not null,
 	url text
 );
 
-create table phrases (
-	id integer primary key,
-	phrase text not null,
-	lang text not null,
-	length int,
-	projectid int,
-	locationid int
+
+create table tlocations (
+        projectid integer not null,
+        phraseid integer not null,
+        lang text not null
 );
+
+
+create table locations (
+        projectid integer not null,
+        phraseid integer not null,
+        lang text not null,
+        count integer not null
+);
+
+
+create table phrases (
+        id integer primary key,
+        phrase text not null,
+        length int
+);
+
+
+create table words (
+        word text not null,
+        phraseid integer not null,
+        count integer not null
+);
+

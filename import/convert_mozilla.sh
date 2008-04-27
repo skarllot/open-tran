@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /home/sliwers
+cd /home/sliwers/projekty
 
 moz2po -t l10n/en-US/ l10n/af/ mozilla-po/af/
 moz2po -t l10n/en-US/ l10n/ar/ mozilla-po/ar/

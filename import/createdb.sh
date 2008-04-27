@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2007 Jacek Śliwerski (rzyjontko)
+#  Copyright (C) 2007, 2008 Jacek Śliwerski (rzyjontko)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,11 +17,18 @@
 set -e
 
 dbname=$1
+ofname=${dbname}-one.db
+tfname=${dbname}-two.db
 
 #createdb -E UNICODE "$dbname"
 #createlang plpgsql "$dbname"
 #psql "$dbname" < db.sql
 
-touch $dbname
-rm $dbname
-sqlite3 $dbname < step1.sql
+touch $ofname
+rm $ofname
+sqlite3 $ofname < step1.sql
+
+touch $tfname
+rm $tfname
+sqlite3 $tfname < step2.sql
+

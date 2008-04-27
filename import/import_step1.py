@@ -31,6 +31,8 @@ def log(text, nonline=False):
 
 
 def get_subdirs(dir):
+    if debug:
+        return ["pl", 'de']
     for r, dirs, files in os.walk(dir):
         if '.svn' in dirs:
             dirs.remove('.svn')
@@ -38,25 +40,16 @@ def get_subdirs(dir):
 
 
 class Importer(object):
+    global_pid = 0
+    
     def __init__(self, conn, parser_class):
+        Importer.global_pid += 1
+        self.projectid = Importer.global_pid
+        self.location = 0
         self.conn = conn
+        self.cursor = self.conn.cursor()
         self.parser_class = parser_class
     
-
-    def store_words(self, phraseid, words):
-        cnt = 1
-        last = words[0]
-        for word in words[1:]:
-            if word == last:
-                cnt += 1
-            else:
-                self.cursor.execute(u"insert into words(word, phraseid, count) values (?, ?, ?)", \
-                                    (last, phraseid, cnt))
-                last = word
-                cnt = 1
-        self.cursor.execute(u"insert into words(word, phraseid, count) values (?, ?, ?)", \
-                            (last, phraseid, cnt))
-                
 
     def store_phrase(self, pid, lid, sentence, lang):
         phrase = Phrase(sentence, lang[:2])
@@ -65,28 +58,22 @@ class Importer(object):
             return
         self.cursor.execute(u"insert into phrases(projectid, locationid, lang, length, phrase) values (?, ?, ?, ?, ?)", \
                             (pid, lid, lang, length, sentence))
-        self.cursor.execute("select max(rowid) from phrases")
-        phraseid = self.cursor.fetchone()[0]
-        self.store_words(phraseid, phrase.canonical_list())
 
 
-    def store_phrases(self, project, phrases):
-        self.cursor.execute(u"insert into projects (path) values (?)", (project,))
-        self.cursor.execute("select max (rowid) from projects")
-        pid = self.cursor.fetchone()[0]
-        lid = 0
+    def store_phrases(self, pid, phrases):
         for source, ls in phrases.iteritems():
             if len(source) < 2:
                 continue
-            lid += 1
-            self.store_phrase(pid, lid, source, "en")
+            self.location += 1
+            self.store_phrase(pid, self.location, source, "en")
             for lang, target in ls.iteritems():
-                self.store_phrase(pid, lid, target, lang)
+                self.store_phrase(pid, self.location, target, lang)
         self.conn.commit()
 
 
     def load_file(self, phrases, fname, lang):
         fname = fname.replace('/fr/', '/' + lang + '/', 1)
+        fname = fname.replace('_fr.po', '_' + lang + '.po', 1)
         store = self.parser_class.parsefile(fname)
         mlang = lang.replace('@', '_').lower()
         for unit in store.units:
@@ -98,7 +85,7 @@ class Importer(object):
         return len(store.units)
 
 
-    def store_file(self, project, fname):
+    def store_file(self, pid, fname):
         phrases = {}
         for lang in self.langs:
             log("  + %s..." % lang, True)
@@ -108,18 +95,16 @@ class Importer(object):
             except:
                 log("failed.")
         log("  phrases: %d" % len(phrases))
-        self.store_phrases(project, phrases)
+        self.store_phrases(pid, phrases)
         
 
     def run_langs(self, dir):
-        #self.langs = ["pl", 'de']
         self.langs = get_subdirs(dir)
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
             for f in files:
                 if self.is_resource(f):
                     log("Importing %s..." % f)
-                    self.cursor = self.conn.cursor()
-                    self.store_file(self.project_name(f, root), os.path.join(root, f))
+                    self.store_file(self.projectid, os.path.join(root, f))
             if '.svn' in dirs:
                 dirs.remove('.svn')
 
@@ -137,13 +122,11 @@ class Importer(object):
 
 
     def run_projects(self, dir):
-        #for proj in ['gtop']:
         for proj in get_subdirs(dir):
             log("Importing %s..." % proj)
             self.cursor = self.conn.cursor()
             phrases = {}
             proj_file_name = os.path.join(dir, proj)
-            #for lang in ["pl.po", "de.po"]:
             for lang in os.listdir(proj_file_name):
                 if not self.is_resource(lang):
                     continue
@@ -154,52 +137,74 @@ class Importer(object):
                 except:
                     log("failed.")
             log("  phrases: %d" % len(phrases))
-            self.store_phrases(self.project_name(os.path.join(proj_file_name, lang)), phrases)
+            self.store_phrases(self.projectid, phrases)
+
+
+    def store_project(self):
+        self.cursor.execute("insert into projects (id, name, url) values (?, ?, ?)",
+                            (self.projectid, self.project_name(), self.project_url()))
 
 
 class KDE_Importer(Importer):
-    def project_name(self, fname, root):
-        return "K" + os.path.join(root[self.pathlen:], fname)
+    def project_name(self):
+        return "KDE"
+
+    def project_url(self):
+        return "http://www.kde.org"
     
     def is_resource(self, fname):
         return fname.endswith('.po')
     
     def run(self, path):
-        self.pathlen = len(path) + 3
+        Importer.store_project(self)
         Importer.run_langs(self, path)
 
 
 
 class Mozilla_Importer(Importer):
-    def project_name(self, fname, root):
-        return "M" + os.path.join(root[self.pathlen:], fname)
+    def project_name(self):
+        return "Mozilla"
+
+    def project_url(self):
+        return "http://www.mozilla.org"
     
     def is_resource(self, fname):
         return fname.endswith('.dtd.po') or fname.endswith('.properties.po')
     
     def run(self, path):
-        self.pathlen = len(path) + 3
+        Importer.store_project(self)
         Importer.run_langs(self, path)
 
 
 
 class Gnome_Importer(Importer):
-    def project_name(self, filename):
-        return "G" + filename[self.pathlen:]
+    def project_name(self):
+        return "Gnome"
+
+    def project_url(self):
+        return "http://www.gnome.org"
     
     def is_resource(self, fname):
+        if debug:
+            return fname == 'pl.po' or fname == 'de.po'
         return fname.endswith('.po') and not fname.startswith('en')
     
     def get_language(self, project):
         return project[:-3].replace('@', '_').lower()
     
     def run(self, path):
-        self.pathlen = len(path)
+        Importer.store_project(self)
         Importer.run_projects(self, path)
 
 
 
 class FY_Importer(Importer):
+    def project_name(self):
+        return "FY"
+    
+    def project_url(self):
+        return "http://members.chello.nl/~s.hiemstra/kompjtr.htm"
+    
     def run(self, path):
         items = {}
         f = open(path)
@@ -207,12 +212,16 @@ class FY_Importer(Importer):
         for line in f:
             en, fy = line.rstrip().split(" | ")
             items[en] = { "fy" : fy }
-        self.store_phrases("FY", items)
+        Importer.store_project(self)
+        self.store_phrases(self.projectid, items)
 
         
 class DI_Importer(Importer):
-    def project_name(self, filename):
-        return "D" + filename[self.pathlen:]
+    def project_name(self):
+        return "DI"
+
+    def project_url(self):
+        return "http://www.debian.org/devel/debian-installer/"
     
     def is_resource(self, fname):
         return fname.endswith('.po')
@@ -221,24 +230,24 @@ class DI_Importer(Importer):
         return project[:-3].replace('@', '_').lower()
     
     def run(self, path):
-        self.pathlen = len(path)
-        Importer.run_projects(self, path)
+        Importer.store_project(self)
+        Importer.run_langs(self, path)
 
 
-root = '/home/sliwers/projekty'
+debug = 0
+root = '/home/sliwers/projekty/open-tran-data'
 pocls = factory.getclass("kde.po")
-conn = sqlite.connect('../data/eight-i.db')
+conn = sqlite.connect('../data/nine-one.db')
 cursor = conn.cursor()
+importers = {
+    DI_Importer(conn, pocls) : '/debian-installer',
+    FY_Importer(conn, pocls) : '/fy/kompjtr2.txt',
+    KDE_Importer(conn, pocls) : '/kde-l10n',
+    Mozilla_Importer(conn, pocls) : '/mozilla-po',
+    Gnome_Importer(conn, pocls) : '/gnome-po'
+    }
 
-di = DI_Importer(conn, pocls)
-di.run(root + '/debian-installer')
-fi = FY_Importer(conn, pocls)
-fi.run(root + '/fy/kompjtr2.txt')
-ki = KDE_Importer(conn, pocls)
-ki.run(root + '/kde-l10n')
-mi = Mozilla_Importer(conn, pocls)
-mi.run(root + '/mozilla-po')
-gi = Gnome_Importer(conn, pocls)
-gi.run(root + '/gnome-po')
+for i, p in importers.iteritems():
+    i.run(root + p)
 
 conn.close()
