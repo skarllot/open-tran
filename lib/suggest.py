@@ -103,28 +103,37 @@ Server sends back a result in the following form:
  * text: string
  * value: integer
  * projects: list
-   * path: string
-   * original phrase: string
+   * count: integer
+   * name: string
+   * orig_phrase: string
 
 Identical translations are grouped together as one suggestion - the 'count'
 tells, how many of them there are.  The value indicates, how good the result
-is - the lower, the better.  And the list contains pairs: path and original
-phrase.
+is - the lower, the better.  And the list contains tripples: name of the
+project, phrase and count.  The sum of counts in the list of projects equals
+the count stored in the suggestion object.
 
-As an example consider a call: suggest2("save", "en", "pl").  The server would
+As an example consider a call: suggest2("save as", "en", "pl").  The server would
 send a list of elements containing the following one:
- * count: 23
- * text: Zapisz
+ * count: 12
+ * text: Zapisz jako
  * value: 1
- * projects[1]:
-   * path: K/kdebase/kcmcolors.po
-   * original phrase: Save
+ * projects[0]:
+   * name: GNOME
+   * orig_phrase: Save As
+   * count: 9
+ * projects[0]:
+   * name: GNOME
+   * orig_phrase: Save as
+   * count: 1
+ * projects[2]:
+   * name: KDE
+   * orig_phrase: Save File As
+   * count: 1
  * projects[3]:
-   * path: M/editor/ui/chrome/composer/editor.properties.po
-   * original phrase: Save
- * projects[9]:
-   * path: G/anjuta/oc.po
-   * original phrase: Save
+   * name: Mozilla
+   * orig_phrase: Save
+   * count: 1
 '''
         result = {}
         phrase = Phrase(text, srclang, False)
