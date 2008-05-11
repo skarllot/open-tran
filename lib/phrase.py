@@ -74,7 +74,7 @@ class Phrase:
 
     def __resolve(self, lang):
         if lang in self.__handlers:
-            return self.__handlers[lang]
+            return self.__handlers[lang[:2]]
         else:
             return self.__def_handler
 

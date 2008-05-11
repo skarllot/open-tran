@@ -23,81 +23,94 @@ from common import LANGUAGES
 iconn = sqlite.connect('/media/disk/data/nine-one.db')
 icur = iconn.cursor()
 
+word_id = 0
+
 sf = open('step2.sql')
-sl = [x for x in sf.readlines() if not x.startswith('--')]
-schema = reduce(lambda x, y: x + y, sl, '').split(';')
+schema = sf.read()
 sf.close()
 
+
+project_names = ['' for x in range(20)]
+
+
 def define_schema(oconn, ocur):
-    for stmt in schema:
-        ocur.execute(stmt)
+    ocur.executescript(schema)
     oconn.commit()
 
 
-def move_projects(oconn, ocur):
+def move_projects():
+    global project_names
     icur.execute("""
 SELECT id, name, url
 FROM projects
+ORDER BY id
 """)
     for (id, name, url) in icur.fetchall():
-        ocur.execute ("INSERT INTO projects (id, name, url) VALUES (?, ?, ?)", (id, name, url))
-    oconn.commit()
+        project_names[id] = name[0]
+    project_names = project_names[:id + 1]
 
 
 def store_words(oconn, ocur, phraseid, words):
+    global word_id
     cnt = 1
     last = words[0]
     for word in words[1:]:
+        word_id += 1
         if word == last:
             cnt += 1
             continue
-        ocur.execute(u"insert into words(word, phraseid, count) values (?, ?, ?)", \
-                         (last, phraseid, cnt))
+        ocur.execute(u"insert into twords(id, word, phraseid, count) values (?, ?, ?, ?)", \
+                         (word_id, last, phraseid, cnt))
         last = word
         cnt = 1
-    ocur.execute(u"insert into words(word, phraseid, count) values (?, ?, ?)", \
-                     (last, phraseid, cnt))
+    word_id += 1
+    ocur.execute(u"insert into twords(id, word, phraseid, count) values (?, ?, ?, ?)", \
+                     (word_id, last, phraseid, cnt))
 
 
 def move_phrases(oconn, ocur, lang):
+    global project_names
     cnt = 0
+    lid = 0
     phrase = ""
 
     icur.execute("""
-SELECT id, phrase, lang, projectid, locationid
+SELECT phrase, projectid, locationid
 FROM phrases
 WHERE lang = ?
 ORDER BY phrase
 """, (lang,))
 
-    for (phraseid, nphrase, lang, projectid, lid) in icur.fetchall():
+    for (nphrase, projectid, nlid) in icur.fetchall():
         if cnt % 5000 == 0:
             print ".",
             sys.stdout.flush()
         cnt += 1
         if phrase != nphrase:
-            phrase = nphrase
-            nphraseid = phraseid
             p = Phrase(nphrase, lang[:2])
             len = p.length()
             if len < 1:
                 continue
-            ocur.execute("INSERT INTO phrases (id, phrase, length) VALUES (?, ?, ?)", (nphraseid, nphrase, len))
-            store_words(oconn, ocur, nphraseid, p.canonical_list())
-        ocur.execute("INSERT INTO tlocations (projectid, phraseid, lang) VALUES (?, ?, ?)", (projectid, nphraseid, lang))
+            lid = nlid
+            ocur.execute("""
+INSERT INTO phrases (id, phrase, length)
+VALUES (?, ?, ?)""", (nlid, nphrase, len))
+            store_words(oconn, ocur, nlid, p.canonical_list())
+            phrase = nphrase
+        ocur.execute("""
+INSERT INTO locations (locationid, phraseid, project)
+VALUES (?, ?, ?)""", (nlid, lid, project_names[projectid]))
     oconn.commit()
 
 
 
+move_projects()
 for lang in sorted(LANGUAGES):
-    if lang < 'ne':
-        continue
-    oconn = sqlite.connect('/media/disk/data/nine-' + lang + '.db')
+    oconn = sqlite.connect('../data/nine-' + lang + '.db')
     ocur = oconn.cursor()
     print "Moving %s phrases..." % lang,
     sys.stdout.flush()
     define_schema(oconn, ocur)
-    move_projects(oconn, ocur)
     move_phrases(oconn, ocur, lang)
     print "done."
     sys.stdout.flush()

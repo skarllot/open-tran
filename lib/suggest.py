@@ -15,31 +15,36 @@
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
-import sys
 from pysqlite2 import dbapi2 as sqlite
 from xml.sax.saxutils import escape, quoteattr
 from phrase import Phrase
+
+PROJS = {
+    'D': 'Debian Installer',
+    'F': 'FY',
+    'G': 'GNOME',
+    'K': 'KDE',
+    'M': 'Mozilla'
+    }
 
 class Project:
     pass
 
 class Suggestion:
-    def __init__ (self, text):
+    def __init__ (self, text, value):
         self.count = 0
-        self.value = 2000000000
+        self.value = value
         self.text = text
-        self.projects = []
+        self.projects = {}
 
-    def set_value (self, value):
-        self.count += 1
-        if self.value > value:
-            self.value = value
-
-    def append_project(self, project, orig_phrase):
+    def append_project(self, project, orig):
         x = Project()
-        x.path = project
-        x.orig_phrase = orig_phrase
-        self.projects.append(x)
+        x.name = project
+        x.orig_phrase = orig
+        x.count = 0
+        x = self.projects.setdefault(orig, x)
+        x.count += 1
+        self.count += 1
     
     def compare (self, sug):
         ret = (self.value > sug.value) - (self.value < sug.value)
@@ -49,14 +54,21 @@ class Suggestion:
         if ret != 0:
             return ret
         return cmp(self.text, sug.text)
+
+    def finish(self):
+        self.projects = self.projects.values()
+        self.projects.sort(key=lambda x: x.count, reverse=True)
     
 
 class TranDB:
-    def __init__ (self):
-        self.db = '../data/eight.db'
-
+    def __init__(self):
+        self.db = '../data/nine-'
+    
     def renumerate(self, suggs):
-        if len(suggs) < 2:
+        if len(suggs) == 0:
+            return suggs
+        if len(suggs) == 1:
+            suggs[0].value = 1
             return suggs
         value = 1
         prev = suggs[0]
@@ -114,41 +126,46 @@ send a list of elements containing the following one:
    * path: G/anjuta/oc.po
    * original phrase: Save
 '''
-        sys.stdout.flush()
         result = {}
         phrase = Phrase(text, srclang, False)
         if phrase.length() < 1:
             return result
         words = phrase.canonical_list()
         qmarks = self.qmarks_string(words)
-        words = words + [srclang, dstlang]
-        conn = sqlite.connect (self.db)
+        conn = sqlite.connect(self.db + srclang + ".db")
         cursor = conn.cursor ()
         cursor.execute ("""
-SELECT t.phrase, o.phrase, p.path, val.value
-FROM phrases t
-JOIN phrases o ON o.locationid = t.locationid
-              AND o.projectid = t.projectid
-JOIN projects p ON o.projectid = p.id
+SELECT p.phrase, l.locationid, val.value
+FROM phrases p
+JOIN locations l ON p.id = l.phraseid
 JOIN (
-    SELECT id, MAX(length) - SUM(count) - COUNT(*) AS value
-    FROM words JOIN phrases on id = phraseid
-    WHERE word IN %s
-    GROUP BY id
-    ORDER BY value
-) AS val ON o.id = val.id
-WHERE o.lang = ?
-  AND t.lang = ?
-LIMIT 50
+     SELECT p.id AS id, MAX(p.length) - SUM(wp.count) - COUNT(*) AS value
+     FROM words w JOIN wp ON w.id = wp.wordid
+     JOIN phrases p ON wp.phraseid = p.id
+     WHERE word IN %s
+     GROUP BY p.id
+     ORDER BY value
+     LIMIT 500
+) val ON l.phraseid = val.id
 """ % qmarks, tuple(words))
         rows = cursor.fetchall()
-        for row in rows:
-            sug = Suggestion(row[0])
-            res = result.setdefault(sug.text, sug)
-            res.append_project(row[2], row[1])
-            res.set_value(row[3])
+        for (orig, lid, value) in rows:
+            dconn = sqlite.connect(self.db + dstlang + ".db")
+            dcur = dconn.cursor()
+            dcur.execute("""
+SELECT DISTINCT phrase, project
+FROM phrases p JOIN locations l ON p.id = l.phraseid
+WHERE locationid = ?""", (lid,))
+            for (trans, project) in dcur.fetchall():
+                sug = Suggestion(trans, value)
+                res = result.setdefault(sug.text, sug)
+                res.append_project(PROJS[project], orig)
+            dcur.close()
+            dconn.close()
         cursor.close ()
         conn.close()
-        result = result.values ()
+        result = result.values()
         result.sort (lambda s1, s2: s1.compare (s2))
-        return self.renumerate(result)
+        for s in result: s.finish()
+        return self.renumerate(result[:50])
+

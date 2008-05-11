@@ -75,12 +75,12 @@ class renderer(object):
     def clear(self):
         self.projects = []
 
-    def feed(self, path):
-        if self.may_render(path):
-            self.projects.append(path)
+    def feed(self, project):
+        if project.name == self.name:
+            self.projects.append(project)
 
     def render_icon(self, needplus):
-        cnt = len(self.projects)
+        cnt = reduce(lambda x,y: x + y.count, self.projects, 0)
         if cnt == 0:
             return ""
         if needplus:
@@ -94,7 +94,9 @@ class renderer(object):
     def render_links(self, lang):
         result = ""
         for project in self.projects:
-            result += "%s / %s<br/>\n" % (self.render_link(project.path, lang), _replace_html(project.orig_phrase))
+            if project.count > 1:
+                result += "%d&times;" % project.count
+            result += "%s: %s<br/>\n" % (self.render_link(), _replace_html(project.orig_phrase))
         return result
 
 
@@ -104,17 +106,8 @@ class gnome_renderer(renderer):
         self.name = "GNOME"
         self.icon_path = "/images/gnome-logo.png"
     
-    def may_render(self, project):
-        return project.path[0] == 'G'
-
-    def render_link(self, path, lang):
-        path = path[2:]
-        fname = os.path.basename(path)
-        while len(path):
-            path, rest = os.path.split(path)
-        if lang in self.langs:
-            lang = self.langs[lang]
-        return '<a href="http://svn.gnome.org/viewvc/%s/trunk/po/%s.po">GNOME %s</a>' % (rest, lang, rest)
+    def render_link(self):
+        return '<a href="http://www.gnome.org/i18n/">GNOME</a>'
     
 
 class kde_renderer(renderer):
@@ -123,14 +116,8 @@ class kde_renderer(renderer):
         self.name = "KDE"
         self.icon_path = "/images/kde-logo.png"
 
-    def may_render(self, project):
-        return project.path[0] == 'K'
-
-    def render_link(self, path, lang):
-        fname = os.path.basename(path)
-        if lang in self.langs:
-            lang = self.langs[lang]
-        return '<a href="http://websvn.kde.org/branches/stable/l10n/%s/messages/%s?view=markup">KDE %s</a>' % (lang, path[2:], fname[:-3])
+    def render_link(self):
+        return '<a href="http://l10n.kde.org/">KDE</a>'
 
 
 class mozilla_renderer(renderer):
@@ -139,18 +126,8 @@ class mozilla_renderer(renderer):
         self.name = "Mozilla"
         self.icon_path = "/images/mozilla-logo.png"
 
-    def may_render(self, project):
-        return project.path[0] == 'M'
-
-    def render_link(self, path, lang):
-        path = path[2:]
-        fname, ext = os.path.splitext(os.path.basename(path))
-        while len(ext):
-            fname, ext = os.path.splitext(fname)
-        folder, rest = os.path.split(os.path.dirname(path))
-        while len(folder):
-            folder, rest = os.path.split(folder)
-        return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla %s %s</a>' % (rest, fname)
+    def render_link(self):
+        return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla</a>'
 
 class fy_renderer(renderer):
     def __init__(self):
@@ -158,26 +135,18 @@ class fy_renderer(renderer):
         self.name = "FY"
         self.icon_path = "/images/pompelyts.png"
 
-    def may_render(self, project):
-        return project.path[0] == 'F'
-
-    def render_link(self, path, lang):
+    def render_link(self):
         return '<a href="http://members.chello.nl/~s.hiemstra/kompjtr.htm">Cor Jousma</a>'
 
 
 class di_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
-        self.name = "DI"
+        self.name = "Debian Installer"
         self.icon_path = "/images/debian-logo.png"
 
-    def may_render(self, project):
-        return project.path[0] == 'D'
-    
-    def render_link(self, path, lang):
-        if lang in self.langs:
-            lang = self.langs[lang]
-        return '<a href="http://d-i.alioth.debian.org/l10n-stats/level1/master/%s.po">Debian Installer</a>' % lang
+    def render_link(self):
+        return '<a href="http://d-i.alioth.debian.org/">Debian Installer</a>'
 
 
 class Suggestion:

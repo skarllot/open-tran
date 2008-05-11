@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.4
 # -*- coding: utf-8 -*-
 #  Copyright (C) 2008 Jacek Śliwerski (rzyjontko)
 #
@@ -16,37 +16,64 @@
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
 import sys
+from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
 
-# for lang in sorted(LANGUAGES):
-#     conn = sqlite.connect('../data/nine-' + lang + '.db')
-#     cur = conn.cursor()
-#     print "Cleaning %s locations..." % lang,
-#     sys.stdout.flush()
-#     cur.execute("""
-# INSERT INTO locations (projectid, phraseid, lang, count)
-# SELECT projectid, phraseid, ?, count(*)
-# FROM tlocations
-# GROUP BY projectid, phraseid
-# """, (lang,))
-#     cur.execute("DROP TABLE tlocations")
-#     cur.execute("VACUUM")
-#     print "done."
-#     sys.stdout.flush()
-#     conn.commit()
-#     cur.close()
-#     conn.close()
+def move_words(conn, cur, lang):
+    cnt = 0
+    nwordid = -1
+    word = ""
+
+    cur.execute("""
+SELECT id, word, phraseid, count
+FROM twords
+ORDER BY word
+""")
+
+    for (wordid, nword, phraseid, count) in cur.fetchall():
+        if cnt % 5000 == 0:
+            print ".",
+            sys.stdout.flush()
+        cnt += 1
+        if word != nword:
+            word = nword
+            nwordid = wordid
+            cur.execute("INSERT INTO words (id, word) VALUES (?, ?)", (nwordid, nword))
+        cur.execute("INSERT INTO wp (wordid, phraseid, count) VALUES (?, ?, ?)", (nwordid, phraseid, count))
+    conn.commit()
+
+
 
 for lang in sorted(LANGUAGES):
     conn = sqlite.connect('../data/nine-' + lang + '.db')
     cur = conn.cursor()
-    print "Cleaning %s locations..." % lang,
+    print "Moving %s words..." % lang,
     sys.stdout.flush()
-    cur.execute ("VACUUM")
+    move_words(conn, cur, lang)
+    print "IW",
+    sys.stdout.flush()
+    cur.execute("CREATE INDEX idx ON words(word)")
+    print "IWP1",
+    sys.stdout.flush()
+    cur.execute("CREATE INDEX wpw ON wp(wordid)")
+    print "IWP2",
+    sys.stdout.flush()
+    cur.execute("CREATE INDEX wpp ON wp(phraseid)")
+    print "IL1",
+    sys.stdout.flush()
+    cur.execute("CREATE INDEX lp ON locations(phraseid)")
+    print "IL2",
+    sys.stdout.flush()
+    cur.execute("CREATE INDEX ll ON locations(locationid)")
+    print "D",
+    sys.stdout.flush()
+    cur.execute("DROP TABLE twords")
+    print "V",
+    sys.stdout.flush()
+    cur.execute("VACUUM")
     print "done."
     sys.stdout.flush()
-    conn.commit()
     cur.close()
     conn.close()

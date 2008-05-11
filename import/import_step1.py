@@ -41,11 +41,11 @@ def get_subdirs(dir):
 
 class Importer(object):
     global_pid = 0
+    global_loc = 0
     
     def __init__(self, conn, parser_class):
         Importer.global_pid += 1
         self.projectid = Importer.global_pid
-        self.location = 0
         self.conn = conn
         self.cursor = self.conn.cursor()
         self.parser_class = parser_class
@@ -64,10 +64,10 @@ class Importer(object):
         for source, ls in phrases.iteritems():
             if len(source) < 2:
                 continue
-            self.location += 1
-            self.store_phrase(pid, self.location, source, "en")
+            Importer.global_loc += 1
+            self.store_phrase(pid, Importer.global_loc, source, "en")
             for lang, target in ls.iteritems():
-                self.store_phrase(pid, self.location, target, lang)
+                self.store_phrase(pid, Importer.global_loc, target, lang)
         self.conn.commit()
 
 

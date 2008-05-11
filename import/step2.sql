@@ -14,38 +14,36 @@
 --  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
 
-create table projects (
-        id integer primary key,
-	name text not null,
-	url text
-);
-
-
-create table tlocations (
-        projectid integer not null,
-        phraseid integer not null,
-        lang text not null
-);
-
-
 create table locations (
-        projectid integer not null,
-        phraseid integer not null,
-        lang text not null,
-        count integer not null
+        locationid int not null,
+        phraseid int not null,
+        project char(1) not null
 );
 
 
 create table phrases (
-        id integer primary key,
+        id int primary key,
         phrase text not null,
         length int
 );
 
 
-create table words (
+create table twords (
+        id int primary key,
         word text not null,
-        phraseid integer not null,
-        count integer not null
+        phraseid int not null,
+        count int not null
 );
 
+
+create table words (
+        id int primary key,
+	word text not null
+);
+
+
+create table wp (
+        wordid int not null,
+        phraseid int not null,
+        count int not null
+);
