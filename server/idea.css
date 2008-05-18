@@ -97,7 +97,7 @@ body{
 }
 
 #lang_choice ul li {
-    padding: 0 4px 0 4px;
+    padding: 0 3px 0 3px;
     display: inline;
     font-size:0.9em;
 }
