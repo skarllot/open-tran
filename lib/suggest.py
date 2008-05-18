@@ -24,7 +24,9 @@ PROJS = {
     'F': 'FY',
     'G': 'GNOME',
     'K': 'KDE',
-    'M': 'Mozilla'
+    'M': 'Mozilla',
+    'S': 'openSUSE',
+    'X': 'XFCE'
     }
 
 class Project:

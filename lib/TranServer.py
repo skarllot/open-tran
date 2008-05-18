@@ -49,6 +49,7 @@ SUGGESTIONS_TXT = {
     'gl' : u'Suxesti&oacute;ns de traduci&oacute;n',
     'it' : u'Suggerimenti traduzione',
     'pl' : u'Sugestie tłumaczeń',
+    'pt_br': u'Sugestões de tradução',
     'uk' : u'Запропоновані переклади'
     }
 
@@ -129,6 +130,7 @@ class mozilla_renderer(renderer):
     def render_link(self):
         return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla</a>'
 
+
 class fy_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
@@ -149,13 +151,33 @@ class di_renderer(renderer):
         return '<a href="http://d-i.alioth.debian.org/">Debian Installer</a>'
 
 
+class suse_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "openSUSE"
+        self.icon_path = "/images/suse-logo.png"
+
+    def render_link(self):
+        return '<a href="http://i18n.opensuse.org/">openSUSE</a>'
+
+
+class xfce_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "XFCE"
+        self.icon_path = "/images/xfce-logo.png"
+
+    def render_link(self):
+        return '<a href="http://i18n.xfce.org/">XFCE</a>'
+
+
 class Suggestion:
     def __init__(self, source, target):
         self.source = source
         self.target = target
 
 
-RENDERERS = [gnome_renderer(), kde_renderer(), mozilla_renderer(), fy_renderer(), di_renderer()]
+RENDERERS = [gnome_renderer(), kde_renderer(), mozilla_renderer(), fy_renderer(), di_renderer(), suse_renderer(), xfce_renderer()]
 
 
 class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
