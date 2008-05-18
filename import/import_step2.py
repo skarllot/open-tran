@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #  Copyright (C) 2008 Jacek Śliwerski (rzyjontko)
 #
@@ -20,7 +20,7 @@ from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
-iconn = sqlite.connect('/media/disk/data/nine-one.db')
+iconn = sqlite.connect('../data/nine-one.db')
 icur = iconn.cursor()
 
 word_id = 0

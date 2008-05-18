@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #  Copyright (C) 2007, 2008 Jacek Śliwerski (rzyjontko)
 #
@@ -42,6 +42,16 @@ def get_subdirs(dir):
 class Importer(object):
     global_pid = 0
     global_loc = 0
+    lang_dict = {
+        'fy_nl' : 'fy',
+        'ga_ie' : 'ga',
+        'hy_am' : 'hy',
+        'nb_no' : 'nb',
+        'nds_de' : 'nds',
+        'nn_no' : 'nn',
+        'sv_se' : 'sv'
+        }
+        
     
     def __init__(self, conn, parser_class):
         Importer.global_pid += 1
@@ -50,6 +60,15 @@ class Importer(object):
         self.cursor = self.conn.cursor()
         self.parser_class = parser_class
     
+
+    def lang_hygiene(self, lang):
+        if lang[:2] == lang[3:].lower():
+            return lang[:2]
+        lang = lang.replace('-', '_')
+        if lang in Importer.lang_dict:
+            lang = Importer.lang_dict[lang]
+        return lang
+
 
     def store_phrase(self, pid, lid, sentence, lang):
         phrase = Phrase(sentence, lang[:2])
@@ -74,8 +93,10 @@ class Importer(object):
     def load_file(self, phrases, fname, lang):
         fname = fname.replace('/fr/', '/' + lang + '/', 1)
         fname = fname.replace('_fr.po', '_' + lang + '.po', 1)
+        fname = fname.replace('.fr.po', '.' + lang + '.po', 1)
         store = self.parser_class.parsefile(fname)
         mlang = lang.replace('@', '_').lower()
+        mlang = self.lang_hygiene(mlang)
         for unit in store.units:
             src = unit.source.encode('utf-8')
             dst = unit.target.encode('utf-8')
@@ -112,6 +133,7 @@ class Importer(object):
     def load_project_file(self, phrases, project, project_file):
         store = self.parser_class.parsefile(project_file)
         lang = self.get_language(project)
+        lang = self.lang_hygiene(lang)
         for unit in store.units:
             src = unit.source.encode('utf-8')
             dst = unit.target.encode('utf-8')
@@ -187,7 +209,7 @@ class Gnome_Importer(Importer):
     def is_resource(self, fname):
         if debug:
             return fname == 'pl.po' or fname == 'de.po'
-        return fname.endswith('.po') and not fname.startswith('en')
+        return fname.endswith('.po')
     
     def get_language(self, project):
         return project[:-3].replace('@', '_').lower()
@@ -226,12 +248,44 @@ class DI_Importer(Importer):
     def is_resource(self, fname):
         return fname.endswith('.po')
     
+    def run(self, path):
+        Importer.store_project(self)
+        Importer.run_langs(self, path)
+
+
+class Suse_Importer(Importer):
+    def project_name(self):
+        return "SUSE"
+
+    def project_url(self):
+        return "http://www.opensuse.org"
+
+    def is_resource(self, fname):
+        return fname.endswith('.po')
+
+    def run(self, path):
+        Importer.store_project(self)
+        Importer.run_langs(self, path + '/yast')
+        Importer.run_langs(self, path + '/lcn')
+
+class Xfce_Importer(Importer):
+    def project_name(self):
+        return "XFCE"
+
+    def project_url(self):
+        return "http://www.xfce.org"
+
+    def is_resource(self, fname):
+        if debug:
+            return fname == 'pl.po' or fname == 'de.po'
+        return fname.endswith('.po')
+
     def get_language(self, project):
         return project[:-3].replace('@', '_').lower()
     
     def run(self, path):
         Importer.store_project(self)
-        Importer.run_langs(self, path)
+        Importer.run_projects(self, path)
 
 
 debug = 0
@@ -244,8 +298,16 @@ importers = {
     FY_Importer(conn, pocls) : '/fy/kompjtr2.txt',
     KDE_Importer(conn, pocls) : '/kde-l10n',
     Mozilla_Importer(conn, pocls) : '/mozilla-po',
-    Gnome_Importer(conn, pocls) : '/gnome-po'
+    Gnome_Importer(conn, pocls) : '/gnome-po',
+    Suse_Importer(conn, pocls) : '/suse-i18n',
+    Xfce_Importer(conn, pocls) : '/xfce'
     }
+
+sf = open('step1.sql')
+schema = sf.read()
+sf.close()
+cursor.executescript(schema)
+conn.commit()
 
 for i, p in importers.iteritems():
     i.run(root + p)
