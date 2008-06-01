@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import ConfigParser, os
@@ -29,6 +29,10 @@ class Settings(object):
     
     def __init__(self):
         self.__hooks = []
+        lang = os.environ['LANG'].lower()
+        lang = lang.split('.')[0]
+        if lang[:2] == lang[3:]:
+            lang = lang[:2]
         self.__config = ConfigParser.ConfigParser({"width": "640",
                                                    "height": "480",
                                                    "src_heigth" : "150",
@@ -36,8 +40,10 @@ class Settings(object):
                                                    "correct_width" : "320",
                                                    "file" : "",
                                                    "folder" : "",
-                                                   "phrase_index" : "1"})
-        self.__config.read(os.path.expanduser('~/.tran/config'))
+                                                   "phrase_index" : "1",
+                                                   "lang" : lang,
+                                                   "dbpath" : "~/.open-tran"})
+        self.__config.read(os.path.expanduser('~/.open-tran/config'))
         if not self.__config.has_section(Settings.SECTION):
             self.__config.add_section(Settings.SECTION)
         for key in self.__config.options(Settings.SECTION):
@@ -48,7 +54,10 @@ class Settings(object):
     def onquit(self):
         for hook in self.__hooks:
             hook.run(self)
-        f = open(os.path.expanduser('~/.tran/config'), 'w')
+        f = os.path.expanduser('~/.open-tran')
+        if not os.path.exists(f):
+            os.mkdir(f)
+        f = open(f + '/config', 'w')
         self.__config.write(f)
         f.close()
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import pygtk
@@ -7,8 +7,9 @@ import gtk
 import os
 import time
 from Settings import Settings
+from common import LANGUAGES
+from suggest import TranDB
 from translate.storage import factory
-from xmlrpclib import ServerProxy, MultiCall
 from phrase import Phrase
 
 class MainWin:
@@ -101,6 +102,28 @@ class MainWin:
     def save_button_click(self, widget, data=None):
         pass
 
+    def lang_changed(self, widget, data=None):
+        model = widget.get_model()
+        self.config.lang = model[widget.get_active()][0]
+        self.load_phrases()
+
+    def select_lang(self, lang):
+        l = self.lang_combo.get_model()
+        idx = [x[0] for x in l].index(lang)
+        self.lang_combo.set_active(idx)
+
+    def create_combo(self):
+        liststore = gtk.ListStore(str, str)
+        for (key, lang) in sorted(LANGUAGES.iteritems()):
+            liststore.append([key, '%s: %s' % (key, lang)])
+        self.lang_combo = gtk.ComboBox(liststore)
+        cell = gtk.CellRendererText()
+        self.lang_combo.pack_start(cell, True)
+        self.lang_combo.add_attribute(cell, 'text', 1)
+        self.select_lang(self.config.lang)
+        return self.lang_combo
+        
+
     def create_toolbar(self):
         hbox = gtk.HBox(False, 0)
         open_button = gtk.Button(stock=gtk.STOCK_OPEN)
@@ -111,8 +134,12 @@ class MainWin:
         save_button.set_focus_on_click(False)
         save_button.show()
         save_button.connect("clicked", self.save_button_click)
+        lang_combo = self.create_combo()
+        lang_combo.connect("changed", self.lang_changed)
+        lang_combo.show()
         hbox.pack_start(open_button, False, False, 0)
         hbox.pack_start(save_button, False, False, 0)
+        hbox.pack_start(lang_combo, False, False, 0)
         hbox.show()
         return hbox
         
@@ -141,8 +168,11 @@ class MainWin:
         self.list_store.clear()
         if self.index == 0:
             return
-        for sug in self.suggestions[self.index - 1]:
-            self.list_store.append([sug])
+        try:
+            for sug in self.sug.suggest(str(self.store.units[self.index].source), self.config.lang):
+                self.list_store.append([sug.text])
+        except:
+            pass
     
     def disable_arrows(self):
         self.left_arrow.set_sensitive(self.index != 0)
@@ -160,7 +190,6 @@ class MainWin:
         cls = factory.getclass(filename)
         self.store = cls.parsefile(filename)
         self.index = int(self.config.phrase_index)
-        self.load_suggestions()
         self.config.register(lambda: self.index, "phrase_index")
         self.scroll(None, 0)
         self.config.file = filename
@@ -182,19 +211,12 @@ class MainWin:
             self.load_file(dialog.get_filename())
         dialog.destroy()
 
-    def load_suggestions(self):
-        start = time.clock()
-        server = ServerProxy("http://open-tran.eu")
-        multicall = MultiCall(server)
-        for unit in self.store.units[1:]:
-            phrase = Phrase(str(unit.source), 'pl', False)
-            multicall.suggest(phrase.canonical(), "pl")
-        self.suggestions = list(multicall())
 
     def __init__ (self):
         self.first = -1
         self.last = -1
         self.config = Settings()
+        self.sug = TranDB(os.path.expanduser(self.config.dbpath))
         self.init_window ()
         self.open_file()
 
