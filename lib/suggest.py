@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  Copyright (C) 2007 Jacek Śliwerski (rzyjontko)
 #
@@ -18,6 +18,7 @@
 from pysqlite2 import dbapi2 as sqlite
 from xml.sax.saxutils import escape, quoteattr
 from phrase import Phrase
+import sys, os
 
 PROJS = {
     'D': 'Debian Installer',
@@ -39,6 +40,26 @@ class Suggestion:
         self.text = text
         self.projects = {}
 
+    def __proj_zip__(self):
+        res = {}
+        for p in self.projects:
+            x = res.setdefault(p.name, p)
+            if x != p:
+                x.count += p.count
+        res = res.values()
+        return sorted(res, lambda a, b: b.count - a.count)
+    
+    def __str__(self):
+        result = self.text + " ("
+        for proj in self.__proj_zip__():
+            if result[-1] != '(':
+                result += " + "
+            if proj.count > 1:
+                result += "%d * " % proj.count
+            result += proj.name
+        result += ")"
+        return result.encode('utf-8')
+    
     def append_project(self, project, orig):
         x = Project()
         x.name = project
@@ -63,8 +84,8 @@ class Suggestion:
     
 
 class TranDB:
-    def __init__(self):
-        self.db = '../data/nine-'
+    def __init__(self, dbpath):
+        self.db = dbpath + '/nine-'
     
     def renumerate(self, suggs):
         if len(suggs) == 0:
@@ -180,3 +201,20 @@ WHERE locationid = ?""", (lid,))
         for s in result: s.finish()
         return self.renumerate(result[:50])
 
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print "Usage: suggest.py [LANG] phrase"
+        exit(0)
+    lang = os.environ['LANG'].lower()
+    lang = lang.split('.')[0]
+    if lang[:2] == lang[3:]:
+        lang = lang[:2]
+    if len(sys.argv) > 2:
+        lang = sys.argv[2]
+    db = TranDB(os.path.expanduser('~/.open-tran'))
+    i = 1
+    for sug in db.suggest(sys.argv[1], lang):
+        print "%2d: %s" % (i, sug)
+        i += 1
+    

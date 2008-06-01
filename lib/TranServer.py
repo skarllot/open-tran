@@ -475,7 +475,7 @@ Checks if the service is capable of suggesting translations from or to
         self.set_server_documentation('''
 This server exports the following methods through the XML-RPC protocol.
 ''')
-        self.storage = TranDB()
+        self.storage = TranDB('../data/')
         self.register_function(self.storage.suggest2, 'suggest2')
         self.register_function(self.storage.suggest, 'suggest')
         self.register_function(self.supported, 'supported')
