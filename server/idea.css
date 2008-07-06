@@ -87,6 +87,7 @@ body{
     clear: both;
     text-align: center;
     padding: 5px 0 5px 0;
+    background: #DDD;
 }
 
 #lang_choice ul {
@@ -122,6 +123,15 @@ body{
 
 #text {
     padding: 0 20px 0 20px;
+}
+
+#fuzzy {
+    font-size: 0.7em;
+    color: #888;
+}
+
+#fuzzy a {
+    color: #7AD;
 }
 
 a {
