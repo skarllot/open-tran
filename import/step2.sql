@@ -17,7 +17,8 @@
 create table locations (
         locationid int not null,
         phraseid int not null,
-        project char(1) not null
+        project text not null,
+	flags int
 );
 
 

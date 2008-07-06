@@ -47,7 +47,7 @@ ORDER BY word
 
 
 for lang in sorted(LANGUAGES):
-    conn = sqlite.connect('../data/nine-' + lang + '.db')
+    conn = sqlite.connect('../data/ten-' + lang + '.db')
     cur = conn.cursor()
     print "Moving %s words..." % lang,
     sys.stdout.flush()

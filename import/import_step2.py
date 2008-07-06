@@ -20,7 +20,7 @@ from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
-iconn = sqlite.connect('../data/nine-one.db')
+iconn = sqlite.connect('../data/ten.db')
 icur = iconn.cursor()
 
 word_id = 0
@@ -30,7 +30,7 @@ schema = sf.read()
 sf.close()
 
 
-project_names = ['' for x in range(20)]
+project_names = ["!"]
 
 
 def define_schema(oconn, ocur):
@@ -41,13 +41,12 @@ def define_schema(oconn, ocur):
 def move_projects():
     global project_names
     icur.execute("""
-SELECT id, name, url
+SELECT id, name
 FROM projects
 ORDER BY id
 """)
-    for (id, name, url) in icur.fetchall():
-        project_names[id] = name[0]
-    project_names = project_names[:id + 1]
+    for (id, name) in icur.fetchall():
+        project_names.append(name)
 
 
 def store_words(oconn, ocur, phraseid, words):
@@ -75,13 +74,13 @@ def move_phrases(oconn, ocur, lang):
     phrase = ""
 
     icur.execute("""
-SELECT phrase, projectid, locationid
+SELECT phrase, projectid, locationid, flags
 FROM phrases
 WHERE lang = ?
 ORDER BY phrase
 """, (lang,))
 
-    for (nphrase, projectid, nlid) in icur.fetchall():
+    for (nphrase, projectid, nlid, flags) in icur.fetchall():
         if cnt % 5000 == 0:
             print ".",
             sys.stdout.flush()
@@ -97,16 +96,20 @@ INSERT INTO phrases (id, phrase, length)
 VALUES (?, ?, ?)""", (nlid, nphrase, len))
             store_words(oconn, ocur, nlid, p.canonical_list())
             phrase = nphrase
+        if lang == "en":
+            proj = project_names[projectid]
+        else:
+            proj = ""
         ocur.execute("""
-INSERT INTO locations (locationid, phraseid, project)
-VALUES (?, ?, ?)""", (nlid, lid, project_names[projectid]))
+INSERT INTO locations (locationid, phraseid, project, flags)
+VALUES (?, ?, ?, ?)""", (nlid, lid, project_names[projectid], flags))
     oconn.commit()
 
 
 
 move_projects()
 for lang in sorted(LANGUAGES):
-    oconn = sqlite.connect('../data/nine-' + lang + '.db')
+    oconn = sqlite.connect('../data/ten-' + lang + '.db')
     ocur = oconn.cursor()
     print "Moving %s phrases..." % lang,
     sys.stdout.flush()

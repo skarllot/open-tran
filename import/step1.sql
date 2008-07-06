@@ -14,15 +14,15 @@
 --  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
 create table projects (
-	id integer primary key,
-	name text not null,
-	url text
+	id int primary key,
+	name text not null
 );
 
 create table phrases (
-	id integer primary key,
+	id int primary key,
 	phrase text not null,
 	lang text not null,
+	flags int,
 	length int,
 	projectid int,
 	locationid int

@@ -31,12 +31,15 @@ def log(text, nonline=False):
 
 
 def get_subdirs(dir):
-    if debug:
-        return ["pl", 'de']
     for r, dirs, files in os.walk(dir):
         if '.svn' in dirs:
             dirs.remove('.svn')
         return dirs
+
+def get_lsubdirs(dir):
+    if debug:
+        return ["de", "pl"]
+    return get_subdirs(dir)
 
 
 class Importer(object):
@@ -54,8 +57,6 @@ class Importer(object):
         
     
     def __init__(self, conn, parser_class):
-        Importer.global_pid += 1
-        self.projectid = Importer.global_pid
         self.conn = conn
         self.cursor = self.conn.cursor()
         self.parser_class = parser_class
@@ -70,13 +71,21 @@ class Importer(object):
         return lang
 
 
-    def store_phrase(self, pid, lid, sentence, lang):
+    def store_phrase(self, pid, lid, sentence, flags, lang):
         phrase = Phrase(sentence, lang[:2])
         length = phrase.length()
         if length == 0:
             return
-        self.cursor.execute(u"insert into phrases(projectid, locationid, lang, length, phrase) values (?, ?, ?, ?, ?)", \
-                            (pid, lid, lang, length, sentence))
+        if flags:
+            flags = 1
+        else:
+            flags = 0
+        self.cursor.execute(u"""
+insert into phrases
+    (projectid, locationid, lang, length, phrase, flags)
+values
+    (?, ?, ?, ?, ?, ?)
+""", (pid, lid, lang, length, sentence, flags))
 
 
     def store_phrases(self, pid, phrases):
@@ -84,9 +93,9 @@ class Importer(object):
             if len(source) < 2:
                 continue
             Importer.global_loc += 1
-            self.store_phrase(pid, Importer.global_loc, source, "en")
+            self.store_phrase(pid, Importer.global_loc, source, 0, "en")
             for lang, target in ls.iteritems():
-                self.store_phrase(pid, Importer.global_loc, target, lang)
+                self.store_phrase(pid, Importer.global_loc, target[0], target[1], lang)
         self.conn.commit()
 
 
@@ -102,7 +111,7 @@ class Importer(object):
             dst = unit.target.encode('utf-8')
             if len(src) > 0:
                 l = phrases.setdefault(src, {})
-                l[mlang] = dst
+                l[mlang] = (dst, unit.isfuzzy())
         return len(store.units)
 
 
@@ -120,12 +129,13 @@ class Importer(object):
         
 
     def run_langs(self, dir):
-        self.langs = get_subdirs(dir)
+        self.langs = get_lsubdirs(dir)
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
             for f in files:
                 if self.is_resource(f):
                     log("Importing %s..." % f)
-                    self.store_file(self.projectid, os.path.join(root, f))
+                    pid = self.store_project(f)
+                    self.store_file(pid, os.path.join(root, f))
             if '.svn' in dirs:
                 dirs.remove('.svn')
 
@@ -139,7 +149,7 @@ class Importer(object):
             dst = unit.target.encode('utf-8')
             if len(src) > 0:
                 l = phrases.setdefault(src, {})
-                l[lang] = dst
+                l[lang] = (dst, unit.isfuzzy())
         return len(store.units)
 
 
@@ -159,52 +169,50 @@ class Importer(object):
                 except:
                     log("failed.")
             log("  phrases: %d" % len(phrases))
-            self.store_phrases(self.projectid, phrases)
+            pid = self.store_project(os.path.basename(proj_file_name))
+            self.store_phrases(pid, phrases)
 
 
-    def store_project(self):
-        self.cursor.execute("insert into projects (id, name, url) values (?, ?, ?)",
-                            (self.projectid, self.project_name(), self.project_url()))
+    def store_project(self, name):
+        if name.endswith(".fr.po"):
+            name = name[:-6]
+        if name.endswith(".po"):
+            name = name[:-3]
+        name = self.getprefix() + "/" + name
+        Importer.global_pid += 1
+        self.cursor.execute("insert into projects (id, name) values (?, ?)",
+                            (Importer.global_pid, name))
+        return Importer.global_pid
+
 
 
 class KDE_Importer(Importer):
-    def project_name(self):
-        return "KDE"
+    def getprefix(self):
+        return "K"
 
-    def project_url(self):
-        return "http://www.kde.org"
-    
     def is_resource(self, fname):
         return fname.endswith('.po')
     
     def run(self, path):
-        Importer.store_project(self)
         Importer.run_langs(self, path)
 
 
 
 class Mozilla_Importer(Importer):
-    def project_name(self):
-        return "Mozilla"
+    def getprefix(self):
+        return "M"
 
-    def project_url(self):
-        return "http://www.mozilla.org"
-    
     def is_resource(self, fname):
         return fname.endswith('.dtd.po') or fname.endswith('.properties.po')
     
     def run(self, path):
-        Importer.store_project(self)
         Importer.run_langs(self, path)
 
 
 
 class Gnome_Importer(Importer):
-    def project_name(self):
-        return "Gnome"
-
-    def project_url(self):
-        return "http://www.gnome.org"
+    def getprefix(self):
+        return "G"
     
     def is_resource(self, fname):
         if debug:
@@ -215,17 +223,13 @@ class Gnome_Importer(Importer):
         return project[:-3].replace('@', '_').lower()
     
     def run(self, path):
-        Importer.store_project(self)
         Importer.run_projects(self, path)
 
 
 
 class FY_Importer(Importer):
-    def project_name(self):
-        return "FY"
-    
-    def project_url(self):
-        return "http://members.chello.nl/~s.hiemstra/kompjtr.htm"
+    def getprefix(self):
+        return "F"
     
     def run(self, path):
         items = {}
@@ -234,46 +238,44 @@ class FY_Importer(Importer):
         for line in f:
             en, fy = line.rstrip().split(" | ")
             items[en] = { "fy" : fy }
-        Importer.store_project(self)
-        self.store_phrases(self.projectid, items)
+        pid = Importer.store_project(self, "")
+        self.store_phrases(pid, items)
+
 
         
 class DI_Importer(Importer):
-    def project_name(self):
-        return "DI"
-
-    def project_url(self):
-        return "http://www.debian.org/devel/debian-installer/"
+    def getprefix(self):
+        return "D"
     
     def is_resource(self, fname):
+        if debug:
+            return fname == 'pl.po' or fname == 'de.po'
         return fname.endswith('.po')
     
+    def get_language(self, project):
+        return project[:-3].replace('@', '_').lower()
+    
     def run(self, path):
-        Importer.store_project(self)
-        Importer.run_langs(self, path)
+        Importer.run_projects(self, path)
+
 
 
 class Suse_Importer(Importer):
-    def project_name(self):
-        return "SUSE"
-
-    def project_url(self):
-        return "http://www.opensuse.org"
-
+    def getprefix(self):
+        return "S"
+    
     def is_resource(self, fname):
         return fname.endswith('.po')
 
     def run(self, path):
-        Importer.store_project(self)
         Importer.run_langs(self, path + '/yast')
         Importer.run_langs(self, path + '/lcn')
 
-class Xfce_Importer(Importer):
-    def project_name(self):
-        return "XFCE"
 
-    def project_url(self):
-        return "http://www.xfce.org"
+
+class Xfce_Importer(Importer):
+    def getprefix(self):
+        return "X"
 
     def is_resource(self, fname):
         if debug:
@@ -284,19 +286,18 @@ class Xfce_Importer(Importer):
         return project[:-3].replace('@', '_').lower()
     
     def run(self, path):
-        Importer.store_project(self)
         Importer.run_projects(self, path)
 
 
 debug = 0
 root = '/home/sliwers/projekty/open-tran-data'
 pocls = factory.getclass("kde.po")
-conn = sqlite.connect('../data/nine-one.db')
+conn = sqlite.connect('../data/ten.db')
 cursor = conn.cursor()
 importers = {
     DI_Importer(conn, pocls) : '/debian-installer',
     FY_Importer(conn, pocls) : '/fy/kompjtr2.txt',
-    KDE_Importer(conn, pocls) : '/kde-l10n',
+    KDE_Importer(conn, pocls) : '/l10n-kde4',
     Mozilla_Importer(conn, pocls) : '/mozilla-po',
     Gnome_Importer(conn, pocls) : '/gnome-po',
     Suse_Importer(conn, pocls) : '/suse-i18n',
@@ -312,4 +313,8 @@ conn.commit()
 for i, p in importers.iteritems():
     i.run(root + p)
 
+log("Creating index...", True)
+cursor.execute("CREATE INDEX idx ON phrases(lang);")
+log("done.")
+conn.commit()
 conn.close()
