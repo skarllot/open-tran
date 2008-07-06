@@ -18,8 +18,15 @@
 
 */
 /****************************************************************************
- *    INTERFACE REQUIRED HEADERS
+ *    INTERFACE DEFINITIONS
  ****************************************************************************/
+
+#define htable_create_s(i) \
+       (htable_create ((i), (unsigned (*)(void *))hash_str, \
+                       (int (*)(void *, void *))strcmp))
+
+                
+
 /****************************************************************************
  *    INTERFACE STRUCTURES / UTILITY CLASSES
  ****************************************************************************/
@@ -57,6 +64,8 @@ extern entry_t *htable_insert (htable_t *table, void *key, void *value);
 
 extern void *htable_fold (htable_t *table, void *(*fun)(entry_t *, void *),
                           void *acc);
+
+extern unsigned hash_str (const char *str);
 
 /****************************************************************************
  *

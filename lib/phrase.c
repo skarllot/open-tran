@@ -130,17 +130,17 @@ utf8_to_wchar(const unsigned char *utf, size_t *memsize)
 
 
 static void
-skip_spaces (wchar_t **text)
+skip_nonalpha (wchar_t **text)
 {
-        while (**text && **text == L' ')
+        while (**text && !iswalpha(**text))
                 (*text)++;
 }
 
 
 static void
-skip_nonspaces (wchar_t **text)
+skip_alpha (wchar_t **text)
 {
-        while (**text && **text != L' ')
+        while (**text && iswalpha(**text))
                 (*text)++;
 }
 
@@ -293,9 +293,9 @@ phrase_create (const char *text)
         ptr = result->text;
 
         do {
-                skip_spaces (& ptr);
+                skip_nonalpha (& ptr);
                 word = ptr;
-                skip_nonspaces (& ptr);
+                skip_alpha (& ptr);
                 if (*word){
                         list_t *node = alloca (sizeof (list_t));
                         node->word = word_create (word, ptr - word);
