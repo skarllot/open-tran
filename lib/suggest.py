@@ -60,14 +60,17 @@ class Suggestion:
         result += ")"
         return result.encode('utf-8')
     
-    def append_project(self, project, orig):
+    def append_project(self, project, orig, value, flags):
         x = Project()
         x.name = project
         x.orig_phrase = orig
         x.count = 0
+        x.flags = flags
         x = self.projects.setdefault(orig, x)
         x.count += 1
         self.count += 1
+        if flags == 0 and self.value > value:
+            self.value = value
     
     def compare (self, sug):
         ret = (self.value > sug.value) - (self.value < sug.value)
@@ -85,7 +88,7 @@ class Suggestion:
 
 class TranDB:
     def __init__(self, dbpath):
-        self.db = dbpath + '/nine-'
+        self.db = dbpath + '/ten-'
     
     def renumerate(self, suggs):
         if len(suggs) == 0:
@@ -177,7 +180,7 @@ JOIN (
      WHERE word IN %s
      GROUP BY p.id
      ORDER BY value
-     LIMIT 500
+     LIMIT 200
 ) val ON l.phraseid = val.id
 """ % qmarks, tuple(words))
         rows = cursor.fetchall()
@@ -185,13 +188,13 @@ JOIN (
             dconn = sqlite.connect(self.db + dstlang + ".db")
             dcur = dconn.cursor()
             dcur.execute("""
-SELECT DISTINCT phrase, project
+SELECT phrase, project, flags
 FROM phrases p JOIN locations l ON p.id = l.phraseid
 WHERE locationid = ?""", (lid,))
-            for (trans, project) in dcur.fetchall():
+            for (trans, project, flags) in dcur.fetchall():
                 sug = Suggestion(trans, value)
-                res = result.setdefault(sug.text, sug)
-                res.append_project(PROJS[project], orig)
+                res = result.setdefault(sug.text.strip(), sug)
+                res.append_project(project, orig, value, flags)
             dcur.close()
             dconn.close()
         cursor.close ()
@@ -204,7 +207,7 @@ WHERE locationid = ?""", (lid,))
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "Usage: suggest.py [LANG] phrase"
+        print "Usage: suggest.py phrase [LANG]"
         exit(0)
     lang = os.environ['LANG'].lower()
     lang = lang.split('.')[0]

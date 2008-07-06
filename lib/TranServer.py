@@ -77,7 +77,7 @@ class renderer(object):
         self.projects = []
 
     def feed(self, project):
-        if project.name == self.name:
+        if project.name[0] == self.name[0]:
             self.projects.append(project)
 
     def render_icon(self, needplus):
@@ -97,7 +97,12 @@ class renderer(object):
         for project in self.projects:
             if project.count > 1:
                 result += "%d&times;" % project.count
-            result += "%s: %s<br/>\n" % (self.render_link(), _replace_html(project.orig_phrase))
+            path = self.name + " " + project.name[2:]
+            if project.flags == 1:
+                result += '<span id="fuzzy">'
+            result += "%s: %s<br/>\n" % (self.render_link(path), _replace_html(project.orig_phrase))
+            if project.flags == 1:
+                result += '</span>'
         return result
 
 
@@ -107,8 +112,8 @@ class gnome_renderer(renderer):
         self.name = "GNOME"
         self.icon_path = "/images/gnome-logo.png"
     
-    def render_link(self):
-        return '<a href="http://www.gnome.org/i18n/">GNOME</a>'
+    def render_link(self, project):
+        return '<a href="http://www.gnome.org/i18n/">%s</a>' % project
     
 
 class kde_renderer(renderer):
@@ -117,8 +122,8 @@ class kde_renderer(renderer):
         self.name = "KDE"
         self.icon_path = "/images/kde-logo.png"
 
-    def render_link(self):
-        return '<a href="http://l10n.kde.org/">KDE</a>'
+    def render_link(self, project):
+        return '<a href="http://l10n.kde.org/">%s</a>' % project
 
 
 class mozilla_renderer(renderer):
@@ -127,8 +132,8 @@ class mozilla_renderer(renderer):
         self.name = "Mozilla"
         self.icon_path = "/images/mozilla-logo.png"
 
-    def render_link(self):
-        return '<a href="http://www.mozilla.org/projects/l10n/">Mozilla</a>'
+    def render_link(self, project):
+        return '<a href="http://www.mozilla.org/projects/l10n/">%s</a>' % project
 
 
 class fy_renderer(renderer):
@@ -137,7 +142,7 @@ class fy_renderer(renderer):
         self.name = "FY"
         self.icon_path = "/images/pompelyts.png"
 
-    def render_link(self):
+    def render_link(self, project):
         return '<a href="http://members.chello.nl/~s.hiemstra/kompjtr.htm">Cor Jousma</a>'
 
 
@@ -147,18 +152,18 @@ class di_renderer(renderer):
         self.name = "Debian Installer"
         self.icon_path = "/images/debian-logo.png"
 
-    def render_link(self):
-        return '<a href="http://d-i.alioth.debian.org/">Debian Installer</a>'
+    def render_link(self, project):
+        return '<a href="http://d-i.alioth.debian.org/">%s</a>' % project
 
 
 class suse_renderer(renderer):
     def __init__(self):
         renderer.__init__(self)
-        self.name = "openSUSE"
+        self.name = "SUSE"
         self.icon_path = "/images/suse-logo.png"
 
-    def render_link(self):
-        return '<a href="http://i18n.opensuse.org/">openSUSE</a>'
+    def render_link(self, project):
+        return '<a href="http://i18n.opensuse.org/">%s</a>' % project
 
 
 class xfce_renderer(renderer):
@@ -167,8 +172,8 @@ class xfce_renderer(renderer):
         self.name = "XFCE"
         self.icon_path = "/images/xfce-logo.png"
 
-    def render_link(self):
-        return '<a href="http://i18n.xfce.org/">XFCE</a>'
+    def render_link(self, project):
+        return '<a href="http://i18n.xfce.org/">%s</a>' % project
 
 
 class Suggestion:
