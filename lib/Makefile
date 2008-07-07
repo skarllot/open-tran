@@ -18,21 +18,25 @@ include ../config.mak
 DEPDIR = .deps
 
 DEFINES += -D_GNU_SOURCE=1
-CFLAGS += -fpic -Wall -I$(PYTHON)
-INCLUDES = -I$(SQLITE)
-COMPILE = gcc $(CFLAGS) $(DEFINES)
-LDFLAGS = 
+CFLAGS += -Wall -fpic
+INCLUDES = 
+COMPILE = LANG=C gcc $(CFLAGS) $(DEFINES)
+LDFLAGS = -lsqlite3
 
-OBJS = xmalloc.o hash.o phrase.o storage.o $(SQLITE)/libsqlite3.a
+TRANOBJS = xmalloc.o hash.o phrase.o storage.o
+OBJS = xmalloc.o hash.o phrase.o opentran.o
 
+all: libopentran.so tran
 
-all: tran _tran.so
+libopentran.so: $(OBJS)
+	@echo "LD	$@"
+	$(Q)gcc -shared $(LDFLAGS) -o $@ $^
 
-tran: $(OBJS) main.o
+tran: $(TRANOBJS) main.o
 	@echo "LD	$@"
 	$(Q)gcc $(LDFLAGS) -o $@ $^
 
-_tran.so: $(OBJS) tran.o
+_tran.so: $(TRANOBJS) tran.o
 	@echo "LD	$@"
 	$(Q)gcc -shared $(LDFLAGS) -o $@ $^
 
@@ -55,3 +59,4 @@ include $(DEPDIR)/xmalloc.po
 include $(DEPDIR)/phrase.po
 include $(DEPDIR)/storage.po
 include $(DEPDIR)/tran.po
+include $(DEPDIR)/opentran.po

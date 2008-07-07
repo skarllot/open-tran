@@ -87,54 +87,18 @@ main_phrases (void)
 
 
 void
-main_storage (void)
-{
-        int i;
-        clock_t start;
-        clock_t end;
-        suggestion_t *sugg;
-        
-        storage_t *storage = storage_create ("C");
-
-        start = clock ();
-        storage_read (storage, "../data/seventh.db");
-        end = clock ();
-
-        printf ("time: %lf\n", ((double) (end - start)) / CLOCKS_PER_SEC);
-
-
-        start = clock ();
-        sugg = storage_suggest (storage, "file");
-        end = clock ();
-
-        printf ("time: %lf\n", ((double) (end - start)) / CLOCKS_PER_SEC);
-
-        for (i = 0; i < sugg->count; i++){
-                printf (" -> %d-%d: %d\n", sugg->project_ids[i], sugg->location_ids[i], sugg->values[i]);
-        }
-
-        xfree (sugg->project_ids);
-        xfree (sugg->location_ids);
-        xfree (sugg->values);
-        xfree (sugg);
-
-        storage_destroy (storage);
-}
-
-
-void
 main_bad_phrase (void)
 {
         int i;
         
-        phrase_t *phrase = phrase_create ("a b a");
+        phrase_t *phrase = phrase_create ("a b a łódź");
         phrase_print (phrase);
         printf ("\n");
         printf ("%d, %d\n", phrase->word_count, phrase->length);
 
         for (i = 0; i < phrase->word_count; i++){
                 phrase_print ((phrase_t *) phrase->words[i]);
-                printf ("\n");
+                printf (" * %d\n", phrase->words[i]->occurences);
         }
 }
 
@@ -142,7 +106,8 @@ main_bad_phrase (void)
 int
 main (int argc, char **argv)
 {
-        main_storage ();
+//        main_phrases ();
+        main_bad_phrase ();
         exit (EXIT_SUCCESS);
 }
 

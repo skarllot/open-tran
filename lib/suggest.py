@@ -58,6 +58,10 @@ class Suggestion:
                 result += "%d * " % proj.count
             result += proj.name
         result += ")"
+        for proj in self.projects:
+            result += "\n\t" + proj.name + ": " + proj.orig_phrase
+            if proj.flags == 1:
+                result += " ***fuzzy***"
         return result.encode('utf-8')
     
     def append_project(self, project, orig, value, flags):
@@ -132,34 +136,45 @@ Server sends back a result in the following form:
    * count: integer
    * name: string
    * orig_phrase: string
+   * flags: integer
 
 Identical translations are grouped together as one suggestion - the 'count'
 tells, how many of them there are.  The value indicates, how good the result
-is - the lower, the better.  And the list contains tripples: name of the
-project, phrase and count.  The sum of counts in the list of projects equals
-the count stored in the suggestion object.
+is - the lower, the better.  And the list contains quadruples: name of the
+project name, original phrase, count and flags.  The sum of counts in the list
+of projects equals the count stored in the suggestion object.  The flags are
+currently only used to indicate if the translation is fuzzy (1) or not (0).
 
 As an example consider a call: suggest2("save as", "en", "pl").  The server would
 send a list of elements containing the following one:
- * count: 12
- * text: Zapisz jako
+ * count: 20
+ * text: Zapisz jako...
  * value: 1
  * projects[0]:
-   * name: GNOME
-   * orig_phrase: Save As
-   * count: 9
- * projects[0]:
-   * name: GNOME
-   * orig_phrase: Save as
-   * count: 1
+   * name: G/drgeo
+   * orig_phrase: Save As...
+   * count: 13
+   * flags: 0
+ * projects[1]:
+   * name: G/gxsnmp
+   * orig_phrase: Save as...
+   * count: 4
+   * flags: 0
  * projects[2]:
-   * name: KDE
-   * orig_phrase: Save File As
+   * name: S/kpowersave
+   * orig_phrase: Save As ...
    * count: 1
+   * flags: 0
  * projects[3]:
-   * name: Mozilla
-   * orig_phrase: Save
+   * name: K/koffice
+   * orig_phrase: Save Document As
    * count: 1
+   * flags: 0
+ * projects[4]:
+   * name: g/gedit
+   * orig_phrase: Save As…
+   * count: 1
+   * flags: 0
 '''
         result = {}
         phrase = Phrase(text, srclang, False)

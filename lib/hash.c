@@ -189,6 +189,25 @@ htable_fold (htable_t *table, void *(*fun)(entry_t *, void *), void *acc)
 }
 
 
+unsigned
+hash_str (const char *str)
+{
+        unsigned h = 0;
+        unsigned g;
+
+        while (*str){
+                h <<= 4;
+                h  += *str;
+                if ((g = h & 0xf0000000)){
+                        h ^= (g >> 24);
+                        h ^= g;
+                }
+                str++;
+        }
+        return h;
+}
+
+
 /****************************************************************************
  *
  *    END MODULE hash.c
