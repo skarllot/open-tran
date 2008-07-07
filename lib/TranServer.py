@@ -33,6 +33,7 @@ import xmlrpclib
 import urllib
 import posixpath
 import os
+import stat
 
 
 SUGGESTIONS_TXT = {
@@ -325,10 +326,13 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.send_header('Set-Cookie', 'lang=%s; domain=.open-tran.eu' % lang)
         self.end_headers()
 
-    def send_plain_headers(self, code, ctype, length):
+    def send_plain_headers(self, code, ctype, length, inode):
         self.send_response(code)
         self.send_header("Content-type", ctype)
-        self.send_header("Content-Length", str(length))
+        if length != 0:
+            self.send_header("Content-Length", str(length))
+        if inode != 0:
+            self.send_header("ETag", str(inode))
         self.end_headers()
 
 
@@ -384,7 +388,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         f.flush()
         length = f.tell()
         f.seek(0)
-        self.send_plain_headers(code, "text/html", length)
+        self.send_plain_headers(code, "text/html", length, 0)
         return f
 
 
@@ -436,7 +440,11 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         except IOError:
             self.send_error(404, "File not found")
             return None
-        self.send_plain_headers(200, ctype, os.fstat(f.fileno())[6])
+        fs = os.fstat(f.fileno())
+        if 'if-none-match' in self.headers and self.headers['if-none-match'] == str(fs[stat.ST_INO]):
+            self.send_plain_headers(304, ctype, 0, 0)
+        else:
+            self.send_plain_headers(200, ctype, fs[stat.ST_SIZE], fs[stat.ST_INO])
         return f
 
 
