@@ -51,7 +51,7 @@ tran.c: tran.i
         else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
 
 clean:
-	rm -f tran _tran.so *.o tran.c tran.py *.pyc
+	rm -f *.so *.o tran.c tran.py *.pyc
 
 include $(DEPDIR)/hash.po
 include $(DEPDIR)/main.po
