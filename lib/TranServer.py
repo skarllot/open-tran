@@ -81,18 +81,27 @@ class renderer(object):
         if project.name[0] == self.name[0]:
             self.projects.append(project)
 
-    def render_icon(self, needplus):
+    def render_icon(self):
+        return '<img src="%s" alt="%s"/>' % (self.icon_path, self.name)
+
+    def render_count(self, needplus):
         cnt = reduce(lambda x,y: x + y.count, self.projects, 0)
         if cnt == 0:
-            return ""
+            return None
         if needplus:
             result = " + "
         else:
             result = ""
         if cnt > 1:
             result += "%d&times;" % cnt
-        return result + '<img src="%s" alt="%s"/>' % (self.icon_path, self.name)
+        return result
 
+    def render_icon_cnt(self, needplus):
+        cnt = self.render_count(needplus)
+        if cnt == None:
+            return ""
+        return  cnt + self.render_icon()
+    
     def render_links(self, lang):
         result = ""
         for project in self.projects:
@@ -105,6 +114,10 @@ class renderer(object):
             if project.flags == 1:
                 result += '</span>'
         return result
+
+    def render_project_link(self):
+        icon = self.render_icon()
+        return self.render_link(icon + " " + self.name)
 
 
 class gnome_renderer(renderer):
@@ -211,7 +224,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         needplus = False
         result = ""
         for r in RENDERERS:
-            icon = r.render_icon(needplus)
+            icon = r.render_icon_cnt(needplus)
             if icon != "":
                 needplus = True
             result += icon
@@ -242,6 +255,34 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         result += '</ol>\n'
         return result
 
+
+    def render_suggestions_compare(self, suggs, dstlang):
+        result = '<ol>\n'
+        for s in suggs:
+            for r in RENDERERS:
+                r.clear()
+            for p in s.projects:
+                for r in RENDERERS:
+                    r.feed(p)
+            for r in RENDERERS:
+                cnt = r.render_count(False)
+                if cnt != None:
+                    break
+            result += '<li value="%d">%s<a href="#" class="jslink" onclick="return blocking(\'sug%d\')">%s</a>' % (s.value, cnt, self.idx, _replace_html(s.text))
+            result += self.render_div(self.idx, dstlang)
+            result += '</li>\n'
+            self.idx += 1
+        result += '</ol>\n'
+        return result
+
+
+    def render_project_link(self, project):
+        for r in RENDERERS:
+            r.clear()
+            if r.name == project:
+                return r.render_project_link()
+
+
     def dump(self, responses, srclang, dstlang):
         rtl = ''
         if dstlang in RTL_LANGUAGES:
@@ -251,6 +292,21 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
             body += u'<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>' % (_replace_html(key), self.render_suggestions(suggs, dstlang))
         body += u"</dl>"
         return body
+
+
+    def dump_compare(self, responses, lang):
+        rtl = ''
+        if lang in RTL_LANGUAGES:
+            rtl = ' dir="rtl" style="text-align: right"'
+        result = '<table%s>\n' % rtl
+        head = ''
+        body = ''
+        for project, suggs in responses.iteritems():
+            head += u'<th>%s</th>' % self.render_project_link(project)
+            body += u'<td valign="top">%s</td>' % self.render_suggestions_compare(suggs, lang)
+        result += '<tr>%s</tr>\n<tr>%s</tr>\n' % (head, body)
+        result += '</table>'
+        return result
 
 
     def get_file(self):
@@ -392,7 +448,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         return f
 
 
-    def send_search_head(self):
+    def get_query(self):
         query = None
         plen = len(self.path)
         if plen > 8 and self.path[8] == '/':
@@ -405,13 +461,29 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
                 query = urllib.unquote(query)
             except:
                 pass
-
         if query == None or self.dstlang == None:
-            return self.shutdown(404)
+            return None
+        return query.replace('+', ' ').decode('utf-8')
 
-        query = query.replace('+', ' ').decode('utf-8')
+
+    def send_search_head(self):
+        query = self.get_query()
+        if query == None:
+            self.shutdown(404)
         response = self.dump([self.suggest(query, self.srclang, self.dstlang)], self.srclang, self.dstlang).encode('utf-8')
         response += self.dump([self.suggest(query, self.dstlang, self.srclang)], self.dstlang, self.srclang).encode('utf-8')
+        return self.embed_in_template(response)
+
+
+    def send_compare_head(self):
+        query = self.get_query()
+        if query == None:
+            self.shutdown(404)
+        lang = self.srclang
+        if lang == "en":
+            lang = self.dstlang
+        suggs = self.server.storage.compare(query, lang)
+        response = self.dump_compare(suggs, lang).encode('utf-8')
         return self.embed_in_template(response)
         
 
@@ -421,6 +493,9 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
         if self.path.startswith('/suggest'):
             return self.send_search_head()
+
+        if self.path.startswith('/compare'):
+            return self.send_compare_head()
 
         path = self.translate_path('/' + self.ifacelang + '/' + self.path)
         f = None
@@ -491,5 +566,6 @@ This server exports the following methods through the XML-RPC protocol.
         self.storage = TranDB('../data/')
         self.register_function(self.storage.suggest2, 'suggest2')
         self.register_function(self.storage.suggest, 'suggest')
+        self.register_function(self.storage.compare, 'compare')
         self.register_function(self.supported, 'supported')
         self.register_introspection_functions()

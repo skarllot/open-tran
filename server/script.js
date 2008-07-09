@@ -26,7 +26,7 @@ function blocking(nr)
 function block_all()
 {
 	blocking('lang_choice');
-        for (i = 1; i < 100; i++){
+        for (i = 1; i < 1000; i++){
                 blocking('sug' + i);
         }
         return false;

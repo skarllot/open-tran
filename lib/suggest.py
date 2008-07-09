@@ -26,9 +26,17 @@ PROJS = {
     'G': 'GNOME',
     'K': 'KDE',
     'M': 'Mozilla',
-    'S': 'openSUSE',
+    'S': 'SUSE',
     'X': 'XFCE'
     }
+
+class TmpSug:
+    def __init__(self, text, orig, project, value, flags):
+        self.text = text
+        self.orig = orig
+        self.project = project
+        self.value = value
+        self.flags = flags
 
 class Project:
     pass
@@ -111,19 +119,74 @@ class TranDB:
         next.value = value
         return suggs
 
+
+    def regroup(self, suggs):
+        result = {}
+        for sug in suggs:
+            res = Suggestion(sug.text, sug.value)
+            res = result.setdefault(sug.text.strip(), res)
+            res.append_project(sug.project, sug.orig, sug.value, sug.flags)
+        result = result.values()
+        for s in result: s.finish()
+        result.sort (lambda s1, s2: s1.compare (s2))
+        return self.renumerate(result[:50])
+        
+
     def qmarks_string(self, words):
         result = "(?"
         for w in words[1:]:
             result += ", ?"
         return result + ")"
 
-    def suggest (self, text, dstlang):
+
+    def get_translations(self, text, srclang, dstlang):
+        result = []
+        phrase = Phrase(text, srclang, False)
+        if phrase.length() < 1:
+            return result
+        words = phrase.canonical_list()
+        qmarks = self.qmarks_string(words)
+        conn = sqlite.connect(self.db + srclang + ".db")
+        cursor = conn.cursor ()
+        cursor.execute ("""
+SELECT p.phrase, l.locationid, val.value
+FROM phrases p
+JOIN locations l ON p.id = l.phraseid
+JOIN (
+     SELECT p.id AS id, MAX(p.length) - SUM(wp.count) - COUNT(*) AS value
+     FROM words w JOIN wp ON w.id = wp.wordid
+     JOIN phrases p ON wp.phraseid = p.id
+     WHERE word IN %s
+     GROUP BY p.id
+     ORDER BY value
+     LIMIT 200
+) val ON l.phraseid = val.id
+""" % qmarks, tuple(words))
+        rows = cursor.fetchall()
+        for (orig, lid, value) in rows:
+            dconn = sqlite.connect(self.db + dstlang + ".db")
+            dcur = dconn.cursor()
+            dcur.execute("""
+SELECT phrase, project, flags
+FROM phrases p JOIN locations l ON p.id = l.phraseid
+WHERE locationid = ?""", (lid,))
+            for (trans, project, flags) in dcur.fetchall():
+                sug = TmpSug(trans, orig, project, value, flags)
+                result.append(sug)
+            dcur.close()
+            dconn.close()
+        cursor.close ()
+        conn.close()
+        return result
+        
+
+    def suggest(self, text, dstlang):
         '''
 Is equivalent to calling suggest2(text, "en", dstlang)
 '''
         return self.suggest2(text, "en", dstlang)
 
-    def suggest2 (self, text, srclang, dstlang):
+    def suggest2(self, text, srclang, dstlang):
         '''
 Translates text from srclang to dstlang.  Each language code must be one
 of those displayed in the drop-down list in the search form.
@@ -176,48 +239,18 @@ send a list of elements containing the following one:
    * count: 1
    * flags: 0
 '''
+        suggs = self.get_translations(text, srclang, dstlang)
+        return self.regroup(suggs)
+
+
+    def compare(self, text, lang):
         result = {}
-        phrase = Phrase(text, srclang, False)
-        if phrase.length() < 1:
-            return result
-        words = phrase.canonical_list()
-        qmarks = self.qmarks_string(words)
-        conn = sqlite.connect(self.db + srclang + ".db")
-        cursor = conn.cursor ()
-        cursor.execute ("""
-SELECT p.phrase, l.locationid, val.value
-FROM phrases p
-JOIN locations l ON p.id = l.phraseid
-JOIN (
-     SELECT p.id AS id, MAX(p.length) - SUM(wp.count) - COUNT(*) AS value
-     FROM words w JOIN wp ON w.id = wp.wordid
-     JOIN phrases p ON wp.phraseid = p.id
-     WHERE word IN %s
-     GROUP BY p.id
-     ORDER BY value
-     LIMIT 200
-) val ON l.phraseid = val.id
-""" % qmarks, tuple(words))
-        rows = cursor.fetchall()
-        for (orig, lid, value) in rows:
-            dconn = sqlite.connect(self.db + dstlang + ".db")
-            dcur = dconn.cursor()
-            dcur.execute("""
-SELECT phrase, project, flags
-FROM phrases p JOIN locations l ON p.id = l.phraseid
-WHERE locationid = ?""", (lid,))
-            for (trans, project, flags) in dcur.fetchall():
-                sug = Suggestion(trans, value)
-                res = result.setdefault(sug.text.strip(), sug)
-                res.append_project(project, orig, value, flags)
-            dcur.close()
-            dconn.close()
-        cursor.close ()
-        conn.close()
-        result = result.values()
-        result.sort (lambda s1, s2: s1.compare (s2))
-        for s in result: s.finish()
-        return self.renumerate(result[:50])
+        suggs = self.get_translations(text, "en", lang)
+        for prefix, project in PROJS.iteritems():
+            subres = self.regroup([s for s in suggs if s.project[0] == prefix])
+            if len(subres) > 0:
+                result[project] = subres
+        return result
 
 
 if __name__ == "__main__":
