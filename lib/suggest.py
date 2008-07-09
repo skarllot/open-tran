@@ -244,6 +244,9 @@ send a list of elements containing the following one:
 
 
     def compare(self, text, lang):
+        '''
+Returns the same results as suggest, but grouped by the projects.
+'''
         result = {}
         suggs = self.get_translations(text, "en", lang)
         for prefix, project in PROJS.iteritems():
