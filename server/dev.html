@@ -1,16 +1,50 @@
 <h1>Developers</h1>
 <p>
-  You can query Open-Tran with your own custom software.  Open-Tran
-  exports its API through the <a href="http://www.xmlrpc.com">XML-RPC</a>
-  protocol.  Check <a href="/RPC2">the list of exported
-  functions</a>.
+  This page is dedicated to all developers that would like to help us
+  develop the service, create new tools or integrate it in the existing
+  software.
 </p>
 
-<h2>Python</h2>
+<h2>Contents</h2>
+<ol>
+  <li><a href="#API">API</a>
+    <ol>
+      <li><a href="#Python">Python</a></li>
+      <li><a href="#C">C</a></li>
+    </ol>
+  </li>
+  <li><a href="#Offline">Off-line mode</a>
+    <ol>
+      <li><a href="#Installing">Installing</a></li>
+      <li><a href="#Database">Database</a></li>
+      <li><a href="#Algorithm">Algorithm</a></li>
+    </ol>
+  </li>
+</ol>
+
+<a name="API"></a>
+<h2>API</h2>
 <p>
-Below is an example of a very simple python script that searches for
-translations of the phrase "<em>save as</em>" from English to
-Brazilian Portugese.
+  Open-Tran had an open API since its creation in February 2007.
+  The interface is exported through
+  the <a href="http://www.xmlrpc.com">XML-RPC</a> protocol.
+  You can fetch the suggestions from the server using your
+  own software by sending a request to the server and fetching an XML
+  response with the results.  The following link will take you to 
+  <a href="/RPC2">the documentation of all exported functions</a>.
+</p>
+<p>
+  Below is the list of programming languages with code snippets (or
+  links to such) that give an example of how to access the Open-Tran
+  service with it.
+</p>
+
+<a name="Python"></a>
+<h3>Python</h3>
+<p>
+  Below is an example of a very simple python script that searches for
+  translations of the phrase "<em>save as</em>" from English to
+  Brazilian Portugese.
 </p>
     <pre>
       from xmlrpclib import ServerProxy
@@ -21,10 +55,81 @@ Brazilian Portugese.
           print sugg
     </pre>
 
-<h2>C</h2>
+<a name="C"></a>
+<h3>C</h3>
 <p>
-Ignacio Casal Quinteiro has contributed
-an <a href="http://bugzilla.gnome.org/attachment.cgi?id=101873">example
-implementation in C</a>.
+  Ignacio Casal Quinteiro has contributed
+  an <a href="http://bugzilla.gnome.org/attachment.cgi?id=101873">example
+    implementation in C</a>.
 </p>
 
+<a name="Offline"></a>
+<h2>Off-line mode</h2>
+<p>
+  Since June, 2008 it is possible to use the Open-Tran service in an
+  off-line mode.  Once the user downloads the databases, she may query
+  it localy.  The off-line access has one important advantage: it
+  returns the results almost instantly.
+</p>
+
+<a name="Installing"></a>
+<h3>Installing</h3>
+<p>
+  First, go to our FTP site
+  at <a href="ftp://open-tran.eu">ftp://open-tran.eu</a> and download
+  two databases: an English one
+  (currently: <a href="ftp://open-tran.eu/ten-en.db">ftp://open-tran.eu/ten-en.db</a>)
+  and one for your language (for
+  example: <a href="ftp://open-tran.eu/ten-pt_br.db">ftp://open-tran.eu/ten-pt_br.db</a>
+  for Brazilian Portuguese).  The databases have to be stored (or
+  symlinked) in the <tt>.open-tran</tt> directory in the user's home
+  directory.
+</p>
+<p>
+  You will also need to download the software
+  from <a href="ftp://open-tran.eu/open-tran-latest.tar.gz">ftp://open-tran.eu/open-tran-latest.tar.gz</a>.
+  Currently, there are two tools in the tarball:
+</p>
+<ol>
+<li><tt>suggest.py</tt> is a console script that may be run like
+  this: <tt>suggest.py "save as" es</tt></li>
+<li><tt>open-tran.py</tt> is a GTK-based GUI tool that has never
+  really been completed.  I thought that I would be able to create a
+  po-editor within few hours but it turned out to be a wrong
+  assumption :)</li> 
+</ol>
+
+
+<a name="Database"></a>
+<h3>Database</h3>
+<p>
+  Open-Tran stores the phrases
+  in <a href="http://sqlite.org">SQLite3</a> databases.  Below is the
+  diagram depicting the current database schema.  You can find the SQL
+  for it 
+  <a href="http://code.google.com/p/open-tran/source/browse/trunk/import/step2.sql?r=180">in
+  the repository</a>.<br/>
+  <img src="/images/db-ten.png" alt="database diagram" width="100%"/><br/>
+  The field <tt>length</tt> in the table <tt>Phrases</tt> holds
+  the number of words in the phrase and there is currently only
+  one <tt>flag</tt>: value 1 indicates that the translation is fuzzy.
+</p>
+
+
+<a name="Algorithm"></a>
+<h3>Algorithm</h3>
+<p>
+  Open-Tran first tries to find the most similar phrase in the
+  original language.  In order to do that, we compute the number of
+  words that are not in the intersection of the phrases.  The lower
+  the number, the better.  As an example consider the following
+  situation: we are looking for the phrase <tt>"do you really want to
+  save"</tt>.  Let's consider the following candidates:
+  <table>
+    <tr><th>candidate</th><th>score</th></tr>
+    <tr><td>do you really want to <span class="yellow">quit</span></td><td>2 (quit, save)</td></tr>
+    <tr><td>save <span class="yellow">what</span> you want</td><td>3 (what, do, really)</td>
+  </table><br/>
+  Once we find the best matches, we locate their translations via
+  their <tt>locationid</tt>.
+</p>

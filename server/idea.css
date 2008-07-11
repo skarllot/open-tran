@@ -153,9 +153,16 @@ a.jslink:hover {
 	border: none;
 }
 
+th {
+    text-align: left;
+}
+
 .clear {
     padding: 10px 10px 10px 10px;
     clear: both;
     margin: 0;
 }
 
+.yellow {
+    background: #ff0;
+}
