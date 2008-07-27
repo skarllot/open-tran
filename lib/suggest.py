@@ -30,6 +30,11 @@ PROJS = {
     'X': 'XFCE'
     }
 
+def sanitize_language(lang):
+    lang = lang.lower()
+    lang = lang.replace('-', '_')
+    return lang
+
 class TmpSug:
     def __init__(self, text, orig, project, value, flags):
         self.text = text
@@ -140,6 +145,8 @@ class TranDB:
 
 
     def get_translations(self, text, srclang, dstlang):
+        srclang = sanitize_language(srclang)
+        dstlang = sanitize_language(dstlang)
         result = []
         phrase = Phrase(text, srclang, False)
         if phrase.length() < 1:
