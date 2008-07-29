@@ -78,7 +78,7 @@ class renderer(object):
         self.projects = []
 
     def feed(self, project):
-        if project.name[0] == self.name[0]:
+        if project.path[0] == self.name[0]:
             self.projects.append(project)
 
     def render_icon(self):
@@ -107,7 +107,7 @@ class renderer(object):
         for project in self.projects:
             if project.count > 1:
                 result += "%d&times;" % project.count
-            path = self.name + " " + project.name[2:]
+            path = self.name + " " + project.path[2:]
             if project.flags == 1:
                 result += '<span id="fuzzy">'
             result += "%s: %s<br/>\n" % (self.render_link(path), _replace_html(project.orig_phrase))

@@ -79,7 +79,8 @@ class Suggestion:
     
     def append_project(self, project, orig, value, flags):
         x = Project()
-        x.name = project
+        x.name = PROJS[project[0]]
+        x.path = project
         x.orig_phrase = orig
         x.count = 0
         x.flags = flags
@@ -221,27 +222,32 @@ send a list of elements containing the following one:
  * text: Zapisz jako...
  * value: 1
  * projects[0]:
-   * name: G/drgeo
+   * name: GNOME
+   * path: G/drgeo
    * orig_phrase: Save As...
    * count: 13
    * flags: 0
  * projects[1]:
-   * name: G/gxsnmp
+   * name: GNOME
+   * path: G/gxsnmp
    * orig_phrase: Save as...
    * count: 4
    * flags: 0
  * projects[2]:
-   * name: S/kpowersave
+   * name: SUSE
+   * path: S/kpowersave
    * orig_phrase: Save As ...
    * count: 1
    * flags: 0
  * projects[3]:
-   * name: K/koffice
+   * name: KDE
+   * path: K/koffice
    * orig_phrase: Save Document As
    * count: 1
    * flags: 0
  * projects[4]:
-   * name: g/gedit
+   * name: GNOME
+   * path: G/gedit
    * orig_phrase: Save As…
    * count: 1
    * flags: 0
