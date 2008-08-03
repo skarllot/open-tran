@@ -191,13 +191,33 @@ class xfce_renderer(renderer):
         return '<a href="http://i18n.xfce.org/">%s</a>' % project
 
 
+class inkscape_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "Inkscape"
+        self.icon_path = "/images/inkscape-logo.png"
+
+    def render_link(self, project):
+        return '<a href="http://www.inkscape.org">%s</a>' % project
+
+
+
 class Suggestion:
     def __init__(self, source, target):
         self.source = source
         self.target = target
 
 
-RENDERERS = [gnome_renderer(), kde_renderer(), mozilla_renderer(), fy_renderer(), di_renderer(), suse_renderer(), xfce_renderer()]
+RENDERERS = [
+    di_renderer(),
+    fy_renderer(),
+    gnome_renderer(),
+    inkscape_renderer(),
+    kde_renderer(),
+    mozilla_renderer(),
+    suse_renderer(),
+    xfce_renderer()
+    ]
 
 
 class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):

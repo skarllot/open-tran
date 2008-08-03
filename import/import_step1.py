@@ -153,24 +153,28 @@ values
         return len(store.units)
 
 
+    def run_project(self, dir, proj):
+        log("Importing %s..." % proj)
+        self.cursor = self.conn.cursor()
+        phrases = {}
+        proj_file_name = os.path.join(dir, proj)
+        for lang in os.listdir(proj_file_name):
+            if not self.is_resource(lang):
+                continue
+            log("  + %s..." % lang, True)
+            try:
+                cnt = self.load_project_file(phrases, lang, os.path.join(proj_file_name, lang))
+                log("ok (%d)" % cnt)
+            except:
+                log("failed.")
+        log("  phrases: %d" % len(phrases))
+        pid = self.store_project(os.path.basename(proj_file_name))
+        self.store_phrases(pid, phrases)
+        
+
     def run_projects(self, dir):
         for proj in get_subdirs(dir):
-            log("Importing %s..." % proj)
-            self.cursor = self.conn.cursor()
-            phrases = {}
-            proj_file_name = os.path.join(dir, proj)
-            for lang in os.listdir(proj_file_name):
-                if not self.is_resource(lang):
-                    continue
-                log("  + %s..." % lang, True)
-                try:
-                    cnt = self.load_project_file(phrases, lang, os.path.join(proj_file_name, lang))
-                    log("ok (%d)" % cnt)
-                except:
-                    log("failed.")
-            log("  phrases: %d" % len(phrases))
-            pid = self.store_project(os.path.basename(proj_file_name))
-            self.store_phrases(pid, phrases)
+            self.run_project(dir, proj)
 
 
     def store_project(self, name):
@@ -289,6 +293,23 @@ class Xfce_Importer(Importer):
         Importer.run_projects(self, path)
 
 
+class Inkscape_Importer(Importer):
+    def getprefix(self):
+        return "I"
+
+    def is_resource(self, fname):
+        if debug:
+            return fname == 'pl.pl' or fname == 'de.po'
+        return fname.endswith('.po')
+
+    def get_language(self, project):
+        return project[:-3].replace('@', '_').lower()
+    
+    def run(self, path):
+        Importer.run_project(self, path, '')
+
+
+
 debug = 0
 root = '/home/sliwers/projekty/open-tran-data'
 pocls = factory.getclass("kde.po")
@@ -297,6 +318,7 @@ cursor = conn.cursor()
 importers = {
     DI_Importer(conn, pocls) : '/debian-installer',
     FY_Importer(conn, pocls) : '/fy/kompjtr2.txt',
+    Inkscape_Importer(conn, pocls) : '/inkscape',
     KDE_Importer(conn, pocls) : '/l10n-kde4',
     Mozilla_Importer(conn, pocls) : '/mozilla-po',
     Gnome_Importer(conn, pocls) : '/gnome-po',

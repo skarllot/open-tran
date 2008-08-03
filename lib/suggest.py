@@ -24,6 +24,7 @@ PROJS = {
     'D': 'Debian Installer',
     'F': 'FY',
     'G': 'GNOME',
+    'I': 'Inkscape',
     'K': 'KDE',
     'M': 'Mozilla',
     'S': 'SUSE',
