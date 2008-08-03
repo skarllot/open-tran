@@ -35,3 +35,5 @@ for d in *; do
     moz2po -t "$mozilla_l10n/en-US" "$mozilla_l10n/$d" "$mozilla_po/$d"
     echo "done."
 done
+
+touch "$data_root/mozilla.stamp"

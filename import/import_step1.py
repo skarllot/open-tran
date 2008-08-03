@@ -52,6 +52,7 @@ class Importer(object):
         'nb_no' : 'nb',
         'nds_de' : 'nds',
         'nn_no' : 'nn',
+        'sr_latin' : 'sr_latn',
         'sv_se' : 'sv'
         }
         

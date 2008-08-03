@@ -20,13 +20,11 @@ import re
 class GenericHandler:
     def __init__(self, connectors):
         self._connectors = set()
-        self._connectors.add("s")
-        self._connectors.add("d")
         for word in connectors:
             self._connectors.add(word)
 
     def discard(self, word):
-        return word in self._connectors
+        return word.startswith('%') or word in self._connectors
         
 
 class DEHandler(GenericHandler):
@@ -59,7 +57,7 @@ class PTHandler(GenericHandler):
 
 
 class Phrase:
-    wre = re.compile('\w(?:[\-&\'_]?\w)*', re.UNICODE)
+    wre = re.compile('[\w%](?:[\-&\'_]?\w)*', re.UNICODE)
     dre = re.compile('^\d+$', re.UNICODE)
 
     __handlers = { "C"  : ENHandler (),

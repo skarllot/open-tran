@@ -1,6 +1,7 @@
 #!/bin/bash
 
-xfce_root="/home/sliwers/projekty/open-tran-data/xfce"
+data_root="/home/sliwers/projekty/open-tran-data"
+xfce_root="$data_root/xfce"
 
 cd $xfce_root
 
@@ -33,3 +34,5 @@ for m in $goodies; do
 	echo "done."
     fi
 done
+
+touch "$data_root/xfce.stamp"

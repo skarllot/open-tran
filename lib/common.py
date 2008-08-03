@@ -46,6 +46,7 @@ LANGUAGES = {
     'fy' : u'Frysk',
     'ga' : u'Gaeilge',
     'gl' : u'Galego',
+    'gu' : u'ગુજરાતી',
     'ha' : u'هَوُسَ',
     'he' : u'‫עברית‬',
     'hi' : u'हिन्दी',

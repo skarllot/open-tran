@@ -1,6 +1,7 @@
 #!/bin/bash
 
-gnome_root="/home/sliwers/projekty/open-tran-data/gnome-po"
+data_root="/home/sliwers/projekty/open-tran-data"
+gnome_root="$data_root/gnome-po"
 
 gmodules=`wget -o /dev/null -O- http://svn.gnome.org/viewvc/ | grep 'a href="/viewvc/[^"]' | sed 's/.*\/viewvc\/\([^\/]*\)\/.*/\1/'`
 
@@ -18,3 +19,5 @@ for m in $gmodules; do
 	echo "done."
     fi
 done
+
+touch "$data_root/gnome.stamp"
