@@ -47,6 +47,10 @@ class ITHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["i", "il", "lo", "gli", "la", "le", "un", "uno", "una"])
 
+class NLHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["de", "een", "het"])
+
 class PLHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["by"])
@@ -57,7 +61,7 @@ class PTHandler(GenericHandler):
 
 
 class Phrase:
-    wre = re.compile('[\w%](?:[\-&\'_]?\w)*', re.UNICODE)
+    wre = re.compile('[\w%](?:[&\'_]?\w)*', re.UNICODE)
     dre = re.compile('^\d+$', re.UNICODE)
 
     __handlers = { "C"  : ENHandler (),
@@ -66,6 +70,7 @@ class Phrase:
                    "es" : ESHandler (),
                    "fr" : FRHandler (),
                    "it" : ITHandler (),
+                   "nl" : NLHandler (),
                    "pl" : PLHandler (),
                    "pt" : PTHandler () }
     __def_handler = GenericHandler ([])

@@ -75,7 +75,7 @@ class Importer(object):
     def store_phrase(self, pid, lid, sentence, flags, lang):
         phrase = Phrase(sentence, lang[:2])
         length = phrase.length()
-        if length == 0:
+        if length == 0 or len(sentence) < 2:
             return
         if flags:
             flags = 1

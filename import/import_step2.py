@@ -20,7 +20,9 @@ from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
-iconn = sqlite.connect('../data/ten.db')
+datadir = '/media/disk-1/sliwers/projekty/open-tran/trunk/data'
+
+iconn = sqlite.connect(datadir + '/ten.db')
 icur = iconn.cursor()
 
 word_id = 0
@@ -109,7 +111,7 @@ VALUES (?, ?, ?, ?)""", (nlid, lid, project_names[projectid], flags))
 
 move_projects()
 for lang in sorted(LANGUAGES):
-    oconn = sqlite.connect('../data/ten-' + lang + '.db')
+    oconn = sqlite.connect(datadir + '/ten-' + lang + '.db')
     ocur = oconn.cursor()
     print "Moving %s phrases..." % lang,
     sys.stdout.flush()
