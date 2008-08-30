@@ -1,6 +1,6 @@
 #!/bin/bash
 
-data_root="/home/sliwers/projekty/open-tran-data"
+data_root="/media/disk/sliwers/projekty/open-tran-data"
 gnome_root="$data_root/gnome-po"
 
 gmodules=`wget -o /dev/null -O- http://svn.gnome.org/viewvc/ | grep 'a href="/viewvc/[^"]' | sed 's/.*\/viewvc\/\([^\/]*\)\/.*/\1/'`

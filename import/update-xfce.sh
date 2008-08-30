@@ -1,6 +1,6 @@
 #!/bin/bash
 
-data_root="/home/sliwers/projekty/open-tran-data"
+data_root="/media/disk/sliwers/projekty/open-tran-data"
 xfce_root="$data_root/xfce"
 
 cd $xfce_root

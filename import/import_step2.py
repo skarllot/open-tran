@@ -20,7 +20,7 @@ from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
-datadir = '/media/disk-1/sliwers/projekty/open-tran/trunk/data'
+datadir = '/home/sliwers/projekty/open-tran/trunk/data'
 
 iconn = sqlite.connect(datadir + '/ten.db')
 icur = iconn.cursor()

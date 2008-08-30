@@ -1,6 +1,6 @@
 #!/bin/bash
 
-data_root="/home/sliwers/projekty/open-tran-data"
+data_root="/media/disk/sliwers/projekty/open-tran-data"
 kde_root="$data_root/l10n-kde4"
 
 cd $kde_root

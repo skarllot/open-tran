@@ -51,13 +51,13 @@ FROM phrases
 WHERE projectid BETWEEN %d AND %d""" % boundaries)
     (cnt, lcnt) = cur.fetchone()
     print proj, cnt, lcnt
-     cur.execute("""
+    cur.execute("""
 SELECT count(*)
 FROM phrases
 WHERE lang = 'en'
   AND projectid BETWEEN %d AND %d""" % boundaries)
-     (cnt,) = cur.fetchone()
-     print proj, cnt
+    (cnt,) = cur.fetchone()
+    print proj, cnt
 
 
 cur.execute("""

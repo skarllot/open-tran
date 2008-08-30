@@ -46,14 +46,21 @@ class Importer(object):
     global_pid = 0
     global_loc = 0
     lang_dict = {
+        'as_in' : 'as',
+        'be_by' : 'be',
         'fy_nl' : 'fy',
         'ga_ie' : 'ga',
+        'hi_in' : 'hi',
         'hy_am' : 'hy',
+        'ml_in' : 'ml',
+        'mr_in' : 'mr',
         'nb_no' : 'nb',
         'nds_de' : 'nds',
         'nn_no' : 'nn',
+        'or_in' : 'or',
         'sr_latin' : 'sr_latn',
-        'sv_se' : 'sv'
+        'sv_se' : 'sv',
+        'te_in' : 'te'
         }
         
     
@@ -134,8 +141,10 @@ values
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
             for f in files:
                 if self.is_resource(f):
+                    rel = root[len(dir) + 1:]
+                    name = self.get_path(rel, f)
                     log("Importing %s..." % f)
-                    pid = self.store_project(f)
+                    pid = self.store_project(name)
                     self.store_file(pid, os.path.join(root, f))
             if '.svn' in dirs:
                 dirs.remove('.svn')
@@ -169,7 +178,8 @@ values
             except:
                 log("failed.")
         log("  phrases: %d" % len(phrases))
-        pid = self.store_project(os.path.basename(proj_file_name))
+        name = self.get_path(proj_file_name, os.path.basename(proj_file_name))
+        pid = self.store_project(name)
         self.store_phrases(pid, phrases)
         
 
@@ -178,12 +188,15 @@ values
             self.run_project(dir, proj)
 
 
-    def store_project(self, name):
+    def get_path(self, dir, name):
         if name.endswith(".fr.po"):
             name = name[:-6]
         if name.endswith(".po"):
             name = name[:-3]
-        name = self.getprefix() + "/" + name
+        return self.getprefix() + "/" + name
+        
+
+    def store_project(self, name):
         Importer.global_pid += 1
         self.cursor.execute("insert into projects (id, name) values (?, ?)",
                             (Importer.global_pid, name))
@@ -311,18 +324,38 @@ class Inkscape_Importer(Importer):
 
 
 
+class OO_Importer(Importer):
+    def getprefix(self):
+        return "O"
+
+    def get_path(self, dir, name):
+        dir = dir[3:]
+        idx = dir.find('/')
+        if idx >= 0:
+            dir = dir[:idx]
+        return self.getprefix() + "/" + dir + "/" + name[:-3]
+    
+    def is_resource(self, fname):
+        return fname.endswith('.po')
+    
+    def run(self, path):
+        Importer.run_langs(self, path)
+
+
+
 debug = 0
-root = '/home/sliwers/projekty/open-tran-data'
+root = '/media/disk/sliwers/projekty/open-tran-data'
 pocls = factory.getclass("kde.po")
 conn = sqlite.connect('../data/ten.db')
 cursor = conn.cursor()
 importers = {
     DI_Importer(conn, pocls) : '/debian-installer',
     FY_Importer(conn, pocls) : '/fy/kompjtr2.txt',
+    Gnome_Importer(conn, pocls) : '/gnome-po',
     Inkscape_Importer(conn, pocls) : '/inkscape',
     KDE_Importer(conn, pocls) : '/l10n-kde4',
     Mozilla_Importer(conn, pocls) : '/mozilla-po',
-    Gnome_Importer(conn, pocls) : '/gnome-po',
+    OO_Importer(conn, pocls) : '/oo-po',
     Suse_Importer(conn, pocls) : '/suse-i18n',
     Xfce_Importer(conn, pocls) : '/xfce'
     }

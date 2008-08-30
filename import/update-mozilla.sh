@@ -2,9 +2,9 @@
 
 TRASH_OFF=YES
 
-data_root="/home/sliwers/projekty/open-tran-data"
+data_root="/media/disk/sliwers/projekty/open-tran-data"
 mozilla_root="$data_root/mozilla"
-mozilla_l10n="$data_root/l10n"
+mozilla_l10n="$data_root/mozilla-l10n"
 mozilla_po="$data_root/mozilla-po"
 
 cd $mozilla_root
