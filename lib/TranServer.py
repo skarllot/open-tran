@@ -43,6 +43,7 @@ SUGGESTIONS_TXT = {
     'csb': u'Sugerowóny dolmaczënczi',
     'da' : u'Oversćttelsesforslag',
     'de' : u'Übersetzungsvorschläge',
+    'en' : u'Translation suggestions',
     'es' : u'Sugerencias de traducción',
     'fi' : u'Käännös ehdotukset',
     'fr' : u'Traductions suggérées',
@@ -201,6 +202,16 @@ class inkscape_renderer(renderer):
         return '<a href="http://www.inkscape.org">%s</a>' % project
 
 
+class openoffice_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "OpenOffice.org"
+        self.icon_path = "/images/oo-logo.png"
+
+    def render_link(self, project):
+        return '<a href="http://l10n.openoffice.org">%s</a>' % project
+
+
 
 class Suggestion:
     def __init__(self, source, target):
@@ -215,6 +226,7 @@ RENDERERS = [
     inkscape_renderer(),
     kde_renderer(),
     mozilla_renderer(),
+    openoffice_renderer(),
     suse_renderer(),
     xfce_renderer()
     ]
@@ -421,14 +433,24 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         return open(path, 'rb')
 
 
-    def write_flag(self, f):
+    def write_flag(self, f, static = False):
         lang = self.ifacelang
         if lang not in SUGGESTIONS_TXT:
             lang = "en"
-        f.write("""
-      <a href="javascript:;" class="jslink" onclick="return blocking('lang_choice');">Locale: <img src="/images/flag-%s.png" alt="%s"/></a>
-""" % (lang, lang))
+        prefix = ""
+        if static:
+            prefix = "sel-"
+        f.write(("""
+      <a href="javascript:;" class="jslink" onclick="return blocking('lang_choice');">
+        <img src="/images/%sflag-%s.png" alt="%s"/>&nbsp;%s</a>
+""" % (prefix, lang, lang, LANGUAGES[lang])).encode('utf-8'))
 
+
+    def write_iface_select(self, f):
+	for lang in sorted(SUGGESTIONS_TXT.keys()):
+	    f.write(('''
+<li><a href="/setlang?lang=%s" class="jslink"><img src="/images/flag-%s.png" alt="%s"/>&nbsp;%s</a></li>
+''' % (lang, lang, lang, LANGUAGES[lang])).encode('utf-8'))
 
     def write_language_select(self, f, chosen):
         for code in sorted(LANGUAGES.keys()):
@@ -438,17 +460,15 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
             f.write('>%s: %s</option>' % (code, LANGUAGES[code].encode('utf-8')))
         
 
-    def embed_in_template(self, text, code=200):
-        template = self.find_template()
-        f = StringIO()
-        for line in template:
-            if line.find('<content/>') != -1:
-                if isinstance(text, file):
-                    self.copyfile(text, f)
-                else:
-                    f.write(text)
-            elif line.find('<ifacelang/>') != -1:
+    def process(self, stream, code=200):
+	f = StringIO()
+	for line in stream:
+	    if line.find('<ifacelang/>') != -1:
                 self.write_flag(f)
+	    elif line.find('<sifacelang/>') != -1:
+                self.write_flag(f, True)
+            elif line.find('<ifaceselect/>') != -1:
+		self.write_iface_select(f)
             elif line.find('<srclang/>') != -1:
                 lang = self.srclang
                 if lang == None:
@@ -461,12 +481,29 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
                 self.write_language_select(f, lang)
             else:
                 f.write(line)
-
         f.flush()
-        length = f.tell()
         f.seek(0)
+	return f
+
+
+    def embed_in_template(self, text, code=200):
+        template = self.find_template()
+        f = StringIO()
+        for line in template:
+            if line.find('<content/>') != -1:
+                if isinstance(text, file):
+                    self.copyfile(text, f)
+                else:
+                    f.write(text)
+            else:
+                f.write(line)
+        f.flush()
+        f.seek(0)
+	result = self.process(f, code)
+        length = result.tell()
+	f.close()
         self.send_plain_headers(code, "text/html", length, 0)
-        return f
+        return result
 
 
     def get_query(self):
@@ -533,6 +570,8 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
             f = open(path, 'rb')
             if path.endswith('.html'):
                 return self.embed_in_template(f)
+	    elif path.endswith('.shtml'):
+		return self.process(f)
         except IOError:
             self.send_error(404, "File not found")
             return None

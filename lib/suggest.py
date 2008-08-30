@@ -27,6 +27,7 @@ PROJS = {
     'I': 'Inkscape',
     'K': 'KDE',
     'M': 'Mozilla',
+    'O': 'OpenOffice.org',
     'S': 'SUSE',
     'X': 'XFCE'
     }

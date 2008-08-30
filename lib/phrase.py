@@ -27,6 +27,10 @@ class GenericHandler:
         return word.startswith('%') or word in self._connectors
         
 
+class AFHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["'n", "die"])
+
 class DEHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["das", "dem", "den", "der", "deren", "des", "dessen", "die", "ein", "eine", "einem", "einen"])
@@ -61,10 +65,11 @@ class PTHandler(GenericHandler):
 
 
 class Phrase:
-    wre = re.compile('[\w%](?:[&\'_]?\w)*', re.UNICODE)
+    wre = re.compile("[\w'%](?:[&'_]?\w)*", re.UNICODE)
     dre = re.compile('^\d+$', re.UNICODE)
 
     __handlers = { "C"  : ENHandler (),
+                   "af" : AFHandler (),
                    "de" : DEHandler (),
                    "en" : ENHandler (),
                    "es" : ESHandler (),
