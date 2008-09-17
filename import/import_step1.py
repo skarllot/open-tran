@@ -82,7 +82,7 @@ class Importer(object):
     def store_phrase(self, pid, lid, sentence, flags, lang):
         phrase = Phrase(sentence, lang[:2])
         length = phrase.length()
-        if length == 0 or len(sentence) < 2:
+        if length == 0 or len(sentence) < 2 or length > 7:
             return
         if flags:
             flags = 1
@@ -138,6 +138,7 @@ values
 
     def run_langs(self, dir):
         self.langs = get_lsubdirs(dir)
+        print self.langs
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
             for f in files:
                 if self.is_resource(f):
@@ -146,6 +147,8 @@ values
                     log("Importing %s..." % f)
                     pid = self.store_project(name)
                     self.store_file(pid, os.path.join(root, f))
+                else:
+                    print f, "is not a resource"
             if '.svn' in dirs:
                 dirs.remove('.svn')
 
@@ -256,7 +259,7 @@ class FY_Importer(Importer):
         for line in f:
             en, fy = line.rstrip().split(" | ")
             items[en] = { "fy" : fy }
-        pid = Importer.store_project(self, "")
+        pid = Importer.store_project(self, "F/")
         self.store_phrases(pid, items)
 
 
@@ -344,7 +347,7 @@ class OO_Importer(Importer):
 
 
 debug = 0
-root = '/media/disk/sliwers/projekty/open-tran-data'
+root = '/media/disk-1/sliwers/projekty/open-tran-data'
 pocls = factory.getclass("kde.po")
 conn = sqlite.connect('../data/ten.db')
 cursor = conn.cursor()
