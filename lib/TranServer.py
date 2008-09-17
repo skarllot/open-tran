@@ -408,26 +408,36 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
             self.dstlang = 'en'
 
 	
+    def convert_iface_lang(self, lang):
+        for l in SUGGESTIONS_TXT.keys():
+            if lang[:2] == l[:2]:
+                return l
+        return None
+
+
     def get_iface_language(self):
-	available_langs = map(lambda x: x[:2], SUGGESTIONS_TXT.keys())
-	if self.srclang in available_langs:
-	    self.ifacelang = self.srclang
-	if self.dstlang in available_langs:
-	    self.ifacelang = self.dstlang
-        try:
-            langs = map(lambda x: x[:2], self.headers['Accept-Language'].split(','))
-            for lang in langs + [self.dstlang, self.srclang]:
-                if lang in available_langs:
-                    self.ifacelang = lang
-                    break
-        except:
-            pass
 	try:
             c = SmartCookie(self.headers['Cookie'])
-            if c['lang'].value in available_langs:
-                self.ifacelang = c['lang'].value
+            self.ifacelang = self.convert_iface_lang(c['lang'].value)
+            if self.ifacelang:
+                return
         except:
             pass
+        try:
+            langs = self.headers['Accept-Language'].split(',')
+            for lang in langs:
+                self.ifacelang = self.convert_iface_lang(lang)
+                if self.ifacelang:
+                    return
+        except:
+            pass
+        self.ifacelang = self.convert_iface_lang(self.srclang)
+        if self.ifacelang:
+            return
+	self.ifacelang = self.convert_iface_lang(self.dstlang)
+        if self.ifacelang:
+            return
+        self.ifacelang = "en"
 	
 
     def get_languages(self):
