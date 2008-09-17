@@ -9,7 +9,7 @@
   <script language="JavaScript" type="text/javascript" src="/script.js"></script>
 </head>
 
-<body onload="return block_all();">
+<body onload="return initialize();">
   <div id="content">
     <div id="blue_box"></div>
 
@@ -19,7 +19,7 @@
       </div>
       <div class="clear"></div>
       <div id="lang_choice">
-	<div class="close"><a href="javascript:;" onclick="return blocking('lang_choice');">&times;</a></div>
+	<div class="close"><a href="javascript:;" onclick="return visibility_switch('lang_choice');">&times;</a></div>
 	<ul>
 	  <ifaceselect/>
 	</ul>
@@ -34,8 +34,8 @@
   <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">                                 
     <div id="form_mode">
       <ul>
-	<li><a href="javascript:;">Foreslå</a></li>
-	<li><a href="javascript:;">Sammenlign</a></li>
+	<li><a href="javascript:;" id="form_mode_suggest" onclick="return set_mode('suggest')">Sugestie</a></li>
+	<li><a href="javascript:;" id="form_mode_compare" onclick="return set_mode('compare')">Porównanie</a></li>
       </ul>
     </div>
     <div id="form_query">
@@ -45,22 +45,25 @@
       <select id="form_lang_src" name="src" size="1">
         <srclang/>
       </select>
-      &harr;
+      <div id="form_lang_switch">
+	<a href="javascript:;" onclick="return switch_select_indices()">&harr;</a>
+      </div>
       <select id="form_lang_dst" name="dst" size="1">
         <dstlang/>
       </select>
     </div>
     <div id="form_submit">
-      <input value="Søg" type="submit"/>
+      <input value="suggest" type="hidden" name="mode"/>
+      <input value="Szukaj" type="submit"/>
     </div>
   </form>                                                                                                                  
 </div>                                                                                                                     
 
 <div id="stats">
   <ul>
-    <li><a href="/">Projekter</a></li>
-    <li><a href="/">Sprog</a></li>
-    <li class="last"><a href="/">Ord</a></li>
+    <li><a href="/projects.html">Projekty</a></li>
+    <li><a href="/languages.html">Języki</a></li>
+    <li class="last"><a href="/words.html">Słowa</a></li>
   </ul>
 </div>
 
@@ -70,16 +73,16 @@
       <div id="global">
 	<ul> 
 	  <li><a href="http://open-tran.blogspot.com">Blog</a></li> 
-	  <li><a href="http://code.google.com/p/open-tran/issues/list">Bugs</a></li>
-	  <li><a href="http://open-tran.eu/dev.html">Developers</a></li>
-	  <li><a href="http://open-tran.eu/hof.html">Hall of Fame</a></li>
+	  <li><a href="http://code.google.com/p/open-tran/issues/list">Błędy</a></li>
+	  <li><a href="http://open-tran.eu/dev.html">Dla programistów</a></li>
+	  <li><a href="http://open-tran.eu/hof.html">Aleja Zasłużonych</a></li>
 	</ul>
       </div> <!-- global -->
       <div id="local">
 	<ul> 
-	  <li><a href="/whatfor.html">Hvad er det?</a></li>
-	  <li><a href="/help.html">Hjælp</a></li> 
-          <li><a href="/contact.html">Kontakt</a></li>
+	  <li><a href="/poco.html">Po co to?</a></li>
+	  <li><a href="/pomoc.html">Pomoc</a></li> 
+	  <li><a href="/kontakt.html">Kontakt</a></li>
 	</ul>
       </div> <!-- local -->
       <div class="clear"></div>

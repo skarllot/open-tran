@@ -4,12 +4,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>Open-Tran.eu - consistency matters</title>
   <link rel="stylesheet" type="text/css" href="/opentran.css"/>
-<!--  <link rel="icon" type="image/x-ico" href="/favicon.ico"> -->
+  <link rel="icon" type="image/x-ico" href="/favicon.ico">
 <!--  <link rel="search" type="application/opensearchdescription+xml" title="Open-Tran.eu" href="/search.xml" /> -->
   <script language="JavaScript" type="text/javascript" src="/script.js"></script>
 </head>
 
-<body onload="return block_all();">
+<body onload="return initialize();">
   <div id="content">
     <div id="blue_box"></div>
 
@@ -19,7 +19,7 @@
       </div>
       <div class="clear"></div>
       <div id="lang_choice">
-	<div class="close"><a href="javascript:;" onclick="return blocking('lang_choice');">&times;</a></div>
+	<div class="close"><a href="javascript:;" onclick="return visibility_switch('lang_choice');">&times;</a></div>
 	<ul>
 	  <ifaceselect/>
 	</ul>
@@ -34,8 +34,8 @@
   <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">                                 
     <div id="form_mode">
       <ul>
-	<li><a href="javascript:;">Пропонувати</a></li>
-	<li><a href="javascript:;">Порівняти</a></li>
+	<li><a href="javascript:;" onclick="return set_mode('suggest');" id="form_mode_suggest">Пропонувати</a></li>
+	<li><a href="javascript:;" onclick="return set_mode('compare');" id="form_mode_compare">Порівняти</a></li>
       </ul>
     </div>
     <div id="form_query">
@@ -45,12 +45,15 @@
       <select id="form_lang_src" name="src" size="1">
         <srclang/>
       </select>
-      &harr;
+      <div id="form_lang_switch">
+	<a href="javascript:;" onclick="return switch_select_indices()">&harr;</a>
+      </div>
       <select id="form_lang_dst" name="dst" size="1">
         <dstlang/>
       </select>
     </div>
     <div id="form_submit">
+      <input value="suggest" type="hidden" name="mode"/>
       <input value="Пошук" type="submit"/>
     </div>
   </form>                                                                                                                  
@@ -58,9 +61,9 @@
 
 <div id="stats">
   <ul>
-    <li><a href="/">Проекти</a></li>
-    <li><a href="/">Мови</a></li>
-    <li class="last"><a href="/">Слова</a></li>
+    <li><a href="/projects.html">Проекти</a></li>
+    <li><a href="/languages.html">Мови</a></li>
+    <li class="last"><a href="/words.html">Слова</a></li>
   </ul>
 </div>
 

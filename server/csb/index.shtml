@@ -4,12 +4,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>Open-Tran.eu - consistency matters</title>
   <link rel="stylesheet" type="text/css" href="/opentran.css"/>
-<!--  <link rel="icon" type="image/x-ico" href="/favicon.ico"> -->
+  <link rel="icon" type="image/x-ico" href="/favicon.ico">
 <!--  <link rel="search" type="application/opensearchdescription+xml" title="Open-Tran.eu" href="/search.xml" /> -->
   <script language="JavaScript" type="text/javascript" src="/script.js"></script>
 </head>
 
-<body onload="return block_all();">
+<body onload="return initialize();">
   <div id="content">
     <div id="blue_box"></div>
 
@@ -19,7 +19,7 @@
       </div>
       <div class="clear"></div>
       <div id="lang_choice">
-	<div class="close"><a href="javascript:;" onclick="return blocking('lang_choice');">&times;</a></div>
+	<div class="close"><a href="javascript:;" onclick="return visibility_switch('lang_choice');">&times;</a></div>
 	<ul>
 	  <ifaceselect/>
 	</ul>
@@ -34,8 +34,8 @@
   <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">                                 
     <div id="form_mode">
       <ul>
-	<li><a href="javascript:;">Vorschlagen</a></li>
-	<li><a href="javascript:;">Vergleichen</a></li>
+	<li><a href="javascript:;" onclick="return set_mode('suggest');" id="form_mode_suggest">Zasugerëjë</a></li>
+	<li><a href="javascript:;" onclick="return set_mode('compare');" id="form_mode_compare">Przerównô</a></li>
       </ul>
     </div>
     <div id="form_query">
@@ -45,22 +45,25 @@
       <select id="form_lang_src" name="src" size="1">
         <srclang/>
       </select>
-      &harr;
+      <div id="form_lang_switch">
+	<a href="javascript:;" onclick="return switch_select_indices()">&harr;</a>
+      </div>
       <select id="form_lang_dst" name="dst" size="1">
         <dstlang/>
       </select>
     </div>
     <div id="form_submit">
-      <input value="Suchen" type="submit"/>
+      <input value="suggest" type="hidden" name="mode"/>
+      <input value="Szëkba" type="submit"/>
     </div>
   </form>                                                                                                                  
 </div>                                                                                                                     
 
 <div id="stats">
   <ul>
-    <li><a href="/">Projekte</a></li>
-    <li><a href="/">Sprachen</a></li>
-    <li class="last"><a href="/">Wörter</a></li>
+    <li><a href="/projects.html">Projektë</a></li>
+    <li><a href="/languages.html">Jãzëczi</a></li>
+    <li class="last"><a href="/words.html">Słowa</a></li>
   </ul>
 </div>
 
@@ -77,9 +80,9 @@
       </div> <!-- global -->
       <div id="local">
 	<ul> 
-	  <li><a href="/wozu.html">Wozu?</a></li>
-	  <li><a href="/help.html">Hilfe</a></li> 
-          <li><a href="/kontakt.html">Kontakt</a></li>
+	  <li><a href="/poco.html">Co to?</a></li>
+	  <li><a href="/pomoc.html">Pòmòc</a></li> 
+          <li><a href="/kontakt.html">Kòntakt</a></li>
 	</ul>
       </div> <!-- local -->
       <div class="clear"></div>

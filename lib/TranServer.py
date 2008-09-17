@@ -34,6 +34,7 @@ import urllib
 import posixpath
 import os
 import stat
+import sys
 
 
 SUGGESTIONS_TXT = {
@@ -238,6 +239,20 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     ifacelang = None
     idx = 1
 
+
+    def log_message(self, format, *args):
+	host = ""
+	try:
+	    host = self.headers['Host']
+	except:
+	    pass
+	
+	sys.stderr.write("%s [%s] %s\n" %
+                         (host,
+                          self.ifacelang,
+                          format%args))
+	
+
     def send_error(self, code, message=None):
         try:
             short, explain = self.responses[code]
@@ -274,7 +289,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     def render_suggestions(self, suggs, dstlang):
         result = '<ol>\n'
         for s in suggs:
-            result += '<li value="%d"><a href="#" class="jslink" onclick="return blocking(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
+            result += '<li value="%d"><a href="#" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
             for r in RENDERERS:
                 r.clear()
             for p in s.projects:
@@ -301,7 +316,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
                 cnt = r.render_count(False)
                 if cnt != None:
                     break
-            result += '<li value="%d">%s<a href="#" class="jslink" onclick="return blocking(\'sug%d\')">%s</a>' % (s.value, cnt, self.idx, _replace_html(s.text))
+            result += '<li value="%d">%s<a href="#" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, self.idx, _replace_html(s.text))
             result += self.render_div(self.idx, dstlang)
             result += '</li>\n'
             self.idx += 1
@@ -368,39 +383,61 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         return
 
 
-    def get_language(self):
+    def get_src_dst_languages(self):
         langone = ""
         langtwo = ""
-        self.ifacelang = "en"
         try:
             langone = self.headers['Host'].split('.')[0].replace('-', '_')
             langtwo = self.headers['Host'].split('.')[1].replace('-', '_')
         except:
-            try:
-                query = urlparse(self.path)[4]
-                vars = [x.strip().split('=') for x in query.split('&')]
-                langone = filter(lambda x: x[0] == 'src', vars)[0][1]
-                langtwo = filter(lambda x: x[0] == 'dst', vars)[0][1]
-            except:
-                pass
+	    pass
+
+	try:
+	    query = urlparse(self.path)[4]
+	    vars = [x.strip().split('=') for x in query.split('&')]
+	    langone = filter(lambda x: x[0] == 'src', vars)[0][1]
+	    langtwo = filter(lambda x: x[0] == 'dst', vars)[0][1]
+	except:
+	    pass
+
         if langone in LANGUAGES and langtwo in LANGUAGES:
             self.srclang = langone
             self.dstlang = langtwo
         elif langone in LANGUAGES:
-            self.srclang = 'en'
-            self.dstlang = langone
-            self.ifacelang = langone
+            self.srclang = langone
+            self.dstlang = 'en'
+
+	
+    def get_iface_language(self):
+	available_langs = map(lambda x: x[:2], SUGGESTIONS_TXT.keys())
+	if self.srclang in available_langs:
+	    self.ifacelang = self.srclang
+	if self.dstlang in available_langs:
+	    self.ifacelang = self.dstlang
         try:
             langs = map(lambda x: x[:2], self.headers['Accept-Language'].split(','))
             for lang in langs + [self.dstlang, self.srclang]:
-                if lang in LANGUAGES:
+                if lang in available_langs:
                     self.ifacelang = lang
                     break
+        except:
+            pass
+	try:
             c = SmartCookie(self.headers['Cookie'])
-            if c['lang'].value in LANGUAGES:
+            if c['lang'].value in available_langs:
                 self.ifacelang = c['lang'].value
         except:
             pass
+	
+
+    def get_languages(self):
+        self.srclang = "en"
+	self.dstlang = "en"
+	self.ifacelang = "en"
+	self.get_src_dst_languages()
+	self.get_iface_language()
+        if self.srclang == "en" and self.dstlang == "en":
+            self.dstlang = self.ifacelang
     
     
     def set_language(self):
@@ -414,6 +451,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.send_header('Location', '/')
         self.send_header('Set-Cookie', 'lang=%s; domain=.open-tran.eu' % lang)
         self.end_headers()
+
 
     def send_plain_headers(self, code, ctype, length, inode):
         self.send_response(code)
@@ -441,7 +479,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         if static:
             prefix = "sel-"
         f.write(("""
-      <a href="javascript:;" class="jslink" onclick="return blocking('lang_choice');">
+      <a href="javascript:;" class="jslink" onclick="return visibility_switch('lang_choice');">
         <img src="/images/%sflag-%s.png" alt="%s"/>&nbsp;%s</a>
 """ % (prefix, lang, lang, LANGUAGES[lang])).encode('utf-8'))
 
@@ -558,7 +596,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         path = self.translate_path('/' + self.ifacelang + '/' + self.path)
         f = None
         if os.path.isdir(path):
-            index = os.path.join(path, "index.html")
+            index = os.path.join(path, "index.shtml")
             if os.path.exists(index):
                 path = index
             else:
@@ -589,7 +627,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
 
     def do_POST(self):
-        self.get_language()
+        self.get_languages()
         if self.path == '/RPC2':
             return DocXMLRPCRequestHandler.do_POST(self)
         else:
@@ -597,7 +635,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
 
     def do_GET(self):
-        self.get_language()
+        self.get_languages()
         if self.path == '/RPC2':
             return DocXMLRPCRequestHandler.do_GET(self)
         return SimpleHTTPRequestHandler.do_GET(self)
