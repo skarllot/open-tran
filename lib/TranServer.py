@@ -17,7 +17,7 @@
 
 from DocXMLRPCServer import DocXMLRPCRequestHandler, DocXMLRPCServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
-from SocketServer import ThreadingMixIn
+from SocketServer import ForkingMixIn
 from signal import signal, SIGPIPE, SIG_IGN
 from suggest import TranDB
 from translate.storage import factory
@@ -653,7 +653,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         
 
 
-class TranServer(ThreadingMixIn, DocXMLRPCServer):
+class TranServer(ForkingMixIn, DocXMLRPCServer):
     allow_reuse_address = True
 
     def supported(self, lang):
