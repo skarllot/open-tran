@@ -123,5 +123,6 @@ function initialize()
         }
         document.search_form.mode.value = get_cookie("mode", "suggest");
         refresh_mode();
+        document.search_form.q.focus();
         return false;
 }
