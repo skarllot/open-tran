@@ -526,6 +526,12 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.end_headers()
 
 
+    def redirect(self, path):
+        self.send_response(301)
+        self.send_header('Location', path)
+        self.end_headers()
+        
+
     def send_plain_headers(self, code, ctype, length, inode):
         self.send_response(code)
         self.send_header("Content-type", ctype)
@@ -679,8 +685,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         ctype = self.guess_type(path)
 
         if path.endswith('index.html'):
-            self.send_header('Location', '/index.shtml')
-            self.send_plain_headers(301, ctype, 0, 0)
+            self.redirect('/index.shtml')
             return None
         
         try:
