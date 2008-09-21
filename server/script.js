@@ -1,7 +1,14 @@
 function formsubmit(){
         mode = document.search_form.mode.value;
-        location.href = "http://"
-                + document.search_form.src.value
+
+        nhref = "http://"
+                + document.search_form.src.value;
+
+        if (mode == "suggest")
+                nhref += "."
+                        + document.search_form.dst.value;
+        
+        location.href = nhref
                 + ".open-tran.eu/"
                 + mode
                 + "/"
@@ -54,13 +61,13 @@ function switch_select_indices()
 
 function second_lang_enable()
 {
-        get_element('form_lang_dst').style.display = 'block';
+        document.search_form.dst.style.display = 'block';
         get_element('form_lang_switch').style.display = 'block';
 }
 
 function second_lang_disable()
 {
-        get_element('form_lang_dst').style.display = 'none';
+        document.search_form.dst.style.display = 'none';
         get_element('form_lang_switch').style.display = 'none';
 }
 
