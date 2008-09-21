@@ -1,28 +1,12 @@
-function submit_suggest(){
-        location.href = "http://" 
-                + document.search_form.src.value
-                + "." + document.search_form.dst.value
-                + ".open-tran.eu/suggest/"
-                + document.search_form.q.value;
-        return false;
-}
-
-function submit_compare(){
-        location.href = "http://"
-                + document.search_form.src.value
-                + ".open-tran.eu/compare/"
-                + document.search_form.q.value;
-        return false;
-}
-
 function formsubmit(){
         mode = document.search_form.mode.value;
-        if (mode == "suggest"){
-                return submit_suggest();
-        }
-        else if (mode == "compare"){
-                return submit_compare();
-        }
+        location.href = "http://"
+                + document.search_form.src.value
+                + ".open-tran.eu/"
+                + mode
+                + "/"
+                + document.search_form.q.value;
+        return false;
 }
 
 function get_element(id)
@@ -100,7 +84,23 @@ function set_mode(mode)
         if (document.search_form.mode.value == mode)
                 return;
         document.search_form.mode.value = mode;
+        document.cookie = "mode=" + mode + "; domain=.open-tran.eu";
         refresh_mode();
+}
+
+function get_cookie(name, def)
+{
+        if (document.cookie.length>0){
+                c_start = document.cookie.indexOf(name + "=");
+                if (c_start != -1){
+                        c_start = c_start + name.length + 1;
+                        c_end = document.cookie.indexOf(";", c_start);
+                        if (c_end == -1)
+                                c_end = document.cookie.length;
+                        return unescape(document.cookie.substring(c_start,c_end));
+                } 
+        }
+        return def;
 }
 
 function initialize()
@@ -109,6 +109,7 @@ function initialize()
         for (i = 1; i < 1000; i++){
                 visibility_switch('sug' + i);
         }
+        document.search_form.mode.value = get_cookie("mode", "suggest");
         refresh_mode();
         return false;
 }
