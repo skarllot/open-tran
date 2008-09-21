@@ -39,15 +39,19 @@ function visibility_switch(id)
 function mode_enable(elem_name)
 {
         elem = get_element(elem_name);
-        elem.style.background = "#fff";
-        elem.style.color = "#000";
+        if (elem){
+                elem.style.background = "#fff";
+                elem.style.color = "#000";
+        }
 }
 
 function mode_disable(elem_name)
 {
         elem = get_element(elem_name);
-        elem.style.background = "#ecf3f9";
-        elem.style.color = "#103c93";
+        if (elem){
+                elem.style.background = "#ecf3f9";
+                elem.style.color = "#103c93";
+        }
 }
 
 function switch_select_indices()
@@ -61,13 +65,14 @@ function switch_select_indices()
 
 function second_lang_enable()
 {
-        get_element('form_lang_dst').style.display = 'block';
-        get_element('form_lang_switch').style.display = 'block';
+        blinline = document.search_form.src.style.display;
+        document.search_form.dst.style.display = blinline;
+        get_element('form_lang_switch').style.display = blinline;
 }
 
 function second_lang_disable()
 {
-        get_element('form_lang_dst').style.display = 'none';
+        document.search_form.dst.style.display = 'none';
         get_element('form_lang_switch').style.display = 'none';
 }
 

@@ -30,10 +30,12 @@
   <a href="/"><img src="/images/logo-mini.png" alt="open-tran"/></a>
   <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">
     <input name="q" maxlength="450" type="text"/>
-    <select name="src" size="1">
+    <select name="src" size="1" style="display: inline">
       <srclang/>
     </select>
-    <a href="javascript:;" onclick="return switch_select_indices()">&harr;</a>
+    <div id="form_lang_switch" style="display: inline">
+      <a href="javascript:;" onclick="return switch_select_indices()">&harr;</a>
+    </div>
     <select name="dst" size="1">
       <dstlang/>
     </select>
