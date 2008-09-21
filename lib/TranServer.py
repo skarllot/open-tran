@@ -504,14 +504,24 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     
     
     def set_language(self):
+        referer = '/'
+        try:
+            referer = self.headers['Referer'].lower()
+            idx = referer.find('open-tran.eu')
+            if idx < 0:
+                referer = '/'
+            else:
+                referer = referer[idx + len('open-tran.eu'):]
+        except:
+            pass
         query = urlparse(self.path)[4]
         idx = query.find('lang=')
         if idx < 0:
             lang = 'en'
         else:
             lang = query[idx + 5:]
-        self.send_response(302)
-        self.send_header('Location', '/')
+        self.send_response(303)
+        self.send_header('Location', referer)
         self.send_header('Set-Cookie', 'lang=%s; domain=.open-tran.eu' % lang)
         self.end_headers()
 
@@ -667,6 +677,12 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
                 return None
 
         ctype = self.guess_type(path)
+
+        if path.endswith('index.html'):
+            self.send_header('Location', '/index.shtml')
+            self.send_plain_headers(301, ctype, 0, 0)
+            return None
+        
         try:
             f = open(path, 'rb')
             if path.endswith('.html'):
@@ -679,6 +695,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         fs = os.fstat(f.fileno())
         if 'if-none-match' in self.headers and self.headers['if-none-match'] == str(fs[stat.ST_INO]):
             self.send_plain_headers(304, ctype, 0, 0)
+            return None
         else:
             self.send_plain_headers(200, ctype, fs[stat.ST_SIZE], fs[stat.ST_INO])
         return f
