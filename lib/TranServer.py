@@ -341,7 +341,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     def render_suggestions(self, suggs, dstlang):
         result = '<ol>\n'
         for s in suggs:
-            result += '<li value="%d"><a href="#" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
+            result += '<li value="%d"><a href="javascript:;" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
             for r in RENDERERS:
                 r.clear()
             for p in s.projects:
@@ -357,7 +357,8 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
 
     def render_suggestions_compare(self, suggs, dstlang):
-        result = '<ol>\n'
+        cnt, sum = reduce(lambda x, y: (x[0] + 1, x[1] + len(y.text)), suggs, (0, 0))
+        result = '<ol style="width: %dem">\n' % (sum / cnt * 2 / 3)
         for s in suggs:
             for r in RENDERERS:
                 r.clear()
@@ -368,7 +369,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
                 cnt = r.render_count(False)
                 if cnt != None:
                     break
-            result += '<li value="%d">%s<a href="#" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, self.idx, _replace_html(s.text))
+            result += '<li value="%d">%s<a href="javascript:;" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, self.idx, _replace_html(s.text))
             result += self.render_div(self.idx, dstlang)
             result += '</li>\n'
             self.idx += 1
@@ -403,7 +404,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         body = ''
         for project, suggs in responses.iteritems():
             head += u'<th>%s</th>' % self.render_project_link(project)
-            body += u'<td valign="top">%s</td>' % self.render_suggestions_compare(suggs, lang)
+            body += u'<td>%s</td>' % self.render_suggestions_compare(suggs, lang)
         result += '<tr>%s</tr>\n<tr>%s</tr>\n' % (head, body)
         result += '</table>'
         return result
