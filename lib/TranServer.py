@@ -18,14 +18,15 @@
 from DocXMLRPCServer import DocXMLRPCRequestHandler, DocXMLRPCServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import ForkingMixIn
-from signal import signal, SIGPIPE, SIG_IGN
+from datetime import datetime
+from signal import signal, alarm, SIGPIPE, SIGALRM, SIG_IGN
 from suggest import TranDB
 from translate.storage import factory
 from tempfile import NamedTemporaryFile
 from phrase import Phrase
 from StringIO import StringIO
 from urlparse import urlparse
-from Cookie import SmartCookie
+from Cookie import SimpleCookie
 from common import LANGUAGES
 
 import email
@@ -35,6 +36,7 @@ import posixpath
 import os
 import stat
 import sys
+import logging
 
 
 SUGGESTIONS_TXT = {
@@ -59,6 +61,13 @@ SUGGESTIONS_TXT = {
 
 
 RTL_LANGUAGES = ['ar', 'fa', 'ha', 'he']
+
+
+logging.basicConfig(level = logging.DEBUG,
+                    format = '%(asctime)s %(levelname)-8s %(message)s',
+                    datefmt = '%y-%m-%d|%H:%M',
+                    filename = '/var/log/open-tran.log',
+                    filemode = 'w')
 
 
 def _replace_html(text):
@@ -233,25 +242,68 @@ RENDERERS = [
     ]
 
 
+
+def rw_handler(signum, frame):
+    raise IOError, 'Read/Write Timeout'
+
+
+class FileWrapper:
+    def __init__(self, socket):
+        self.socket = socket
+        signal(SIGALRM, rw_handler)
+        for n in dir(self.socket):
+            if not n[0:2] == '__' and n not in ['read', 'readline', 'write']:
+                setattr(self, n, getattr(self.socket, n))
+
+    def read(self, size = -1):
+        alarm(45)
+        result = self.socket.read(size)
+        alarm(0)
+        return result
+
+    def readline(self, size = -1):
+        alarm(45)
+        result = self.socket.readline(size)
+        alarm(0)
+        return result
+
+    def write(self, str):
+        alarm(90)
+        result = self.socket.write(str)
+        alarm(0)
+        return result
+
+
+
 class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     srclang = None
     dstlang = None
     ifacelang = None
     idx = 1
 
+    def setup(self):
+        self.connection = self.request
+        self.rfile = FileWrapper(self.connection.makefile('rb', self.rbufsize))
+        self.wfile = FileWrapper(self.connection.makefile('wb', self.wbufsize))
 
-    def log_message(self, format, *args):
+
+    def do_logging(self, level, format, *args):
 	host = ""
 	try:
 	    host = self.headers['Host']
 	except:
 	    pass
 	
-	sys.stderr.write("%s [%s] %s\n" %
-                         (host,
-                          self.ifacelang,
-                          format%args))
-	
+	logging.log(level, '%s [%s] %s' % (host, self.ifacelang, format % args))
+        
+
+    def log_error(self, *args):
+        self.do_logging(logging.ERROR, *args)
+
+    
+    def log_message(self, format, *args):
+	self.do_logging(logging.INFO, format, *args)
+
 
     def send_error(self, code, message=None):
         try:
@@ -417,7 +469,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
     def get_iface_language(self):
 	try:
-            c = SmartCookie(self.headers['Cookie'])
+            c = SimpleCookie(self.headers['Cookie'])
             self.ifacelang = self.convert_iface_lang(c['lang'].value)
             if self.ifacelang:
                 return
@@ -654,6 +706,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
 
 class TranServer(ForkingMixIn, DocXMLRPCServer):
+    max_children = 70
     allow_reuse_address = True
 
     def supported(self, lang):
