@@ -67,7 +67,7 @@ logging.basicConfig(level = logging.DEBUG,
                     format = '%(asctime)s %(levelname)-8s %(message)s',
                     datefmt = '%y-%m-%d|%H:%M',
                     filename = '/var/log/open-tran.log',
-                    filemode = 'w')
+                    filemode = 'a')
 
 
 def _replace_html(text):
@@ -294,7 +294,7 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 	except:
 	    pass
 	
-	logging.log(level, '%s [%s] %s' % (host, self.ifacelang, format % args))
+	logging.log(level, '%s [%s] {%s} %s' % (host, self.ifacelang, self.address_string(), format % args))
         
 
     def log_error(self, *args):
