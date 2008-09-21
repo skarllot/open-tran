@@ -330,7 +330,7 @@ img {
     border: none;
 }
 
-h1, h2, h3, p, pre, ol {
+dl, h1, h2, h3, p, pre, ol {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
