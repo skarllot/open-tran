@@ -61,13 +61,13 @@ function switch_select_indices()
 
 function second_lang_enable()
 {
-        document.search_form.dst.style.display = 'block';
+        get_element('form_lang_dst').style.display = 'block';
         get_element('form_lang_switch').style.display = 'block';
 }
 
 function second_lang_disable()
 {
-        document.search_form.dst.style.display = 'none';
+        get_element('form_lang_dst').style.display = 'none';
         get_element('form_lang_switch').style.display = 'none';
 }
 
