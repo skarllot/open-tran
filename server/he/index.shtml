@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>Open-Tran.eu - consistency matters</title>
+  <title>Open-Tran.eu - האחידות משנה</title>
   <link rel="stylesheet" type="text/css" href="/opentran-rtl.css"/>
   <link rel="icon" type="image/x-ico" href="/favicon.ico">
 <!--  <link rel="search" type="application/opensearchdescription+xml" title="Open-Tran.eu" href="/search.xml" /> -->
@@ -34,8 +34,8 @@
   <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">                                 
     <div id="form_mode">
       <ul>
-	<li><a href="javascript:;" onclick="return set_mode('suggest');" id="form_mode_suggest">Suggest</a></li>
-	<li><a href="javascript:;" onclick="return set_mode('compare');" id="form_mode_compare">Compare</a></li>
+	<li><a href="javascript:;" onclick="return set_mode('suggest');" id="form_mode_suggest">הצעה</a></li>
+	<li><a href="javascript:;" onclick="return set_mode('compare');" id="form_mode_compare">השוואה</a></li>
       </ul>
     </div>
     <div id="form_query">
@@ -54,16 +54,16 @@
     </div>
     <div id="form_submit">
       <input value="suggest" type="hidden" name="mode"/>
-      <input value="ترجِم" type="submit"/>
+      <input value="חפש" type="submit"/>
     </div>
   </form>                                                                                                                  
 </div>                                                                                                                     
 
 <div id="stats">
   <ul>
-    <li><a href="/projects.html">Projects</a></li>
-    <li><a href="/languages.html">Languages</a></li>
-    <li class="last"><a href="/words.html">Words</a></li>
+    <li><a href="/projects.html">מיזמים</a></li>
+    <li><a href="/languages.html">שפות</a></li>
+    <li class="last"><a href="/words.html">מילים</a></li>
   </ul>
 </div>
 
@@ -72,17 +72,17 @@
     <div id="nav">
       <div id="global">
 	<ul> 
-	  <li><a href="http://open-tran.blogspot.com">المدوَّنة</a></li> 
-	  <li><a href="http://code.google.com/p/open-tran/issues/list">الأعطال</a></li>
-	  <li><a href="http://open-tran.eu/dev.html">مطوّرو البرمجيات</a></li>
-	  <li><a href="http://open-tran.eu/hof.html">لوحة الشرف</a></li>
+	  <li><a href="http://open-tran.blogspot.com">יומן</a></li> 
+	  <li><a href="http://code.google.com/p/open-tran/issues/list">תקלות</a></li>
+	  <li><a href="http://open-tran.eu/dev.html">מפתחים</a></li>
+	  <li><a href="http://open-tran.eu/hof.html">היכל התהילה</a></li>
 	</ul>
       </div> <!-- global -->
       <div id="local">
 	<ul> 
-	  <li><a href="/whatfor.html">ما الهدف مِن المشروع؟</a></li>
-	  <li><a href="/help.html">مساعدة</a></li>
-	  <li><a href="/contact.html">اتّصل بنا</a></li>
+	  <li><a href="/whatfor.html">למה זה?</a></li>
+	  <li><a href="/help.html">עזרה</a></li> 
+	  <li><a href="/contact.html">צור קשר</a></li>
 	</ul>
       </div> <!-- local -->
       <div class="clear"></div>

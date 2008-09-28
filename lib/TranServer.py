@@ -52,6 +52,7 @@ SUGGESTIONS_TXT = {
     'fr' : u'Traductions suggérées',
     'fy' : u'Oersetsuggestjes',
     'gl' : u'Suxesti&oacute;ns de traduci&oacute;n',
+    'he' : u'הצעות לתרגום',
     'it' : u'Suggerimenti traduzione',
     'ka' : u'თარგმნის შემოთავაზებები',
     'pl' : u'Sugestie tłumaczeń',
