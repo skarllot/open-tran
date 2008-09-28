@@ -54,7 +54,7 @@
     </div>
     <div id="form_submit">
       <input value="suggest" type="hidden" name="mode"/>
-      <input value="חפש" type="submit"/>
+      <input value="חיפוש" type="submit"/>
     </div>
   </form>                                                                                                                  
 </div>                                                                                                                     
