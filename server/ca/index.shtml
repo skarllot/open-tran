@@ -72,10 +72,10 @@
     <div id="nav">
       <div id="global">
 	<ul> 
-	  <li><a href="http://open-tran.blogspot.com">Blog</a></li> 
-	  <li><a href="http://code.google.com/p/open-tran/issues/list">Bugs</a></li>
-	  <li><a href="http://open-tran.eu/dev.html">Developers</a></li>
-	  <li><a href="http://open-tran.eu/hof.html">Hall of Fame</a></li>
+	  <li><a href="http://open-tran.blogspot.com">Bloc</a></li> 
+	  <li><a href="http://code.google.com/p/open-tran/issues/list">Errades</a></li>
+	  <li><a href="http://open-tran.eu/dev.html">Desenvolupadors</a></li>
+	  <li><a href="http://open-tran.eu/hof.html">Crèdits</a></li>
 	</ul>
       </div> <!-- global -->
       <div id="local">
