@@ -464,7 +464,10 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 	
     def convert_iface_lang(self, lang):
         for l in SUGGESTIONS_TXT.keys():
-            if lang[:2] == l[:2]:
+            i = l.find('_')
+	    if i < 0:
+		i = len(l)
+	    if lang[:i] == l[:i]:
                 return l
         return None
 
