@@ -19,12 +19,12 @@ import re
 
 class GenericHandler:
     def __init__(self, connectors):
-        self._connectors = set()
-        for word in connectors:
-            self._connectors.add(word)
+        self._connectors = sorted(connectors + ["'"])
 
     def discard(self, word):
-        return word.startswith('%') or word in self._connectors
+        return word.startswith('%') \
+            or word.startswith('<') \
+            or word in self._connectors
         
 
 class AFHandler(GenericHandler):
@@ -65,8 +65,9 @@ class PTHandler(GenericHandler):
 
 
 class Phrase:
-    wre = re.compile("[\w'%](?:[&'_]?\w)*", re.UNICODE)
+    wre = re.compile("([\w'%<]/?(?:[&'_]?\w)*>?)", re.UNICODE)
     dre = re.compile('^\d+$', re.UNICODE)
+    xre = re.compile("<\?w*>", re.UNICODE)
 
     __handlers = { "C"  : ENHandler (),
                    "af" : AFHandler (),
@@ -81,13 +82,17 @@ class Phrase:
     __def_handler = GenericHandler ([])
 
     def __resolve(self, lang):
+        lang = lang[:2]
         if lang in self.__handlers:
-            return self.__handlers[lang[:2]]
+            return self.__handlers[lang]
         else:
             return self.__def_handler
 
     def __filterfun(self, word, handler):
-        return len(word) < 50 and not re.match(self.dre, word) and not handler.discard(word)
+        return len(word) < 50 \
+            and not re.match(self.dre, word) \
+            and not re.match(self.xre, word) \
+            and not handler.discard(word)
 
     def __init__(self, phrase, lang, sort=True):
         handler = self.__resolve (lang)
