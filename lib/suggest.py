@@ -159,9 +159,12 @@ class TranDB:
         conn = sqlite.connect(self.db + srclang + ".db")
         cursor = conn.cursor ()
         cursor.execute ("""
-SELECT p.phrase, l.locationid, val.value
-FROM phrases p
-JOIN locations l ON p.id = l.phraseid
+ATTACH ? AS dest
+""", (self.db + dstlang + '.db',))
+        cursor.execute ("""
+SELECT dst.phrase, src.phrase, dstl.project, dstl.flags, val.value
+FROM phrases src
+JOIN locations srcl ON src.id = srcl.phraseid
 JOIN (
      SELECT p.id AS id, MAX(p.length) - SUM(wp.count) - COUNT(*) AS value
      FROM words w JOIN wp ON w.id = wp.wordid
@@ -170,21 +173,14 @@ JOIN (
      GROUP BY p.id
      ORDER BY value
      LIMIT 200
-) val ON l.phraseid = val.id
+) val ON srcl.phraseid = val.id
+JOIN dest.locations dstl ON srcl.locationid = dstl.locationid
+JOIN dest.phrases dst ON dstl.phraseid = dst.id
 """ % qmarks, tuple(words))
         rows = cursor.fetchall()
-        for (orig, lid, value) in rows:
-            dconn = sqlite.connect(self.db + dstlang + ".db")
-            dcur = dconn.cursor()
-            dcur.execute("""
-SELECT phrase, project, flags
-FROM phrases p JOIN locations l ON p.id = l.phraseid
-WHERE locationid = ?""", (lid,))
-            for (trans, project, flags) in dcur.fetchall():
-                sug = TmpSug(trans, orig, project, value, flags)
-                result.append(sug)
-            dcur.close()
-            dconn.close()
+        for (trans, orig, project, flags, value) in rows:
+	    sug = TmpSug(trans, orig, project, value, flags)
+	    result.append(sug)
         cursor.close ()
         conn.close()
         return result
