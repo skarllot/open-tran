@@ -170,7 +170,7 @@ class fy_renderer(renderer):
         self.icon_path = "/images/pompelyts.png"
 
     def render_link(self, project):
-        return '<a href="http://members.chello.nl/~s.hiemstra/kompjtr.htm">%s</a>' % project
+        return '<a href="http://members.chello.nl/~s.hiemstra/kompjtr.htm">%s</a>' % project.replace('FY', 'Cor Jousma')
 
 
 class di_renderer(renderer):
