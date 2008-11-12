@@ -204,6 +204,7 @@ Server sends back a result in the following form:
  * projects: list
    * count: integer
    * name: string
+   * path: string
    * orig_phrase: string
    * flags: integer
 
@@ -252,6 +253,14 @@ send a list of elements containing the following one:
 '''
         suggs = self.get_translations(text, srclang, dstlang)
         return self.regroup(suggs)
+
+
+    def suggest3(self, text, srclang, dstlang, maxcount):
+        '''
+Is equivalent to calling suggest2(text, srclang, dstlang) and limiting
+the number of returned records to maxcount.
+'''
+        return self.suggest2(text, srclang, dstlang)[:maxcount]
 
 
     def compare(self, text, lang):
