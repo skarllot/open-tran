@@ -252,7 +252,8 @@ class TranRequestHandler(PremiumRequestHandler):
     PremiumRequestHandler.substitutes['dstlang'] = lambda request, f: \
         request.write_language_select(f, request.dstlang, 'en')
 
-    PremiumRequestHandler.actions.append(PremiumActionRedirect([('/index.html', '/index.shtml')]))
+    PremiumRequestHandler.actions.append(PremiumActionRedirect([('/index.html', '/index.shtml'),
+                                                                ('/API', '/RPC2')]))
     PremiumRequestHandler.actions.append(PremiumActionCustom('/suggest', \
         lambda request, match: request.send_search_head()))
     PremiumRequestHandler.actions.append(PremiumActionCustom('/compare', \
