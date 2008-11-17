@@ -11,6 +11,7 @@
     <ol>
       <li><a href="#Python">Python</a></li>
       <li><a href="#C">C</a></li>
+      <li><a href="#Java">Java</a></li>
     </ol>
   </li>
   <li><a href="#Offline">Off-line mode</a>
@@ -61,10 +62,67 @@
 <a name="C"></a>
 <h3>C</h3>
 <p>
-  Ignacio Casal Quinteiro has contributed
+  Ignacio Casal Quinteiro contributed
   an <a href="http://bugzilla.gnome.org/attachment.cgi?id=101873">example
     implementation in C</a>.
 </p>
+
+<a name="Java"></a>
+<h3>Java</h3>
+<p>
+  Yves Savourel contributed an example implementation in Java.
+</p>
+<pre>
+  import org.apache.xmlrpc.XmlRpcException;
+  import org.apache.xmlrpc.client.XmlRpcClient;
+  import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+
+  public void queryOpenTran (String textToQuery,
+	String sourceLanguage,
+	String targetLanguage)
+  {
+  	try {
+		// Setup the XML-RPC client
+		XmlRpcClient client;
+		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+		config.setServerURL(new URL("http://open-tran.eu/RPC2"));
+		client = new XmlRpcClient();
+		client.setConfig(config);
+			
+		// Prepare the query parameters
+		Object[] params = new Object[] {
+			new String(textToQuery),
+			new String(sourceLanguage),
+			new String(targetLanguage)};
+		// Execute the query
+		Object[] results = (Object[])client.execute("suggest2", params);
+		
+		// Parse the result back
+		StringBuilder tmp = new StringBuilder();
+		for ( Object obj1 : results ) {
+			tmp.setLength(0);
+			Map<String, Object> map1 = (Map<String, Object>)obj1;
+			tmp.append(String.format("Translation=\"%s\"", (String)map1.get("text")));
+			tmp.append(String.format(", value=%d", (Integer)map1.get("value")));
+			tmp.append(String.format(", count=%d", (Integer)map1.get("count")));
+			Object[] projects = (Object[])map1.get("projects");
+			for ( Object obj2 : projects ) {
+				Map<String, Object> map2 = (Map<String, Object>)obj2;
+				tmp.append(String.format("\nProject: name=", (String)map2.get("name"))); 
+				tmp.append(String.format("\n  original=\"%s\"", (String)map2.get("orig_phrase")));
+				tmp.append(String.format("\n  flags=%d", (Integer)map2.get("flags")));
+				tmp.append(String.format("\n  path=%s", (String)map2.get("path")));
+				tmp.append(String.format("\n  count=%d", (Integer)map2.get("count")));
+			}
+			System.out.println(tmp.toString());
+		}
+		
+	}
+	catch ( Throwable e ) {
+		e.printStackTrace();
+	}
+  }
+</pre>
 
 <a name="Offline"></a>
 <h2>Off-line mode</h2>
