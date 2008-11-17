@@ -15,16 +15,12 @@
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
-from DocXMLRPCServer import DocXMLRPCRequestHandler, DocXMLRPCServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from SocketServer import ForkingMixIn
+from PremiumHTTPServer import PremiumServer, PremiumRequestHandler, \
+    PremiumActionRedirect, PremiumActionCustom, PremiumActionServeFile
 from datetime import datetime
-from signal import signal, alarm, SIGPIPE, SIGALRM, SIG_IGN
 from suggest import TranDB
-from translate.storage import factory
 from tempfile import NamedTemporaryFile
 from phrase import Phrase
-from StringIO import StringIO
 from urlparse import urlparse
 from Cookie import SimpleCookie
 from common import LANGUAGES
@@ -34,7 +30,6 @@ import xmlrpclib
 import urllib
 import posixpath
 import os
-import stat
 import sys
 import logging
 
@@ -73,7 +68,6 @@ logging.basicConfig(level = logging.DEBUG,
 
 def _replace_html(text):
     return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-
 
 
 class renderer(object):
@@ -244,48 +238,28 @@ RENDERERS = [
 
 
 
-def rw_handler(signum, frame):
-    raise IOError, 'Read/Write Timeout'
-
-
-class FileWrapper:
-    def __init__(self, socket):
-        self.socket = socket
-        signal(SIGALRM, rw_handler)
-        for n in dir(self.socket):
-            if not n[0:2] == '__' and n not in ['read', 'readline', 'write']:
-                setattr(self, n, getattr(self.socket, n))
-
-    def read(self, size = -1):
-        alarm(45)
-        result = self.socket.read(size)
-        alarm(0)
-        return result
-
-    def readline(self, size = -1):
-        alarm(45)
-        result = self.socket.readline(size)
-        alarm(0)
-        return result
-
-    def write(self, str):
-        alarm(90)
-        result = self.socket.write(str)
-        alarm(0)
-        return result
-
-
-
-class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
+class TranRequestHandler(PremiumRequestHandler):
     srclang = None
     dstlang = None
     ifacelang = None
     idx = 1
 
-    def setup(self):
-        self.connection = self.request
-        self.rfile = FileWrapper(self.connection.makefile('rb', self.rbufsize))
-        self.wfile = FileWrapper(self.connection.makefile('wb', self.wbufsize))
+    PremiumRequestHandler.substitutes['ifacelang'] = lambda request, f: request.write_flag(f)
+    PremiumRequestHandler.substitutes['sifacelang'] = lambda request, f: request.write_flag(f, True)
+    PremiumRequestHandler.substitutes['ifaceselect'] = lambda request, f: request.write_iface_select(f)
+    PremiumRequestHandler.substitutes['srclang'] = lambda request, f: \
+        request.write_language_select(f, request.srclang, request.ifacelang)
+    PremiumRequestHandler.substitutes['dstlang'] = lambda request, f: \
+        request.write_language_select(f, request.dstlang, 'en')
+
+    PremiumRequestHandler.actions.append(PremiumActionRedirect([('/index.html', '/index.shtml')]))
+    PremiumRequestHandler.actions.append(PremiumActionCustom('/suggest', \
+        lambda request, match: request.send_search_head()))
+    PremiumRequestHandler.actions.append(PremiumActionCustom('/compare', \
+        lambda request, match: request.send_compare_head()))
+    PremiumRequestHandler.actions.append(PremiumActionCustom('/setlang', \
+        lambda request, match: request.set_language()))
+    PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
 
     def do_logging(self, level, format, *args):
@@ -411,23 +385,9 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         return result
 
 
-    def get_file(self):
-        data = self.rfile.read(int(self.headers["content-length"]))
-        msg = email.message_from_string(str(self.headers) + data)
-        i = msg.walk()
-        i.next()
-        part = i.next()
-        cls = factory.getclass(part.get_filename())
-        return cls.parsestring(part.get_payload(decode=1))
-
-    
     def suggest(self, text, srclang, dstlang):
         suggs = self.server.storage.suggest2(text, srclang, dstlang)
         return (text, suggs)
-
-
-    def suggest_unit(self, unit):
-        return self.suggest(str(unit.source), self.srclang, self.dstlang)
 
 
     def shutdown(self, errcode):
@@ -528,29 +488,15 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.send_header('Location', referer)
         self.send_header('Set-Cookie', 'lang=%s; domain=.open-tran.eu' % lang)
         self.end_headers()
+        return None
 
 
-    def redirect(self, path):
-        self.send_response(301)
-        self.send_header('Location', path)
-        self.end_headers()
-        
-
-    def send_plain_headers(self, code, ctype, length, inode):
-        self.send_response(code)
-        self.send_header("Content-type", ctype)
-        if length != 0:
-            self.send_header("Content-Length", str(length))
-        if inode != 0:
-            self.send_header("ETag", str(inode))
-        self.end_headers()
+    def translate_path(self, path):
+        return PremiumRequestHandler.translate_path(self, '/' + self.ifacelang + '/' + path)
 
 
     def find_template(self):
-        if self.ifacelang != None and self.ifacelang in LANGUAGES:
-            path = self.translate_path('/' + self.ifacelang + '/template.html')
-        else:
-            path = self.translate_path('/template.html')
+        path = self.translate_path('/template.html')
         return open(path, 'rb')
 
 
@@ -573,58 +519,15 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 <li><a href="/setlang?lang=%s" class="jslink"><img src="/images/flag-%s.png" alt="%s"/>&nbsp;%s</a></li>
 ''' % (lang, lang, lang, LANGUAGES[lang])).encode('utf-8'))
 
-    def write_language_select(self, f, chosen):
+
+    def write_language_select(self, f, chosen, default):
+        if chosen == None:
+            chose = default
         for code in sorted(LANGUAGES.keys()):
             f.write('<option value="%s"' % code)
             if code == chosen:
                 f.write(' selected="selected"')
             f.write('>%s: %s</option>' % (code, LANGUAGES[code].encode('utf-8')))
-        
-
-    def process(self, stream, code=200):
-	f = StringIO()
-	for line in stream:
-	    if line.find('<ifacelang/>') != -1:
-                self.write_flag(f)
-	    elif line.find('<sifacelang/>') != -1:
-                self.write_flag(f, True)
-            elif line.find('<ifaceselect/>') != -1:
-		self.write_iface_select(f)
-            elif line.find('<srclang/>') != -1:
-                lang = self.srclang
-                if lang == None:
-                    lang = self.ifacelang
-                self.write_language_select(f, lang)
-            elif line.find('<dstlang/>') != -1:
-                lang = self.dstlang
-                if lang == None:
-                    lang = "en"
-                self.write_language_select(f, lang)
-            else:
-                f.write(line)
-        f.flush()
-        f.seek(0)
-	return f
-
-
-    def embed_in_template(self, text, code=200):
-        template = self.find_template()
-        f = StringIO()
-        for line in template:
-            if line.find('<content/>') != -1:
-                if isinstance(text, file):
-                    self.copyfile(text, f)
-                else:
-                    f.write(text)
-            else:
-                f.write(line)
-        f.flush()
-        f.seek(0)
-	result = self.process(f, code)
-        length = result.tell()
-	f.close()
-        self.send_plain_headers(code, "text/html", length, 0)
-        return result
 
 
     def get_query(self):
@@ -666,76 +569,12 @@ class TranRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         return self.embed_in_template(response)
         
 
-    def send_head(self):
-        if self.path.startswith('/setlang'):
-            return self.set_language()
-
-        if self.path.startswith('/suggest'):
-            return self.send_search_head()
-
-        if self.path.startswith('/compare'):
-            return self.send_compare_head()
-
-        path = self.translate_path('/' + self.ifacelang + '/' + self.path)
-        f = None
-        if os.path.isdir(path):
-            index = os.path.join(path, "index.shtml")
-            if os.path.exists(index):
-                path = index
-            else:
-                self.send_error(404, "File not found")
-                return None
-
-        ctype = self.guess_type(path)
-
-        if path.endswith('index.html'):
-            self.redirect('/index.shtml')
-            return None
-        
-        try:
-            f = open(path, 'rb')
-            if path.endswith('.html'):
-                return self.embed_in_template(f)
-	    elif path.endswith('.shtml'):
-		return self.process(f)
-        except IOError:
-            self.send_error(404, "File not found")
-            return None
-        fs = os.fstat(f.fileno())
-        if 'if-none-match' in self.headers and self.headers['if-none-match'] == str(fs[stat.ST_INO]):
-            self.send_plain_headers(304, ctype, 0, 0)
-            return None
-        else:
-            self.send_plain_headers(200, ctype, fs[stat.ST_SIZE], fs[stat.ST_INO])
-        return f
-
-
-    def list_directory(self, path):
-        self.send_error(404, "File not found")
-        return None
-
-
-    def do_POST(self):
+    def request_init(self):
         self.get_languages()
-        if self.path == '/RPC2':
-            return DocXMLRPCRequestHandler.do_POST(self)
-        else:
-            return self.shutdown(403)
 
 
-    def do_GET(self):
-        self.get_languages()
-        if self.path == '/RPC2':
-            return DocXMLRPCRequestHandler.do_GET(self)
-        return SimpleHTTPRequestHandler.do_GET(self)
 
-        
-
-
-class TranServer(ForkingMixIn, DocXMLRPCServer):
-    max_children = 70
-    allow_reuse_address = True
-
+class TranServer(PremiumServer):
     def supported(self, lang):
         """
 Checks if the service is capable of suggesting translations from or to
@@ -744,8 +583,7 @@ Checks if the service is capable of suggesting translations from or to
         return lang in LANGUAGES
 
     def __init__(self, addr):
-        signal(SIGPIPE, SIG_IGN)
-        DocXMLRPCServer.__init__(self, addr, TranRequestHandler)
+        PremiumServer.__init__(self, addr, TranRequestHandler)
         self.set_server_title('Open-Tran.eu')
         self.set_server_name('Open-Tran.eu XML-RPC API documentation')
         self.set_server_documentation('''

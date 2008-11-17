@@ -15,13 +15,13 @@
 
     <div id="locale">
       <div id="current_locale">
-	<sifacelang/>
+	<premium:sifacelang/>
       </div>
       <div class="clear"></div>
       <div id="lang_choice">
 	<div class="close"><a href="javascript:;" onclick="return visibility_switch('lang_choice');">&times;</a></div>
 	<ul>
-	  <ifaceselect/>
+	  <premium:ifaceselect/>
 	</ul>
       </div> <!-- lang_choice -->
     </div> <!-- locale -->
@@ -31,20 +31,20 @@
   <form name="search_form" method="get" action="/suggest" onsubmit="return formsubmit();">
     <input name="q" maxlength="450" type="text"/>
     <select name="src" size="1" style="display: inline">
-      <srclang/>
+      <premium:srclang/>
     </select>
     <div id="form_lang_switch" style="display: inline">
       <a href="javascript:;" onclick="return switch_select_indices()">&harr;</a>
     </div>
     <select name="dst" size="1">
-      <dstlang/>
+      <premium:dstlang/>
     </select>
     <input value="Recherche" type="submit"/>
     <input value="suggest" type="hidden" name="mode"/>
   </form>
 </div>
 
-<content/>		
+<premium:content/>		
 
   <div id="bottom">
     <div class="clear"></div>

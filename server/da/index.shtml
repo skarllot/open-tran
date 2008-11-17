@@ -15,13 +15,13 @@
 
     <div id="locale">
       <div id="current_locale">
-	<sifacelang/>
+	<premium:sifacelang/>
       </div>
       <div class="clear"></div>
       <div id="lang_choice">
 	<div class="close"><a href="javascript:;" onclick="return visibility_switch('lang_choice');">&times;</a></div>
 	<ul>
-	  <ifaceselect/>
+	  <premium:ifaceselect/>
 	</ul>
       </div> <!-- lang_choice -->
     </div> <!-- locale -->
@@ -43,13 +43,13 @@
     </div>
     <div id="form_langs">
       <select id="form_lang_src" name="src" size="1">
-        <srclang/>
+        <premium:srclang/>
       </select>
       <div id="form_lang_switch">
 	<a href="javascript:;" onclick="return switch_select_indices()">&harr;</a>
       </div>
       <select id="form_lang_dst" name="dst" size="1">
-        <dstlang/>
+        <premium:dstlang/>
       </select>
     </div>
     <div id="form_submit">
