@@ -130,7 +130,7 @@ class PremiumActionRedirect(PremiumAction):
 
     def execute(self, request, match):
         for i in range(match.lastindex + 1):
-            if match.group[i]:
+            if match.groups()[i]:
                 request.redirect(self.mapping[i][1])
                 return None
         raise ActionError, 'None of the redirection mappings executed'
