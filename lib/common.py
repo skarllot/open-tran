@@ -61,6 +61,7 @@ LANGUAGES = {
     'ka' : u'ქართული',
     'kk' : u'Қазақша',
     'km' : u'ភាសាខ្មែរ',
+    'kn' : u'ಕನ್ನಡ',
     'ko' : u'한국어',
     'ku' : u'Kurdî/كوردی',
     'lb' : u'Lëtzebuergesch',
