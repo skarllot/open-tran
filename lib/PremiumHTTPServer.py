@@ -20,6 +20,7 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import ForkingMixIn
 from StringIO import StringIO
 from signal import signal, alarm, SIGPIPE, SIGALRM, SIG_IGN
+from traceback import print_exc
 
 import re
 import os
@@ -115,7 +116,12 @@ class PremiumActionCustom(PremiumAction):
         self.method = method
 
     def execute(self, request, match):
-        return self.method(request, match)
+        try:
+            return self.method(request, match)
+        except Exception, inst:
+            request.send_error(500, str(inst))
+            print_exc()
+            return None
 
 
 class PremiumActionRedirect(PremiumAction):

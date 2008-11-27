@@ -252,13 +252,13 @@ class TranRequestHandler(PremiumRequestHandler):
     PremiumRequestHandler.substitutes['dstlang'] = lambda request, f: \
         request.write_language_select(f, request.dstlang, 'en')
 
-    PremiumRequestHandler.actions.append(PremiumActionRedirect([('/index.html', '/index.shtml'),
-                                                                ('/API', '/RPC2')]))
-    PremiumRequestHandler.actions.append(PremiumActionCustom('/suggest', \
+    PremiumRequestHandler.actions.append(PremiumActionRedirect([('^/index.html$', '/index.shtml'),
+                                                                ('^/API$', '/RPC2')]))
+    PremiumRequestHandler.actions.append(PremiumActionCustom('^/suggest', \
         lambda request, match: request.send_search_head()))
-    PremiumRequestHandler.actions.append(PremiumActionCustom('/compare', \
+    PremiumRequestHandler.actions.append(PremiumActionCustom('^/compare', \
         lambda request, match: request.send_compare_head()))
-    PremiumRequestHandler.actions.append(PremiumActionCustom('/setlang', \
+    PremiumRequestHandler.actions.append(PremiumActionCustom('^/setlang', \
         lambda request, match: request.set_language()))
     PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
