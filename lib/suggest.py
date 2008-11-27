@@ -176,6 +176,7 @@ JOIN (
 ) val ON srcl.phraseid = val.id
 JOIN dest.locations dstl ON srcl.locationid = dstl.locationid
 JOIN dest.phrases dst ON dstl.phraseid = dst.id
+ORDER BY dstl.flags, val.value
 """ % qmarks, tuple(words))
         rows = cursor.fetchall()
         for (trans, orig, project, flags, value) in rows:
