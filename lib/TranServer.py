@@ -116,7 +116,7 @@ class renderer(object):
                 result += "%d&times;" % project.count
             path = self.name + " " + project.path[2:]
             if project.flags == 1:
-                result += '<span id="fuzzy">'
+                result += '<span class="fuzzy">'
             result += "%s: %s<br/>\n" % (self.render_link(path), _replace_html(project.orig_phrase))
             if project.flags == 1:
                 result += '</span>'
@@ -317,7 +317,8 @@ class TranRequestHandler(PremiumRequestHandler):
     def render_suggestions(self, suggs, dstlang):
         result = '<ol>\n'
         for s in suggs:
-            result += '<li value="%d"><a href="javascript:;" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, self.idx, _replace_html(s.text))
+            fuzzy = reduce(lambda s, p: p.flags == 1 and s or '', s.projects, 'class="fuzzy"')
+            result += '<li value="%d"><a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, fuzzy, self.idx, _replace_html(s.text))
             for r in RENDERERS:
                 r.clear()
             for p in s.projects:

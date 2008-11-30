@@ -293,13 +293,9 @@ body{
     position: relative;
 }
 
-#fuzzy {
+.fuzzy {
     font-size: 0.7em;
     color: #888;
-}
-
-#fuzzy a {
-    color: #7AD;
 }
 
 a {
@@ -314,6 +310,10 @@ a:active, a:focus {
 a:hover {
     color: #234;
     text-decoration: underline;
+}
+
+a.fuzzy {
+    color: #7AD;
 }
 
 h1 a:hover {
