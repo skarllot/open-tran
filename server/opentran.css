@@ -293,6 +293,15 @@ body{
     position: relative;
 }
 
+#fuzzy {
+    font-size: 0.7em;
+    color: #888;
+}
+
+#fuzzy a {
+    color: #7AD;
+}
+
 a {
     color: #58B;
     text-decoration: none;
