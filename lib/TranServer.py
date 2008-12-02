@@ -337,6 +337,7 @@ class TranRequestHandler(PremiumRequestHandler):
         cnt, sum = reduce(lambda x, y: (x[0] + 1, x[1] + len(y.text)), suggs, (0, 0))
         result = '<ol style="width: %dem">\n' % (sum / cnt * 2 / 3)
         for s in suggs:
+            fuzzy = reduce(lambda s, p: p.flags == 1 and s or '', s.projects, 'class="fuzzy"')
             for r in RENDERERS:
                 r.clear()
             for p in s.projects:
@@ -346,7 +347,7 @@ class TranRequestHandler(PremiumRequestHandler):
                 cnt = r.render_count(False)
                 if cnt != None:
                     break
-            result += '<li value="%d">%s<a href="javascript:;" class="jslink" onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, self.idx, _replace_html(s.text))
+            result += '<li value="%d">%s<a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, fuzzy, self.idx, _replace_html(s.text))
             result += self.render_div(self.idx, dstlang)
             result += '</li>\n'
             self.idx += 1
