@@ -49,9 +49,9 @@ class Project:
     pass
 
 class Suggestion:
-    def __init__ (self, text, value):
+    def __init__ (self, text):
         self.count = 0
-        self.value = value
+        self.value = 1000000
         self.text = text
         self.projects = {}
 
@@ -131,13 +131,13 @@ class TranDB:
     def regroup(self, suggs):
         result = {}
         for sug in suggs:
-            res = Suggestion(sug.text, sug.value)
+            res = Suggestion(sug.text)
             res = result.setdefault(sug.text.strip(), res)
             res.append_project(sug.project, sug.orig, sug.value, sug.flags)
         result = result.values()
         for s in result: s.finish()
         result.sort (lambda s1, s2: s1.compare (s2))
-        return self.renumerate(result[:50])
+        return self.renumerate(result[:200])
         
 
     def qmarks_string(self, words):
