@@ -111,17 +111,17 @@ class renderer(object):
         return  cnt + self.render_icon()
     
     def render_links(self, lang):
-        result = ""
+        result = []
         for project in self.projects:
             if project.count > 1:
-                result += "%d&times;" % project.count
+                result.append("%d&times;" % project.count)
             path = self.name + " " + project.path[2:]
             if project.flags == 1:
-                result += '<span class="fuzzy">'
-            result += "%s: %s<br/>\n" % (self.render_link(path), _replace_html(project.orig_phrase))
+                result.append('<span class="fuzzy">')
+            result.append("%s: %s<br/>\n" % (self.render_link(path), _replace_html(project.orig_phrase)))
             if project.flags == 1:
-                result += '</span>'
-        return result
+                result.append('</span>')
+        return ''.join(result)
 
     def render_project_link(self):
         icon = self.render_icon()
@@ -299,44 +299,42 @@ class TranRequestHandler(PremiumRequestHandler):
 
     def render_all(self):
         needplus = False
-        result = ""
+        result = []
         for r in RENDERERS:
             icon = r.render_icon_cnt(needplus)
             if icon != "":
                 needplus = True
-            result += icon
-        return result
+            result.append(icon)
+        return ''.join(result)
 
 
     def render_div(self, idx, dstlang):
-        result = '<div id="sug%d" dir="ltr">' % idx
-        for r in RENDERERS:
-            result += r.render_links(dstlang)
-        return result + "</div>\n"
+        result = ''.join([r.render_links(dstlang) for r in RENDERERS])
+        return '<div id="sug%d" dir="ltr">%s</div>\n' % (idx, result)
 
 
     def render_suggestions(self, suggs, dstlang):
-        result = '<ol>\n'
+        result = ['<ol>\n']
         for s in suggs:
             fuzzy = reduce(lambda s, p: p.flags == 1 and s or '', s.projects, 'class="fuzzy"')
-            result += '<li value="%d"><a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, fuzzy, self.idx, _replace_html(s.text))
+            result.append('<li value="%d"><a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, fuzzy, self.idx, _replace_html(s.text)))
             for r in RENDERERS:
                 r.clear()
             for p in s.projects:
                 for r in RENDERERS:
                     r.feed(p)
-            result += self.render_all()
-            result += ')</a>'
-            result += self.render_div(self.idx, dstlang)
-            result += '</li>\n'
+            result.append(self.render_all())
+            result.append(')</a>')
+            result.append(self.render_div(self.idx, dstlang))
+            result.append('</li>\n')
             self.idx += 1
-        result += '</ol>\n'
-        return result
+        result.append('</ol>\n')
+        return u''.join(result)
 
 
     def render_suggestions_compare(self, suggs, dstlang):
         cnt, sum = reduce(lambda x, y: (x[0] + 1, x[1] + len(y.text)), suggs, (0, 0))
-        result = '<ol style="width: %dem">\n' % (sum / cnt * 2 / 3)
+        result = ['<ol style="width: %dem">\n' % (sum / cnt * 2 / 3)]
         for s in suggs:
             fuzzy = reduce(lambda s, p: p.flags == 1 and s or '', s.projects, 'class="fuzzy"')
             for r in RENDERERS:
@@ -348,12 +346,12 @@ class TranRequestHandler(PremiumRequestHandler):
                 cnt = r.render_count(False)
                 if cnt != None:
                     break
-            result += '<li value="%d">%s<a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, fuzzy, self.idx, _replace_html(s.text))
-            result += self.render_div(self.idx, dstlang)
-            result += '</li>\n'
+            result.append('<li value="%d">%s<a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, fuzzy, self.idx, _replace_html(s.text)))
+            result.append(self.render_div(self.idx, dstlang))
+            result.append('</li>\n')
             self.idx += 1
-        result += '</ol>\n'
-        return result
+        result.append('</ol>\n')
+        return u''.join(result)
 
 
     def render_project_link(self, project):
@@ -367,26 +365,27 @@ class TranRequestHandler(PremiumRequestHandler):
         rtl = ''
         if dstlang in RTL_LANGUAGES:
             rtl = ' dir="rtl" style="text-align: right"'
-        body = u'<h1>%s (%s &rarr; %s)</h1><dl%s>' % (SUGGESTIONS_TXT.get(self.ifacelang, u'Translation suggestions'), srclang, dstlang, rtl)
+        body = [u'<h1>%s (%s &rarr; %s)</h1><dl%s>'
+                % (SUGGESTIONS_TXT.get(self.ifacelang, u'Translation suggestions'),
+                   srclang, dstlang, rtl)]
         for key, suggs in responses:
-            body += u'<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>' % (_replace_html(key), self.render_suggestions(suggs, dstlang))
-        body += u"</dl>"
-        return body
+            body.append(u'<di><dt><strong>%s</strong></dt>\n<dd>%s</dd></di>'
+                        % (_replace_html(key),
+                           self.render_suggestions(suggs, dstlang)))
+        body.append(u"</dl>")
+        return u''.join(body)
 
 
     def dump_compare(self, responses, lang):
         rtl = ''
         if lang in RTL_LANGUAGES:
             rtl = ' dir="rtl" style="text-align: right"'
-        result = '<table%s>\n' % rtl
-        head = ''
-        body = ''
+        head = []
+        body = []
         for project, suggs in responses.iteritems():
-            head += u'<th>%s</th>' % self.render_project_link(project)
-            body += u'<td>%s</td>' % self.render_suggestions_compare(suggs, lang)
-        result += '<tr>%s</tr>\n<tr>%s</tr>\n' % (head, body)
-        result += '</table>'
-        return result
+            head.append(u'<th>%s</th>' % self.render_project_link(project))
+            body.append(u'<td>%s</td>' % self.render_suggestions_compare(suggs, lang))
+        return '<table%s>\n<tr>%s</tr>\n<tr>%s</tr>\n</table>' % (rtl, ''.join(head), ''.join(body))
 
 
     def suggest(self, text, srclang, dstlang):
