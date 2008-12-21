@@ -281,6 +281,7 @@ body{
     color: #1347c3;
     float: left;
     border: 1px solid #1347c3;
+    font-size: small;
     margin: 2px 2px 2px 3px;
     padding: 0px 2px 0px 2px;
 }
@@ -298,6 +299,11 @@ body{
     position: relative;
 }
 
+.fuzzy {
+    font-size: 0.7em;
+    color: #696;
+}
+
 a {
     color: #58B;
     text-decoration: none;
@@ -310,6 +316,10 @@ a:active, a:focus {
 a:hover {
     color: #234;
     text-decoration: underline;
+}
+
+a.fuzzy {
+    color: #696;
 }
 
 h1 a:hover {
