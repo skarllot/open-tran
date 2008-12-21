@@ -276,6 +276,7 @@ body{
     color: #1347c3;
     float: right;
     border: 1px solid #1347c3;
+    font-size: small;
     margin: 2px 3px 2px 2px;
     padding: 0px 2px 0px 2px;
 }
@@ -295,7 +296,7 @@ body{
 
 .fuzzy {
     font-size: 0.7em;
-    color: #dbcbab;
+    color: #696;
 }
 
 a {
@@ -313,7 +314,7 @@ a:hover {
 }
 
 a.fuzzy {
-    color: #dbcbab;
+    color: #696;
 }
 
 h1 a:hover {
