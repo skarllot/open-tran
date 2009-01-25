@@ -37,8 +37,8 @@ def get_subdirs(dir):
         return dirs
 
 def get_lsubdirs(dir):
-    if debug:
-        return ["de", "pl"]
+    if shortlist:
+        return shortlist
     return get_subdirs(dir)
 
 
@@ -236,8 +236,8 @@ class Gnome_Importer(Importer):
         return "G"
     
     def is_resource(self, fname):
-        if debug:
-            return fname == 'pl.po' or fname == 'de.po'
+        if shortlist:
+            return fname in map(lambda x: x + '.po', shortlist)
         return fname.endswith('.po')
     
     def get_language(self, project):
@@ -258,7 +258,7 @@ class FY_Importer(Importer):
         self.cursor = self.conn.cursor()
         for line in f:
             en, fy = line.rstrip().split(" | ")
-            items[en] = { "fy" : fy }
+            items[en] = { "fy" : (fy, 0) }
         pid = Importer.store_project(self, "F/")
         self.store_phrases(pid, items)
 
@@ -269,8 +269,8 @@ class DI_Importer(Importer):
         return "D"
     
     def is_resource(self, fname):
-        if debug:
-            return fname == 'pl.po' or fname == 'de.po'
+        if shortlist:
+            return fname in shortlist
         return fname.endswith('.po')
     
     def get_language(self, project):
@@ -299,8 +299,8 @@ class Xfce_Importer(Importer):
         return "X"
 
     def is_resource(self, fname):
-        if debug:
-            return fname == 'pl.po' or fname == 'de.po'
+        if shortlist:
+            return fname in map(lambda x: x + '.po', shortlist)
         return fname.endswith('.po')
 
     def get_language(self, project):
@@ -315,8 +315,8 @@ class Inkscape_Importer(Importer):
         return "I"
 
     def is_resource(self, fname):
-        if debug:
-            return fname == 'pl.pl' or fname == 'de.po'
+        if shortlist:
+            return fname in map(lambda x: x + '.po', shortlist)
         return fname.endswith('.po')
 
     def get_language(self, project):
@@ -346,7 +346,7 @@ class OO_Importer(Importer):
 
 
 
-debug = 0
+shortlist = None #['fy', 'fy-NL']
 root = '/media/disk-1/sliwers/projekty/open-tran-data'
 pocls = factory.getclass("kde.po")
 conn = sqlite.connect('../data/ten.db')
