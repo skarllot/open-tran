@@ -21,13 +21,14 @@ from SocketServer import ForkingMixIn
 from StringIO import StringIO
 from signal import signal, alarm, SIGPIPE, SIGALRM, SIG_IGN
 from traceback import print_exc
+from urlparse import urlparse
 
 import re
 import os
 import stat
+import urllib
 
-
-__version__ = "240"
+__version__ = "250"
 
 
 def _replace_html(text):
@@ -172,6 +173,15 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.end_headers()
         
 
+    def redirect_back(self):
+        referer = self.headers['Referer']
+        path = urlparse(referer)[2]
+        if not path:
+            path = '/'
+        self.redirect(path)
+        return None
+
+
     def send_plain_headers(self, code, ctype, length, inode):
         self.send_response(code)
         self.send_header("Content-type", ctype)
@@ -241,9 +251,24 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     def do_POST(self):
         self.request_init()
         if self.path == '/RPC2':
-            return DocXMLRPCRequestHandler.do_POST(self)
-        else:
-            return self.shutdown(403)
+            return PremiumRequestHandler.do_POST(self)
+        try:
+            fname = "post_" + self.path[1:].replace('-', '_')
+            if hasattr(self, fname):
+                fun = getattr(self, fname)
+                data = self.rfile.read(int(self.headers["content-length"]))
+                fields = dict([urllib.unquote_plus(x).split('=') for x in data.split('&')])
+                f = fun(**fields)
+                if f:
+                    try:
+                        self.copyfile(f, self.wfile)
+                    finally:
+                        f.close()
+            else:
+                return self.shutdown(404)
+        except Exception, e:
+            self.log_error("POST action %s failed: %s" % (self.path, e))
+            self.send_error(500)
 
 
     def do_GET(self):
