@@ -251,7 +251,7 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     def do_POST(self):
         self.request_init()
         if self.path == '/RPC2':
-            return PremiumRequestHandler.do_POST(self)
+            return DocXMLRPCRequestHandler.do_POST(self)
         try:
             fname = "post_" + self.path[1:].replace('-', '_')
             if hasattr(self, fname):
