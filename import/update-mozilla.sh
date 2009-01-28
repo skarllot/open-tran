@@ -1,24 +1,24 @@
 #!/bin/bash
 
-TRASH_OFF=YES
+set -e
 
-data_root="/media/disk/sliwers/projekty/open-tran-data"
+data_root="$1"
 mozilla_root="$data_root/mozilla"
-mozilla_l10n="$data_root/mozilla-l10n"
+mozilla_l10n="$data_root/l10n"
 mozilla_po="$data_root/mozilla-po"
 
 cd $mozilla_root
 echo -n "up mozilla..."
-cvs up > /dev/null 2> /dev/null
+cvs up > /dev/null
 echo "done."
 
 cd $mozilla_l10n
 echo -n "up l10n..."
-cvs up > /dev/null 2> /dev/null
+cvs up > /dev/null
 echo "done."
 
-rm -r $mozilla_l10n/en-US
-rm -r $mozilla_po/*
+rm -rf $mozilla_l10n/en-US
+rm -rf $mozilla_po/*
 
 echo -n "en-US..."
 cd $mozilla_root
@@ -32,8 +32,6 @@ for d in *; do
     fi
     cd $data_root
     echo -n "$d..."
-    moz2po -t "$mozilla_l10n/en-US" "$mozilla_l10n/$d" "$mozilla_po/$d"
+    moz2po --progress none --errorlevel none -t "$mozilla_l10n/en-US" "$mozilla_l10n/$d" "$mozilla_po/$d" > /dev/null
     echo "done."
 done
-
-touch "$data_root/mozilla.stamp"

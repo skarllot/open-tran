@@ -1,26 +1,35 @@
 #!/bin/bash
 
-TRASH_OFF=YES
+set -e
 
-data_root="/media/disk/sliwers/projekty/open-tran-data"
+data_root="$1"
 oo_l10n="$data_root/oo-l10n"
 oo_po="$data_root/oo-po"
 
-if [ -z "$1" ] || [ "$1" != "skip" ]; then
+if [ ! -d $oo_l10n ]; then
+    echo -n "co l10n..."
+    cd $data_root
+    cvs -d:pserver:anoncvs@anoncvs.services.openoffice.org:/cvs co -P -d oo-l10n l10n/l10n/source
+    echo "done."
+else
     cd $oo_l10n
     echo -n "up l10n..."
-    cvs up > /dev/null 2> /dev/null
+    cvs up > /dev/null
     echo "done."
 fi
 
-# cd $oo_po
-# echo -n "clean..."
-# rm -r *
-# echo "done"
+if [ ! -d $oo_po ]; then
+    mkdir $oo_po
+fi
 
-# echo -n "get en-US..."
-# wget ftp://ftp.linux.cz/pub/localization/OpenOffice.org/latest/GSI/en-US.sdf
-# echo "done."
+cd $oo_po
+echo -n "clean..."
+rm -rf *
+echo "done"
+
+echo -n "get en-US..."
+wget -o /dev/null ftp://ftp.linux.cz/pub/localization/OpenOffice.org/latest/GSI/en-US.sdf
+echo "done."
 
 cd $oo_l10n
 
@@ -35,8 +44,6 @@ for d in *; do
     echo "done."
 
     echo -n "converting %d..."
-    oo2po --duplicates=merge -l $d "$oo_po/full.sdf" "$oo_po/$d"
+    oo2po --progress none --errorlevel none --duplicates=merge -l $d "$oo_po/full.sdf" "$oo_po/$d" > /dev/null
     echo "done."
 done
-
-touch "$data_root/oo.stamp"
