@@ -20,7 +20,7 @@ from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
 
-datadir = '/media/disk/sliwers/projekty/open-tran/trunk/data'
+datadir = '/home/sliwers/projekty/open-tran/trunk/data'
 
 
 langs = sorted(LANGUAGES)
