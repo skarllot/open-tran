@@ -29,3 +29,6 @@ update oo
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
 
+# if [ $import_success == 0 ]; then
+#     mail -s "Open-Tran update error" -f $err rzyj@o2.pl
+# fi
