@@ -1,0 +1,3 @@
+data_root="/media/disk-1/sliwers/projekty/open-tran-data"
+log="/tmp/import.log"
+err="/tmp/import.err"

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-data_root="/media/disk-1/sliwers/projekty/open-tran-data"
-log="/tmp/import.log"
-err="/tmp/import.err"
+. update.conf
+
+import_success=1
 
 rm -f $log $err
 
@@ -15,8 +15,10 @@ update () {
     fi
     echo "===== UPDATING $proj ====" >> $log
     $script $data_root $2 $3 >> $log 2>> $err
+    if [ $? != 0 ]; then
+	import_success=0
+    fi
 }
-
 
 update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
 update gnome
