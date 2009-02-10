@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export LC_ALL=C
+
 . update.conf
 
 import_success=1
