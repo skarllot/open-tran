@@ -4,8 +4,14 @@ export LC_ALL=C
 
 . update.conf
 
+log="$log_dir/import.log"
+err="$log_dir/import.err"
+status="$log_dir/status.txt"
+
+
 echo "importing" > $status
 rm -f $log $err
+
 
 update () {
     script="./update-$1.sh"
