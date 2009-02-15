@@ -16,11 +16,11 @@ for m in $gmodules; do
     if test -d $m; then
 	cd $m
 	echo -n "up $m..."
-	svn up > /dev/null
+	svn up > /dev/null || true
 	echo "done."
     else
 	echo -n "co $m..."
-	svn co http://svn.gnome.org/svn/$m/trunk/po $m > /dev/null
+	svn co http://svn.gnome.org/svn/$m/trunk/po $m > /dev/null || true
 	echo "done."
     fi
 done

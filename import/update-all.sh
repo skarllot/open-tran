@@ -4,8 +4,7 @@ export LC_ALL=C
 
 . update.conf
 
-import_success=1
-
+echo "importing" > $status
 rm -f $log $err
 
 update () {
@@ -15,11 +14,10 @@ update () {
     else
 	proj=$2
     fi
+    echo $proj >> $status
+    echo
     echo "===== UPDATING $proj ====" >> $log
     $script $data_root $2 $3 >> $log 2>> $err
-    if [ $? != 0 ]; then
-	import_success=0
-    fi
 }
 
 update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
@@ -31,6 +29,4 @@ update oo
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
 
-# if [ $import_success == 0 ]; then
-#     mail -s "Open-Tran update error" -f $err rzyj@o2.pl
-# fi
+rm $status

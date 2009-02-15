@@ -16,12 +16,12 @@ for m in $xmodules; do
     if test -d $m; then
 	cd $m
 	echo -n "up $m..."
-	svn up > /dev/null
+	svn up > /dev/null || true
 	echo "done."
 	cd ..
     else
 	echo -n "co $m..."
-	svn co http://svn.xfce.org/svn/xfce/${m}trunk/po $m /dev/null
+	svn co http://svn.xfce.org/svn/xfce/${m}trunk/po $m /dev/null || true
 	echo "done."
     fi
 done
@@ -31,12 +31,12 @@ for m in $goodies; do
     if test -d $m; then
 	cd $m
 	echo -n "up $m..."
-	svn up > /dev/null
+	svn up > /dev/null || true
 	echo "done."
 	cd ..
     else
 	echo -n "co $m..."
-	svn co http://svn.xfce.org/svn/goodies/${m}/trunk/po $m > /dev/null
+	svn co http://svn.xfce.org/svn/goodies/${m}/trunk/po $m > /dev/null || true
 	echo "done."
     fi
 done

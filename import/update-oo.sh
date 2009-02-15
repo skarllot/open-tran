@@ -9,12 +9,12 @@ oo_po="$data_root/oo-po"
 if [ ! -d $oo_l10n ]; then
     echo -n "co l10n..."
     cd $data_root
-    cvs -d:pserver:anoncvs@anoncvs.services.openoffice.org:/cvs co -P -d oo-l10n l10n/l10n/source
+    (cvs -d:pserver:anoncvs@anoncvs.services.openoffice.org:/cvs co -P -d oo-l10n l10n/l10n/source > /dev/null || true) 2>&1
     echo "done."
 else
     cd $oo_l10n
     echo -n "up l10n..."
-    cvs up > /dev/null
+    (cvs up > /dev/null || true) 2>&1
     echo "done."
 fi
 
@@ -43,7 +43,7 @@ for d in *; do
     sed '/^#/d' < "$d/localize.sdf" >> "$oo_po/full.sdf"
     echo "done."
 
-    echo -n "converting %d..."
-    oo2po --progress none --errorlevel none --duplicates=merge -l $d "$oo_po/full.sdf" "$oo_po/$d" > /dev/null
+    echo -n "converting $d..."
+    oo2po --progress none --errorlevel none --duplicates=merge -l $d "$oo_po/full.sdf" "$oo_po/$d" > /dev/null 2>&1
     echo "done."
 done
