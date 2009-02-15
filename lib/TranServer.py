@@ -252,6 +252,13 @@ class TranRequestHandler(PremiumRequestHandler):
         request.write_language_select(f, request.srclang, request.ifacelang)
     PremiumRequestHandler.substitutes['dstlang'] = lambda request, f: \
         request.write_language_select(f, request.dstlang, 'en')
+    PremiumRequestHandler.substitutes['searchShortName'] = lambda request, f: \
+        f.write('<ShortName>Open-Tran.eu (%s/%s)</ShortName>' \
+                    % (request.srclang, request.dstlang))
+    PremiumRequestHandler.substitutes['searchTemplateURL'] = lambda request, f:\
+        request.write_search_template_url(f)
+    PremiumRequestHandler.substitutes['openSearchLink'] = lambda request, f: \
+        request.write_opensearch_link(f)
 
     PremiumRequestHandler.actions.append(PremiumActionRedirect([('^/index.html$', '/index.shtml'),
                                                                 ('^/API$', '/RPC2')]))
@@ -261,6 +268,8 @@ class TranRequestHandler(PremiumRequestHandler):
         lambda request, match: request.send_compare_head()))
     PremiumRequestHandler.actions.append(PremiumActionCustom('^/setlang', \
         lambda request, match: request.set_language()))
+    PremiumRequestHandler.actions.append(PremiumActionCustom('^/search.xml', \
+        lambda request, match: request.send_search_xml()))
     PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
 
@@ -533,6 +542,27 @@ class TranRequestHandler(PremiumRequestHandler):
             f.write('>%s: %s</option>' % (code, LANGUAGES[code].encode('utf-8')))
 
 
+    def write_search_template_url(self, f):
+        if self.dstlang != "en":
+            f.write('template="http://%s.%s.' % (self.srclang,
+                                                       self.dstlang))
+        elif self.srclang != "en":
+            f.write('template="http://%s.' % self.srclang)
+        else:
+            f.write('template="http://%s.' % self.ifacelang)
+        f.write('open-tran.eu/suggest/{searchTerms}"')
+
+
+    def write_opensearch_link(self, f):
+        if self.srclang != "en" or self.dstlang != "en" \
+                or self.ifacelang != "en":
+            f.write('''<link rel="search"
+type="application/opensearchdescription+xml"
+title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
+                    % (self.srclang, self.dstlang))
+
+
+
     def get_query(self):
         query = None
         plen = len(self.path)
@@ -570,6 +600,11 @@ class TranRequestHandler(PremiumRequestHandler):
         suggs = self.server.storage.compare(query, lang)
         response = self.dump_compare(suggs, lang).encode('utf-8')
         return self.embed_in_template(response)
+
+
+    def send_search_xml(self):
+        template = PremiumRequestHandler.translate_path(self, '/search.xml')
+        return self.embed_in_given_template('', template, 200, 'text/xml')
         
 
     def request_init(self):

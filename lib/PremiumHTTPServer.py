@@ -192,7 +192,7 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.end_headers()
 
 
-    def process(self, stream, code=200):
+    def process(self, stream, code=200, content="text/html"):
 	f = StringIO()
 	for line in stream:
             m = re.search(PremiumRequestHandler.premre, line)
@@ -205,12 +205,12 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         f.flush()
         length = f.tell()
         f.seek(0)
-        self.send_plain_headers(code, "text/html", length, 0)
+        self.send_plain_headers(code, content, length, 0)
 	return f
 
 
-    def embed_in_template(self, text, code=200):
-        template = self.find_template()
+    def embed_in_given_template(self, text, template, code=200,
+                                content="text/html"):
         if not isinstance(template, file):
             template = open(template, 'rb')
         f = StringIO()
@@ -224,9 +224,15 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
                 f.write(line)
         f.flush()
         f.seek(0)
-	result = self.process(f, code)
+	result = self.process(f, code, content)
 	f.close()
         return result
+        
+
+
+    def embed_in_template(self, text, code=200):
+        template = self.find_template()
+        return self.embed_in_given_template(text, template, code)
 
 
     def send_head(self):
