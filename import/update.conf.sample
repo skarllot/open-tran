@@ -1,4 +1,6 @@
 data_root="/media/disk-1/sliwers/projekty/open-tran-data"
-log="/tmp/import.log"
-err="/tmp/import.err"
-status="/tmp/status.txt"
+log_dir="/tmp"
+
+log="$log_dir/import.log"
+err="$log_dir/import.err"
+status="$log_dir/status.txt"
