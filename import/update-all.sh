@@ -29,7 +29,7 @@ update () {
 update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
 update gnome
 update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
-update svn l10n-kde4 svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4
+update kde
 update mozilla
 update oo
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk

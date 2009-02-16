@@ -21,7 +21,7 @@ for m in $xmodules; do
 	cd ..
     else
 	echo -n "co $m..."
-	svn co http://svn.xfce.org/svn/xfce/${m}trunk/po $m /dev/null || true
+	svn co http://svn.xfce.org/svn/xfce/${m}trunk/po $m > /dev/null || true
 	echo "done."
     fi
 done
