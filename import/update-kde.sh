@@ -18,9 +18,15 @@ for m in $modules; do
     fi
     if test -d $m; then
 	cd $m
+
+	echo -n "up $m..."
+	svn cleanup > /dev/null || true
+	echo "done."
+
 	echo -n "up $m..."
 	svn up > /dev/null || true
 	echo "done."
+
 	cd ..
     else
 	echo -n "co $m..."

@@ -20,6 +20,7 @@ from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 
+datadir = sys.argv[1] + '/../data'
 
 def move_words(conn, cur, lang):
     cnt = 0
@@ -47,7 +48,7 @@ ORDER BY word
 
 
 for lang in sorted(LANGUAGES):
-    conn = sqlite.connect('../data/ten-' + lang + '.db')
+    conn = sqlite.connect(datadir + '/ten-' + lang + '.db')
     cur = conn.cursor()
     print "Moving %s words..." % lang,
     sys.stdout.flush()

@@ -9,8 +9,13 @@ svn_root="$data_root/$proj_name"
 
 if test -d $svn_root; then
     cd $svn_root
+
+    echo -n "cleanup $proj_name..."
+    svn cleanup > /dev/null
+    echo "done."
+
     echo -n "up $proj_name..."
-    svn up > /dev/null 
+    svn up > /dev/null
     echo "done."
 else
     echo -n "co $proj_name..."

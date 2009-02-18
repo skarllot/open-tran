@@ -1,17 +1,21 @@
 #!/bin/bash
 
-export LC_ALL=C
-
 . update.conf
+
+export LC_ALL=C
+export PYTHONPATH=$data_root/../lib
+export PATH=$PATH:$data_root/../import
 
 log="$log_dir/import.log"
 err="$log_dir/import.err"
+audit="$log_dir/audit.txt"
 status="$log_dir/status.txt"
 
 
 echo "importing" > $status
-rm -f $log $err
+rm -f $log $err $audit
 
+date > $log
 
 update () {
     script="./update-$1.sh"
@@ -35,4 +39,12 @@ update oo
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
 
+echo "processing" > $status
+
+import_step1.py $data_root >> $log 2>> $err
+audit_step1.py $data_root > $audit 2>> $err
+import_step2.py $data_root >> $log 2>> $err
+import_step3.py $data_root >> $log 2>> $err
+
 rm $status
+

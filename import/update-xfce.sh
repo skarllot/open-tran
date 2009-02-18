@@ -15,9 +15,15 @@ xmodules=`svn ls http://svn.xfce.org/svn/xfce/`
 for m in $xmodules; do
     if test -d $m; then
 	cd $m
+
+	echo -n "cleanup $m..."
+	svn cleanup > /dev/null || true
+	echo "done."
+
 	echo -n "up $m..."
 	svn up > /dev/null || true
 	echo "done."
+
 	cd ..
     else
 	echo -n "co $m..."

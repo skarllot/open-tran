@@ -347,9 +347,9 @@ class OO_Importer(Importer):
 
 
 shortlist = None #['fy', 'fy-NL']
-root = '/media/disk-1/sliwers/projekty/open-tran-data'
+root = sys.argv[1]
 pocls = factory.getclass("kde.po")
-conn = sqlite.connect('../data/ten.db')
+conn = sqlite.connect(sys.argv[1] + '/../data/ten.db')
 cursor = conn.cursor()
 importers = {
     DI_Importer(conn, pocls) : '/debian-installer',

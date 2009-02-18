@@ -15,6 +15,11 @@ for m in $gmodules; do
     cd $gnome_root
     if test -d $m; then
 	cd $m
+	
+	echo -n "cleanup $m..."
+	svn cleanup > /dev/null || true
+	echo "done."
+
 	echo -n "up $m..."
 	svn up > /dev/null || true
 	echo "done."
