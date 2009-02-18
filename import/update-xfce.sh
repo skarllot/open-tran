@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 data_root="$1"
 xfce_root="$data_root/xfce"
 

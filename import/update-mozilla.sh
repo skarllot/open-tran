@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 data_root="$1"
 mozilla_root="$data_root/mozilla"
 mozilla_l10n="$data_root/l10n"

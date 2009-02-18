@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 data_root="$1"
 gnome_root="$data_root/gnome-po"
 

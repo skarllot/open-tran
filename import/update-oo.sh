@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 data_root="$1"
 oo_l10n="$data_root/oo-l10n"
 oo_po="$data_root/oo-po"

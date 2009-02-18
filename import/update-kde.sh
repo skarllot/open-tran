@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 data_root="$1"
 kde_root="$data_root/l10n-kde4"
 
