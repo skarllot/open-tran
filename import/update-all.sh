@@ -3,7 +3,7 @@
 . update.conf
 
 export LC_ALL=C
-export PYTHONPATH=$data_root/../lib
+export PYTHONPATH=$toolkit_path:$data_root/../lib
 export PATH=$PATH:$data_root/../import
 
 log="$log_dir/import.log"
