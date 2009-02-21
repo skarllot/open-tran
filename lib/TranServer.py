@@ -270,8 +270,6 @@ class TranRequestHandler(PremiumRequestHandler):
         lambda request, match: request.set_language()))
     PremiumRequestHandler.actions.append(PremiumActionCustom('^/search.xml', \
         lambda request, match: request.send_search_xml()))
-    PremiumRequestHandler.actions.append(PremiumActionCustom('^/getcookie$', \
-        lambda request, match: request.send_cookie()))
     PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
 
@@ -446,7 +444,7 @@ class TranRequestHandler(PremiumRequestHandler):
         return None
 
 
-    def send_cookie(self):
+    def post_getcookie(self):
         result = 'no cookie set'
         try:
             c = SimpleCookie(self.headers['Cookie'])
