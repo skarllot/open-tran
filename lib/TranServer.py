@@ -444,11 +444,11 @@ class TranRequestHandler(PremiumRequestHandler):
         return None
 
 
-    def post_getcookie(self):
+    def post_getcookie(self, name):
         result = 'no cookie set'
         try:
             c = SimpleCookie(self.headers['Cookie'])
-            result = c['lang'].value
+            result = c[name].value
         except:
             pass
         self.send_plain_headers(200, "text", len(result), None)
