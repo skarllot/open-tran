@@ -27,7 +27,7 @@ icur = iconn.cursor()
 
 word_id = 0
 
-sf = open('step2.sql')
+sf = open(datadir + '/../import/step2.sql')
 schema = sf.read()
 sf.close()
 

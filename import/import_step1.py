@@ -363,7 +363,7 @@ importers = {
     Xfce_Importer(conn, pocls) : '/xfce'
     }
 
-sf = open('step1.sql')
+sf = open(sys.argv[1] + '/../import/step1.sql')
 schema = sf.read()
 sf.close()
 cursor.executescript(schema)
