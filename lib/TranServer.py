@@ -444,19 +444,6 @@ class TranRequestHandler(PremiumRequestHandler):
         return None
 
 
-    def post_getcookie(self, name):
-        result = 'no cookie set'
-        try:
-            c = SimpleCookie(self.headers['Cookie'])
-            result = c[name].value
-        except:
-            pass
-        self.send_plain_headers(200, "text", len(result), None)
-        self.wfile.write(result)
-        return None
-        
-
-
     def get_iface_language(self):
 	try:
             c = SimpleCookie(self.headers['Cookie'])
