@@ -52,29 +52,32 @@ for lang in sorted(LANGUAGES):
     cur = conn.cursor()
     print "Moving %s words..." % lang,
     sys.stdout.flush()
-    move_words(conn, cur, lang)
-    print "IW",
-    sys.stdout.flush()
-    cur.execute("CREATE INDEX idx ON words(word)")
-    print "IWP1",
-    sys.stdout.flush()
-    cur.execute("CREATE INDEX wpw ON wp(wordid)")
-    print "IWP2",
-    sys.stdout.flush()
-    cur.execute("CREATE INDEX wpp ON wp(phraseid)")
-    print "IL1",
-    sys.stdout.flush()
-    cur.execute("CREATE INDEX lp ON locations(phraseid)")
-    print "IL2",
-    sys.stdout.flush()
-    cur.execute("CREATE INDEX ll ON locations(locationid)")
-    print "D",
-    sys.stdout.flush()
-    cur.execute("DROP TABLE twords")
-    print "V",
-    sys.stdout.flush()
-    cur.execute("VACUUM")
-    print "done."
+    try:
+        move_words(conn, cur, lang)
+        print "IW",
+        sys.stdout.flush()
+        cur.execute("CREATE INDEX idx ON words(word)")
+        print "IWP1",
+        sys.stdout.flush()
+        cur.execute("CREATE INDEX wpw ON wp(wordid)")
+        print "IWP2",
+        sys.stdout.flush()
+        cur.execute("CREATE INDEX wpp ON wp(phraseid)")
+        print "IL1",
+        sys.stdout.flush()
+        cur.execute("CREATE INDEX lp ON locations(phraseid)")
+        print "IL2",
+        sys.stdout.flush()
+        cur.execute("CREATE INDEX ll ON locations(locationid)")
+        print "D",
+        sys.stdout.flush()
+        cur.execute("DROP TABLE twords")
+        print "V",
+        sys.stdout.flush()
+        cur.execute("VACUUM")
+        print "done."
+    except:
+        print "failed."
     sys.stdout.flush()
     cur.close()
     conn.close()

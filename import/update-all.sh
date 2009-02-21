@@ -11,8 +11,12 @@ err="$log_dir/import.err"
 audit="$log_dir/audit.txt"
 status="$log_dir/status.txt"
 
+echo "initializing" > $status
 
-echo "importing" > $status
+svn up $data_root/../lib > /dev/null 2>&1
+svn up $data_root/../import > /dev/null 2>&1
+
+echo "importing" >> $status
 rm -f $log $err $audit
 
 date > $log
@@ -38,6 +42,9 @@ update mozilla
 update oo
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
+
+
+rm -rf $data_root/*
 
 echo "processing" > $status
 

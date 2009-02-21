@@ -115,9 +115,12 @@ for lang in sorted(LANGUAGES):
     ocur = oconn.cursor()
     print "Moving %s phrases..." % lang,
     sys.stdout.flush()
-    define_schema(oconn, ocur)
-    move_phrases(oconn, ocur, lang)
-    print "done."
+    try:
+        define_schema(oconn, ocur)
+        move_phrases(oconn, ocur, lang)
+        print "done."
+    except:
+        print "failed."
     sys.stdout.flush()
     ocur.close()
     oconn.close()
