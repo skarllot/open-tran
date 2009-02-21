@@ -270,6 +270,8 @@ class TranRequestHandler(PremiumRequestHandler):
         lambda request, match: request.set_language()))
     PremiumRequestHandler.actions.append(PremiumActionCustom('^/search.xml', \
         lambda request, match: request.send_search_xml()))
+    PremiumRequestHandler.actions.append(PremiumActionCustom('^/getcookie$', \
+        lambda request, match: request.send_cookie()))
     PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
 
@@ -442,6 +444,19 @@ class TranRequestHandler(PremiumRequestHandler):
 	    if lang[:i] == l[:i]:
                 return l
         return None
+
+
+    def send_cookie(self):
+        result = 'no cookie set'
+        try:
+            c = SimpleCookie(self.headers['Cookie'])
+            result = c['lang'].value
+        except:
+            pass
+        self.send_plain_headers(200, "text", len(result), None)
+        self.wfile.write(result)
+        return None
+        
 
 
     def get_iface_language(self):
