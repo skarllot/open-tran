@@ -71,6 +71,7 @@ class Importer(object):
     
 
     def lang_hygiene(self, lang):
+        lang = lang.replace('@', '_').lower()
         if lang[:2] == lang[3:].lower():
             return lang[:2]
         lang = lang.replace('-', '_')
@@ -112,8 +113,7 @@ values
         fname = fname.replace('_fr.po', '_' + lang + '.po', 1)
         fname = fname.replace('.fr.po', '.' + lang + '.po', 1)
         store = self.parser_class.parsefile(fname)
-        mlang = lang.replace('@', '_').lower()
-        mlang = self.lang_hygiene(mlang)
+        mlang = self.lang_hygiene(lang)
         for unit in store.units:
             src = unit.source.encode('utf-8')
             dst = unit.target.encode('utf-8')

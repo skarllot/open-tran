@@ -27,7 +27,7 @@ LANGUAGES = {
     'br' : u'Brezhoneg',
     'bs' : u'Bosanski',
     'ca' : u'Català',
-    'ca_val' : u'Valencià, Català',
+    'ca_valencia' : u'Valencià, Català',
     'cs' : u'Čeština',
     'csb' : u'Kaszëbsczi',
     'cy' : u'Cymraeg',
