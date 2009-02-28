@@ -370,7 +370,10 @@ cursor.executescript(schema)
 conn.commit()
 
 for i, p in importers.iteritems():
-    i.run(root + p)
+    try:
+        i.run(root + p)
+    except Exception, inst:
+        sys.stderr.write('%s failed: %s' % (p, str(inst)))
 
 log("Creating index...", True)
 cursor.execute("CREATE INDEX idx ON phrases(lang);")
