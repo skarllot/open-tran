@@ -138,7 +138,6 @@ values
 
     def run_langs(self, dir):
         self.langs = get_lsubdirs(dir)
-        print self.langs
         for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
             for f in files:
                 if self.is_resource(f):
