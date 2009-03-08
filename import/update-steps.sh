@@ -2,9 +2,7 @@
 
 . update.conf
 
-export LC_ALL=C
 export PYTHONPATH=$toolkit_path:$data_root/../lib
-export PATH=$PATH:$data_root/../import
 
 log="$log_dir/import.log"
 err="$log_dir/import.err"
@@ -12,7 +10,7 @@ audit="$log_dir/audit.txt"
 status="$log_dir/status.txt"
 
 update () {
-    script="./update-$1.sh"
+    script="update-$1.sh"
     if test -z "$2"; then
 	proj=$1
     else
