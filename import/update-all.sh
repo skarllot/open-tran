@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. update.conf
+. /home/leonardof/ot.leonardof.org/import/update.conf
 
 export LC_ALL=C
 export PATH=$PATH:$data_root/../import
