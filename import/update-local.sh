@@ -1,6 +1,8 @@
 #!/bin/bash
 
-. /home/sliwers/projekty/open-tran/trunk/import/update.conf
+. /home/sliwers/open-tran/import/update.conf
+
+export PYTHONPATH=$local_dir/lib
 
 errfile="/tmp/import.err"
 restfile="/tmp/import.rest"
@@ -50,7 +52,7 @@ if [ -f "$newdir/ten-zu.db" ]; then
 fi
 
 if [ ! -f "$newdir/ten.db" ]; then
-    echo "no primary file" >> $logout
+    echo "no primary file in $newdir" >> $logout
     exit 1
 fi
 
