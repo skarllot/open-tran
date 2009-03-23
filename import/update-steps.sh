@@ -44,8 +44,6 @@ date >> $log
 
 import_step1.py $data_root >> $log 2>> $err
 audit_step1.py $data_root > $audit 2>> $err
-import_step2.py $data_root >> $log 2>> $err
-import_step3.py $data_root >> $log 2>> $err
 
 date >> $log
 
