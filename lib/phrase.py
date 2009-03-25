@@ -31,6 +31,10 @@ class AFHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["'n", "die"])
 
+class DAHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ["de", "dem", "den", "det", "en", "et"])
+
 class DEHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["das", "dem", "den", "der", "deren", "des", "dessen", "die", "ein", "eine", "einem", "einen"])
