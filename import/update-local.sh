@@ -47,7 +47,7 @@ else
 fi
 
 if [ -f "$newdir/ten-zu.db" ]; then
-    if [ `stat -c "%Z" $newdir/ten-zu.db` < `stat -c "%Z" $newdir/ten.db` ]; then
+    if [ `stat -c "%Z" $newdir/ten-zu.db` -le `stat -c "%Z" $newdir/ten.db` ]; then
 	echo "nothing new here" >> $logout
 	exit 0
     fi
