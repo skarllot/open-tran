@@ -38,7 +38,7 @@ fi
 
 cat $errfile | grep -v "^svn:" | grep -v "No module named lxml" > $restfile
 
-cnt=`wc -l $restfile`
+cnt=`cat $restfile | wc -l`
 
 if [ "$cnt" == 0 ]; then
     wget -o /dev/null -O "$newdir/ten.db" http://ot.leonardof.org/data/ten.db
