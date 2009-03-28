@@ -51,7 +51,7 @@ if [ -f "$newdir/ten-zu.db" ]; then
     fi
 fi
 
-rm -f "$newdir/ten-*.db"
+rm -f $newdir/ten-*.db
 
 if [ ! -f "$newdir/ten.db" ]; then
     echo "no primary file in $newdir" >> $logout
