@@ -43,7 +43,7 @@ cnt=`wc -l $restfile`
 if [ "$cnt" == 0 ]; then
     wget -o /dev/null -O "$newdir/ten.db" http://ot.leonardof.org/data/ten.db
 else
-    echo "There were $cnt unexpected errors in the file." >> $logerr
+    echo "There were $cnt unexpected errors in the file." >> $errout
 fi
 
 if [ -f "$newdir/ten-zu.db" ]; then
