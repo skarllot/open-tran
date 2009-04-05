@@ -19,7 +19,7 @@ from translate.storage import factory
 from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 
-import dircache, sys, os
+import dircache, sys, os, gc
 
 
 def log(text, nonline=False):
@@ -146,6 +146,7 @@ values
                     log("Importing %s..." % f)
                     pid = self.store_project(name)
                     self.store_file(pid, os.path.join(root, f))
+                    gc.collect()
                 else:
                     print f, "is not a resource"
             if '.svn' in dirs:
@@ -188,6 +189,7 @@ values
     def run_projects(self, dir):
         for proj in get_subdirs(dir):
             self.run_project(dir, proj)
+            gc.collect()
 
 
     def get_path(self, dir, name):
