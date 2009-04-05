@@ -108,8 +108,12 @@ VALUES (?, ?, ?, ?)""", (nlid, lid, project_names[projectid], flags))
     oconn.commit()
 
 
-
 move_projects()
+
+log("Creating index...", True)
+icur.execute("CREATE INDEX idx ON phrases(lang);")
+log("done.")
+
 for lang in sorted(LANGUAGES):
     oconn = sqlite.connect(datadir + '/ten-' + lang + '.db')
     ocur = oconn.cursor()

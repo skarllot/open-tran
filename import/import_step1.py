@@ -374,8 +374,5 @@ for i, p in importers.iteritems():
     except Exception, inst:
         sys.stderr.write('%s failed: %s\n' % (p, str(inst)))
 
-log("Creating index...", True)
-cursor.execute("CREATE INDEX idx ON phrases(lang);")
-log("done.")
 conn.commit()
 conn.close()
