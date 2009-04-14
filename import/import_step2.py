@@ -110,9 +110,9 @@ VALUES (?, ?, ?, ?)""", (nlid, lid, project_names[projectid], flags))
 
 move_projects()
 
-log("Creating index...", True)
+print "Creating index...",
 icur.execute("CREATE INDEX idx ON phrases(lang);")
-log("done.")
+print "done."
 
 for lang in sorted(LANGUAGES):
     oconn = sqlite.connect(datadir + '/ten-' + lang + '.db')
