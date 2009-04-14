@@ -31,10 +31,10 @@ fi
 
 cnt=`grep "^svn:" $errfile | wc -l`
 
-if [ "$cnt" != 275 ]; then
-    echo "strange number of errors: $cnt" >> $logout
-    exit 1
-fi
+#if [ "$cnt" != 275 ]; then
+#    echo "strange number of errors: $cnt" >> $logout
+#    exit 1
+#fi
 
 cat $errfile | grep -v "^svn:" | grep -v "No module named lxml" > $restfile
 
