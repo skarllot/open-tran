@@ -50,6 +50,7 @@ class Importer(object):
         'be_by' : 'be',
         'fy_nl' : 'fy',
         'ga_ie' : 'ga',
+        'gl_es' : 'gl',
         'hi_in' : 'hi',
         'hy_am' : 'hy',
         'ml_in' : 'ml',
