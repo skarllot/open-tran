@@ -106,7 +106,7 @@ LANGUAGES = {
     'tt' : u'Tatarça/Татарча',
     'uk' : u'Українська',
     'uz' : u'Ўзбек',
-    'ven' : u'Tshivenda',
+    've' : u'Tshivenda',
     'vi' : u'Tiếng Việt',
     'wa' : u'Walon',
     'xh' : u'isiXhosa',
