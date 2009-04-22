@@ -31,8 +31,8 @@ for l in langs[1:]:
 conn = sqlite.connect(datadir + '/ten.db')
 cur = conn.cursor()
 
-cur.execute("DELETE FROM phrases WHERE lang NOT IN (" + str + ");")
-conn.commit()
+#cur.execute("DELETE FROM phrases WHERE lang NOT IN (" + str + ");")
+#conn.commit()
 
 projs = {}
 
