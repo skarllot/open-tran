@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
 #  Copyright (C) 2007 Jacek Śliwerski (rzyjontko)
@@ -33,6 +34,7 @@ LANGUAGES = {
     'cy' : u'Cymraeg',
     'da' : u'Dansk',
     'de' : u'Deutsch',
+    'dz' : u'རྫོང་ཁ',
     'el' : u'Ελληνικά',
     'en' : u'English',
     'en_gb' : u'English',
@@ -81,6 +83,7 @@ LANGUAGES = {
     'ne' : u'नेपाली',
     'nl' : u'Nederlands',
     'nn' : u'Norsk nynorsk',
+    'nr' : u'isiNdebele',
     'oc' : u'Occitan',
     'or' : u'ଓଡ଼ିଆ',
     'pa' : u'ਪਜਾਬੀ/पंजाबी/پنجابي',
@@ -96,15 +99,19 @@ LANGUAGES = {
     'sq' : u'Shqip',
     'sr' : u'Српски',
     'ss' : u'SiSwati',
+    'st' : u'Sesotho',
     'sv' : u'Svenska',
     'sw' : u'Kiswahili',
     'ta' : u'தமிழ்',
     'te' : u'తెలుగు',
     'tg' : u'Тоҷикӣ',
     'th' : u'ไทย',
+    'tn' : u'Setswana',
     'tr' : u'Türkçe',
     'tt' : u'Tatarça/Татарча',
+    'ts' : u'Xitsonga',
     'uk' : u'Українська',
+    'ur' : u'Urdu',
     'uz' : u'Ўзбек',
     've' : u'Tshivenda',
     'vi' : u'Tiếng Việt',

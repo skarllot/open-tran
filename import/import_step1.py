@@ -61,6 +61,7 @@ class Importer(object):
         'or_in' : 'or',
         'sr_latin' : 'sr_latn',
         'sv_se' : 'sv',
+        'sw_tz' : 'sw',
         'te_in' : 'te',
         'ven' : 've'
         }
