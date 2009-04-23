@@ -72,9 +72,11 @@ class Phrase:
     wre = re.compile("([\w'%<]/?(?:[&'_]?\w)*>?)", re.UNICODE)
     dre = re.compile('^\d+$', re.UNICODE)
     xre = re.compile("<\?w*>", re.UNICODE)
+    qre = re.compile('"[^"]*"', re.UNICODE)
 
     __handlers = { "C"  : ENHandler (),
                    "af" : AFHandler (),
+                   "da" : DAHandler (),
                    "de" : DEHandler (),
                    "en" : ENHandler (),
                    "es" : ESHandler (),
@@ -115,3 +117,6 @@ class Phrase:
 
     def canonical_list(self):
         return self._wordlist
+
+    def required(self):
+        return [m[1:-1] for m in self.qre.findall(self._phrase)]

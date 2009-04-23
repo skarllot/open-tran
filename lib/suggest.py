@@ -141,10 +141,13 @@ class TranDB:
         
 
     def qmarks_string(self, words):
-        result = "(?"
-        for w in words[1:]:
-            result += ", ?"
-        return result + ")"
+        return "(" + ", ".join(["?" for w in words]) + ")"
+
+
+    def required_where(self, likes):
+        if not likes:
+            return ""
+        return "WHERE " + ' AND '.join(["src.phrase LIKE ?" for l in likes])
 
 
     def get_translations(self, text, srclang, dstlang):
@@ -156,6 +159,8 @@ class TranDB:
             return result
         words = phrase.canonical_list()
         qmarks = self.qmarks_string(words)
+        likes = ["%%%s%%" % m for m in phrase.required()]
+        where = self.required_where(likes)
         conn = sqlite.connect(self.db + srclang + ".db")
         cursor = conn.cursor ()
         cursor.execute ("""
@@ -176,8 +181,9 @@ JOIN (
 ) val ON srcl.phraseid = val.id
 JOIN dest.locations dstl ON srcl.locationid = dstl.locationid
 JOIN dest.phrases dst ON dstl.phraseid = dst.id
+%s
 ORDER BY dstl.flags, val.value
-""" % qmarks, tuple(words))
+""" % (qmarks, where), tuple(words + likes))
         rows = cursor.fetchall()
         for (trans, orig, project, flags, value) in rows:
 	    sug = TmpSug(trans, orig, project, value, flags)
