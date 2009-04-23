@@ -147,7 +147,13 @@ class TranDB:
     def required_where(self, likes):
         if not likes:
             return ""
-        return "WHERE " + ' AND '.join(["src.phrase LIKE ?" for l in likes])
+        return "WHERE " + 'AND '.join(['''src.phrase LIKE ? ESCAPE '"' '''
+                                        for l in likes])
+
+
+    def required_likes(self, likes):
+        return ["%%%s%%" % m.replace('_', '"_').replace('%', '"%')
+                for m in likes]
 
 
     def get_translations(self, text, srclang, dstlang):
@@ -159,14 +165,14 @@ class TranDB:
             return result
         words = phrase.canonical_list()
         qmarks = self.qmarks_string(words)
-        likes = ["%%%s%%" % m for m in phrase.required()]
+        likes = self.required_likes(phrase.required())
         where = self.required_where(likes)
         conn = sqlite.connect(self.db + srclang + ".db")
         cursor = conn.cursor ()
         cursor.execute ("""
 ATTACH ? AS dest
 """, (self.db + dstlang + '.db',))
-        cursor.execute ("""
+        sql = """
 SELECT dst.phrase, src.phrase, dstl.project, dstl.flags, val.value
 FROM phrases src
 JOIN locations srcl ON src.id = srcl.phraseid
@@ -183,7 +189,11 @@ JOIN dest.locations dstl ON srcl.locationid = dstl.locationid
 JOIN dest.phrases dst ON dstl.phraseid = dst.id
 %s
 ORDER BY dstl.flags, val.value
-""" % (qmarks, where), tuple(words + likes))
+""" % (qmarks, where)
+        print sql
+        print words
+        print likes
+        cursor.execute (sql, tuple(words + likes))
         rows = cursor.fetchall()
         for (trans, orig, project, flags, value) in rows:
 	    sug = TmpSug(trans, orig, project, value, flags)
