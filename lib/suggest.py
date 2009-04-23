@@ -190,9 +190,6 @@ JOIN dest.phrases dst ON dstl.phraseid = dst.id
 %s
 ORDER BY dstl.flags, val.value
 """ % (qmarks, where)
-        print sql
-        print words
-        print likes
         cursor.execute (sql, tuple(words + likes))
         rows = cursor.fetchall()
         for (trans, orig, project, flags, value) in rows:
@@ -291,6 +288,31 @@ Returns the same results as suggest, but grouped by the projects.
             if len(subres) > 0:
                 result[project] = subres
         return result
+
+
+    def words(self, lang, offset = 0, limit = 50):
+        """
+Returns the list of most popular words for the given language.
+The server will skip offset records from start and return at
+most limit records.  Every record in the result set is a pair:
+(word, count) where count is the number of occurences of the
+word in the database.
+"""
+        conn = sqlite.connect(self.db + lang + ".db")
+        cursor = conn.cursor ()
+        cursor.execute("""
+SELECT word, sum(count) cnt
+FROM words w
+JOIN wp ON w.id = wp.wordid
+GROUP BY word
+ORDER BY cnt DESC
+LIMIT ?
+OFFSET ?
+""", (limit, offset))
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return [(w, cnt) for (w, cnt) in rows]
 
 
 if __name__ == "__main__":

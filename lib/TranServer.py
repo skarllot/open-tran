@@ -271,6 +271,8 @@ class TranRequestHandler(PremiumRequestHandler):
         lambda request, match: request.set_language()))
     PremiumRequestHandler.actions.append(PremiumActionCustom('^/search.xml', \
         lambda request, match: request.send_search_xml()))
+    PremiumRequestHandler.actions.append(PremiumActionCustom('^/words.html', \
+        lambda request, match: request.send_words()))
     PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
 
@@ -591,6 +593,40 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
         return self.embed_in_template(response)
 
 
+
+    def dump_word(self, num, word, cnt):
+        if self.srclang != self.dstlang:
+            return u'<li value="%d"><a href="/compare/%s">%s</a> %d</li>' \
+                % (num, _replace_html(word), _replace_html(word), cnt)
+        else:
+            return u'<li value="%d">%s %d</li>' \
+                % (num, _replace_html(word), cnt)
+    
+    
+    def dump_words(self, offset, words):
+        return u'<ol>' \
+            + u''.join([self.dump_word(offset + num + 1, word, cnt)
+                       for (num, (word, cnt)) in enumerate(words)]) \
+            + u'</ol>' \
+            + u'<p><a href="/words.html/%d">next page</a></p>' \
+            % (offset / 50 + 2)
+        
+    
+    def words_offset(self):
+        try:
+            return 50 * (int(self.path[12:]) - 1)
+        except ValueError:
+            return 0
+    
+    
+    def send_words(self):
+        offset = self.words_offset()
+        words = self.server.storage.words(self.srclang, offset)
+        response = self.dump_words(offset, words)
+        response = response.encode('utf-8')
+        return self.embed_in_template(response)
+    
+    
     def send_compare_head(self):
         query = self.get_query()
         if query == None:
@@ -633,5 +669,6 @@ This server exports the following methods through the XML-RPC protocol.
         self.register_function(self.storage.suggest2, 'suggest2')
         self.register_function(self.storage.suggest, 'suggest')
         self.register_function(self.storage.compare, 'compare')
+        self.register_function(self.storage.words, 'words')
         self.register_function(self.supported, 'supported')
         self.register_introspection_functions()
