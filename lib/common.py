@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
 #  Copyright (C) 2007 Jacek Śliwerski (rzyjontko)
