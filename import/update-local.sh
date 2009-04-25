@@ -62,3 +62,5 @@ fi
 
 $local_dir/import/import_step2.py $newdir >> $logout 2>> $errout
 $local_dir/import/import_step3.py $newdir >> $logout 2>> $errout
+echo -n "Finished " >> $logout
+date >> $logout
