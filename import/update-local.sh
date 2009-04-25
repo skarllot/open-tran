@@ -40,11 +40,11 @@ cat $errfile | grep -v "^svn:" | grep -v "No module named lxml" > $restfile
 
 cnt=`cat $restfile | wc -l`
 
-if [ "$cnt" == 0 ]; then
-    wget -o /dev/null -O "$newdir/ten.db" http://ot.leonardof.org/data/ten.db
-else
-    echo "There were $cnt unexpected errors in the file." >> $errout
-fi
+#if [ "$cnt" == 0 ]; then
+wget -o /dev/null -O "$newdir/ten.db" http://ot.leonardof.org/data/ten.db
+#else
+#    echo "There were $cnt unexpected errors in the file." >> $errout
+#fi
 
 if [ -f "$newdir/ten-zu.db" ]; then
     if [ `stat -c "%Z" $newdir/ten-zu.db` -ge `stat -c "%Z" $newdir/ten.db` ]; then

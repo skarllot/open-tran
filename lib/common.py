@@ -17,6 +17,7 @@
 
 LANGUAGES = {
     'af' : u'Afrikaans',
+    'am' : u'አማርኛ amarəñña',
     'ar' : u'العربية',
     'as' : u'অসমীয়া',
     'az' : u'Azərbaycan',
