@@ -15,6 +15,11 @@
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
+def pretty_int(s):
+    return ",".join(["%03d" % a for a in
+            	     [(s / 1000000) % 1000, (s / 1000) % 1000, s % 1000]
+                    if a > 0]).lstrip('0')
+
 LANGUAGES = {
     'af' : u'Afrikaans',
     'am' : u'አማርኛ amarəñña',

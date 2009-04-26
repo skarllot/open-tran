@@ -17,7 +17,7 @@
 
 import sys
 from pysqlite2 import dbapi2 as sqlite
-from common import LANGUAGES
+from common import LANGUAGES, pretty_int
 
 
 datadir = sys.argv[1] + '/../data'
@@ -25,11 +25,6 @@ datadir = sys.argv[1] + '/../data'
 
 conn = sqlite.connect(datadir + '/ten.db')
 cur = conn.cursor()
-
-def pretty_int(s):
-    return ",".join([str(a) for a in
-                     [(s / 1000000) % 1000, (s / 1000) % 1000, s % 1000]
-                     if a > 0])
 
 print '''
 <div class="ltr">
