@@ -71,7 +71,7 @@ projects = {
 conn = sqlite.connect(datadir + '/ten.db')
 cur = conn.cursor()
 
-cur.execute("CREATE INDEX idx ON phrases(projectid)")
+cur.execute("CREATE INDEX idy ON phrases(projectid)")
 conn.commit()
 
 cur.execute("""
