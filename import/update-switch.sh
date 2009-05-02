@@ -7,7 +7,7 @@ if [[ -z "$IMPORTDIR" ]]; then
     exit 1
 fi
 
-PYTHONPATH="$IMPORTDIR/../lib"
+export PYTHONPATH="$IMPORTDIR/../lib"
 
 $IMPORTDIR/audit_step1.py $IMPORTDIR > /tmp/projects.html
 $IMPORTDIR/audit_step2.py $IMPORTDIR > /tmp/languages.html
