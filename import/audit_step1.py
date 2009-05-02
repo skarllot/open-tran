@@ -20,7 +20,7 @@ from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES, pretty_int
 from datetime import date
 
-datadir = sys.argv[1] + '/../data'
+datadir = sys.argv[1]
 
 
 class Project:
