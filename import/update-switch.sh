@@ -10,17 +10,18 @@ fi
 export PYTHONPATH="$IMPORTDIR/../lib"
 
 if file "$IMPORTDIR/../data" | grep "dataa"; then
-    olddir="$IMPORTDIR/../dataa"
-    newdir="$IMPORTDIR/../datab"
+    olddir="dataa"
+    newdir="datab"
 else
-    olddir="$IMPORTDIR/../datab"
-    newdir="$IMPORTDIR/../dataa"
+    olddir="datab"
+    newdir="dataa"
 fi
 
-$IMPORTDIR/audit_step1.py $newdir > /tmp/projects.html
-$IMPORTDIR/audit_step2.py $newdir > /tmp/languages.html
+$IMPORTDIR/audit_step1.py $IMPORTDIR/../$newdir > /tmp/projects.html
+$IMPORTDIR/audit_step2.py $IMPORTDIR/../$newdir > /tmp/languages.html
 
-rm "$IMPORTDIR/../data"
+cd "$IMPORTDIR/.."
+rm data
 ln -s "$newdir" "$IMPORTDIR/../data"
-mv /tmp/projects.html $IMPORTDIR/../server
-mv /tmp/languages.html $IMPORTDIR/../server
+mv /tmp/projects.html server
+mv /tmp/languages.html server
