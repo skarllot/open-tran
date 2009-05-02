@@ -87,7 +87,10 @@ for proj in projects.values():
     cur.execute("""
 SELECT count(*), count(distinct lang)
 FROM phrases
-WHERE projectid BETWEEN %d AND %d""" % (proj.min, proj.max))
+WHERE projectid BETWEEN %d AND %d
+  AND lang in (%s)""" % (proj.min, proj.max,
+                         ", ".join(["'" + lang + "'" for lang
+                                    in LANGUAGES.keys() if lang != 'en'])))
     (cnt, lcnt) = cur.fetchone()
     proj.total = cnt
     proj.langs = lcnt
