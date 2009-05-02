@@ -30,7 +30,7 @@ for m in $xmodules; do
     fi
 done
 
-goodies=`wget -o /dev/null -O- http://svn.xfce.org/index.cgi/xfce-goodies | grep 'href="/index.cgi/xfce-goodies/browse' | sed 's/.*\/browse\/\([^"]*\)".*/\1/'`
+goodies=`wget -o /dev/null -O- http://svn.xfce.org/index.cgi/goodies | grep 'a href="/index.cgi/goodies/[^?]' | sed 's/.*\/goodies\/\([^\/]*\)\/.*/\1/'`
 for m in $goodies; do
     if test -d $m; then
 	cd $m
