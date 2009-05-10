@@ -42,6 +42,6 @@ for d in *; do
     echo "done."
 
     echo -n "converting $d..."
-    oo2po --progress none --errorlevel none --duplicates=merge -l $d "$oo_po/full.sdf" "$oo_po/$d" > /dev/null 2>&1
+    oo2po --progress none --duplicates=merge -l $d "$oo_po/full.sdf" "$oo_po/$d" > /dev/null
     echo "done."
 done

@@ -54,6 +54,6 @@ for d in *; do
     fi
     cd $data_root
     echo -n "$d..."
-    moz2po --progress none --errorlevel none -t "$mozilla_l10n/en-US" "$mozilla_l10n/$d" "$mozilla_po/$d" > /dev/null 2>&1
+    moz2po --progress none -t "$mozilla_l10n/en-US" "$mozilla_l10n/$d" "$mozilla_po/$d" > /dev/null
     echo "done."
 done
