@@ -401,7 +401,7 @@ class TranRequestHandler(PremiumRequestHandler):
             return cmp(dic[x[0]], dic[y[0]])
             
         rtl = ''
-        if lang in RTL_LANGUAGES:
+        if self.srclang in RTL_LANGUAGES:
             rtl = ' dir="rtl" style="text-align: right"'
         head = []
         body = []
