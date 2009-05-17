@@ -33,7 +33,7 @@ schema = sf.read()
 sf.close()
 
 
-project_names = ["!"]
+project_names = {}
 
 
 def define_schema(oconn, ocur):
@@ -48,8 +48,8 @@ SELECT id, name
 FROM projects
 ORDER BY id
 """)
-    for (id, name) in icur.fetchall():
-        project_names.append(name)
+    for (pid, name) in icur.fetchall():
+        project_names[pid] = name
 
 
 def store_words(oconn, ocur, phraseid, words):
