@@ -344,7 +344,7 @@ class TranRequestHandler(PremiumRequestHandler):
         return u''.join(result)
 
 
-    def render_suggestions_compare(self, suggs, dstlang):
+    def render_suggestions_compare(self, suggs, srclang):
         cnt, total = reduce(lambda x, y: (x[0] + 1, x[1] + len(y.text)), suggs, (0, 0))
         result = ['<ol style="width: %dem">\n' % (total / cnt * 2 / 3)]
         for s in suggs:
@@ -360,7 +360,7 @@ class TranRequestHandler(PremiumRequestHandler):
                 if cnt != None:
                     break
             result.append('<li value="%d">%s<a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, fuzzy, self.idx, _replace_html(s.text)))
-            result.append(self.render_div(self.idx, dstlang))
+            result.append(self.render_div(self.idx, srclang))
             result.append('</li>\n')
             self.idx += 1
         result.append('</ol>\n')
@@ -401,7 +401,7 @@ class TranRequestHandler(PremiumRequestHandler):
             return cmp(dic[x[0]], dic[y[0]])
             
         rtl = ''
-        if self.srclang in RTL_LANGUAGES:
+        if lang in RTL_LANGUAGES:
             rtl = ' dir="rtl" style="text-align: right"'
         head = []
         body = []
@@ -644,7 +644,7 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
         if query == None:
             self.shutdown(404)
         suggs = self.server.storage.compare2(query, self.srclang, self.dstlang)
-        response = self.dump_compare(suggs, self.dstlang).encode('utf-8')
+        response = self.dump_compare(suggs, self.srclang).encode('utf-8')
         return self.embed_in_template(response)
 
 
