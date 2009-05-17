@@ -31,8 +31,6 @@ update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packag
 update gnome
 update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
 update kde
-update mozilla
-update oo
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
 
