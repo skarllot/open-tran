@@ -19,6 +19,7 @@ import sys
 from phrase import Phrase
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
+from traceback import print_exc
 
 datadir = sys.argv[1]
 
@@ -111,7 +112,7 @@ VALUES (?, ?, ?, ?)""", (nlid, lid, project_names[projectid], flags))
 move_projects()
 
 print "Creating index...",
-icur.execute("CREATE INDEX idx ON phrases(lang);")
+icur.execute("CREATE INDEX IF NOT EXISTS idx ON phrases(lang);")
 print "done."
 
 for lang in sorted(LANGUAGES):
@@ -123,7 +124,9 @@ for lang in sorted(LANGUAGES):
         define_schema(oconn, ocur)
         move_phrases(oconn, ocur, lang)
         print "done."
-    except:
+    except Exception, e:
+        sys.stdout.write(str(e))
+        print_exc()
         print "failed."
     sys.stdout.flush()
     ocur.close()
