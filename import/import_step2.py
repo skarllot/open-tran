@@ -125,7 +125,7 @@ for lang in sorted(LANGUAGES):
         move_phrases(oconn, ocur, lang)
         print "done."
     except Exception, e:
-        sys.stdout.write(str(e))
+        sys.stderr.write(str(e))
         print_exc()
         print "failed."
     sys.stdout.flush()
