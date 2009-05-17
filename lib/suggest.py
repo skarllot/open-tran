@@ -290,6 +290,19 @@ Returns the same results as suggest, but grouped by the projects.
         return result
 
 
+    def compare2(self, text, srclang, dstlang):
+        '''
+Returns the same results as suggest, but grouped by the projects.
+'''
+        result = {}
+        suggs = self.get_translations(text, srclang, dstlang)
+        for prefix, project in PROJS.iteritems():
+            subres = self.regroup([s for s in suggs if s.project[0] == prefix])
+            if len(subres) > 0:
+                result[project] = subres
+        return result
+
+
     def words(self, lang, offset = 0, limit = 50):
         """
 Returns the list of most popular words for the given language.

@@ -643,11 +643,8 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
         query = self.get_query()
         if query == None:
             self.shutdown(404)
-        lang = self.srclang
-        if lang == "en":
-            lang = self.dstlang
-        suggs = self.server.storage.compare(query, lang)
-        response = self.dump_compare(suggs, lang).encode('utf-8')
+        suggs = self.server.storage.compare2(query, self.srclang, self.dstlang)
+        response = self.dump_compare(suggs, self.dstlang).encode('utf-8')
         return self.embed_in_template(response)
 
 
