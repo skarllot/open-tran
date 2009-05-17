@@ -120,7 +120,7 @@ LANGUAGES = {
     'uk' : u'Українська',
     'ur' : u'Urdu',
     'uz' : u'Ўзбек',
-    've' : u'Tshivenda',
+    've' : u'Tshivenḓa',
     'vi' : u'Tiếng Việt',
     'wa' : u'Walon',
     'xh' : u'isiXhosa',
