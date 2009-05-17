@@ -79,6 +79,7 @@ class Importer(object):
         if lang[:2] == lang[3:].lower():
             return lang[:2]
         lang = lang.replace('-', '_')
+        lang = lang.replace('ooo_build_', '')
         if lang in Importer.lang_dict:
             lang = Importer.lang_dict[lang]
         return lang
