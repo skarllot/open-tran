@@ -345,8 +345,8 @@ class TranRequestHandler(PremiumRequestHandler):
 
 
     def render_suggestions_compare(self, suggs, dstlang):
-        cnt, sum = reduce(lambda x, y: (x[0] + 1, x[1] + len(y.text)), suggs, (0, 0))
-        result = ['<ol style="width: %dem">\n' % (sum / cnt * 2 / 3)]
+        cnt, total = reduce(lambda x, y: (x[0] + 1, x[1] + len(y.text)), suggs, (0, 0))
+        result = ['<ol style="width: %dem">\n' % (total / cnt * 2 / 3)]
         for s in suggs:
             fuzzy = reduce(lambda s, p: p.flags == 1 and s or '', s.projects, 'class="fuzzy"')
             for r in RENDERERS:
@@ -354,6 +354,7 @@ class TranRequestHandler(PremiumRequestHandler):
             for p in s.projects:
                 for r in RENDERERS:
                     r.feed(p)
+            cnt = ''
             for r in RENDERERS:
                 cnt = r.render_count(False)
                 if cnt != None:
@@ -389,12 +390,23 @@ class TranRequestHandler(PremiumRequestHandler):
 
 
     def dump_compare(self, responses, lang):
+        dic = {}
+        def cmp_ps(x, y):
+            if x[0] not in dic:
+                dic[x[0]] = sum([sum([p.count for p in e.projects])
+                                 for e in x[1]])
+            if y[0] not in dic:
+                dic[y[0]] = sum([sum([p.count for p in e.projects])
+                                 for e in y[1]])
+            return cmp(dic[x[0]], dic[y[0]])
+            
         rtl = ''
         if lang in RTL_LANGUAGES:
             rtl = ' dir="rtl" style="text-align: right"'
         head = []
         body = []
-        for project, suggs in responses.iteritems():
+        for project, suggs in sorted(responses.iteritems(), cmp = cmp_ps,
+                                     reverse = True):
             head.append(u'<th>%s</th>' % self.render_project_link(project))
             body.append(u'<td>%s</td>' % self.render_suggestions_compare(suggs, lang))
         return '<table%s>\n<tr>%s</tr>\n<tr>%s</tr>\n</table>' % (rtl, ''.join(head), ''.join(body))
