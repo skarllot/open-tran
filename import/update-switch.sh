@@ -17,6 +17,9 @@ else
     newdir="dataa"
 fi
 
+echo "Old directory: $olddir"
+echo "New directory: $newdir"
+
 $IMPORTDIR/audit_step1.py $IMPORTDIR/../$newdir > /tmp/projects.html
 $IMPORTDIR/audit_step2.py $IMPORTDIR/../$newdir > /tmp/languages.html
 

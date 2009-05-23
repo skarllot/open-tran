@@ -71,9 +71,13 @@ projects = {
 conn = sqlite.connect(datadir + '/ten.db')
 cur = conn.cursor()
 
-cur.execute("CREATE INDEX idy ON phrases(projectid)")
+sys.stderr.write('Creating index...')
+cur.execute("CREATE INDEX IF NOT EXISTS idy ON phrases(projectid)")
 conn.commit()
+sys.stderr.write('done.\n')
 
+
+sys.stderr.write('Computing project boundaries...')
 cur.execute("""
 SELECT substr(name, 1, 1), min(id), max(id)
 FROM projects
@@ -82,15 +86,14 @@ GROUP BY substr(name, 1, 1)
 for (proj, mn, mx) in cur.fetchall():
     projects[proj].min = mn
     projects[proj].max = mx
+sys.stderr.write('done.\n')
 
 for proj in projects.values():
+    sys.stderr.write(proj.name + '...')
     cur.execute("""
 SELECT count(*), count(distinct lang)
 FROM phrases
-WHERE projectid BETWEEN %d AND %d
-  AND lang in (%s)""" % (proj.min, proj.max,
-                         ", ".join(["'" + lang + "'" for lang
-                                    in LANGUAGES.keys() if lang != 'en'])))
+WHERE projectid BETWEEN %d AND %d""" % (proj.min, proj.max))
     (cnt, lcnt) = cur.fetchone()
     proj.total = cnt
     proj.langs = lcnt
@@ -101,6 +104,7 @@ WHERE lang = 'en'
   AND projectid BETWEEN %d AND %d""" % (proj.min, proj.max))
     (cnt,) = cur.fetchone()
     proj.eng = cnt
+    sys.stderr.write('done.\n')
 
 cur.close()
 conn.close()
