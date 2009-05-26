@@ -124,7 +124,7 @@ print '''
     <th>Languages</th>
     <th>License</th>
   </tr>
-''' % date.today().strftime('%B %d, %Y')
+''' % date.fromtimestamp(datadir + '/ten.db').strftime('%B %d, %Y')
 
 projs = sorted(projects.values(), key = lambda p: p.total, reverse = True)
 for project in projs:
