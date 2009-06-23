@@ -99,7 +99,7 @@ insert into phrases
     (projectid, locationid, lang, length, phrase, flags)
 values
     (?, ?, ?, ?, ?, ?)
-""", (pid, lid, lang, length, sentence, flags))
+""", (pid, lid, lang, length, sentence.decode('utf-8'), flags))
 
 
     def store_phrases(self, pid, phrases):
@@ -355,31 +355,35 @@ class OO_Importer(Importer):
 shortlist = None #['fy', 'fy-NL']
 root = sys.argv[1]
 pocls = factory.getclass("kde.po")
-conn = sqlite.connect(sys.argv[1] + '/../data/ten.db')
-cursor = conn.cursor()
 importers = {
-    DI_Importer(conn, pocls) : '/debian-installer',
-    FY_Importer(conn, pocls) : '/fy/kompjtr2.txt',
-    Gnome_Importer(conn, pocls) : '/gnome-po',
-    Inkscape_Importer(conn, pocls) : '/inkscape',
-    KDE_Importer(conn, pocls) : '/l10n-kde4',
-    Mozilla_Importer(conn, pocls) : '/mozilla-po',
-    OO_Importer(conn, pocls) : '/oo-po',
-    Suse_Importer(conn, pocls) : '/suse-i18n',
-    Xfce_Importer(conn, pocls) : '/xfce'
+    DI_Importer : ('di', '/debian-installer'),
+    FY_Importer : ('fy', '/fy/kompjtr2.txt'),
+    Gnome_Importer : ('gnome', '/gnome-po'),
+    Inkscape_Importer : ('ink', '/inkscape'),
+    KDE_Importer : ('kde', '/l10n-kde4'),
+    Mozilla_Importer : ('moz', '/mozilla-po'),
+    OO_Importer : ('oo', '/oo-po'),
+    Suse_Importer : ('suse', '/suse-i18n'),
+    Xfce_Importer : ('xfce', '/xfce')
     }
 
 sf = open(sys.argv[1] + '/../import/step1.sql')
 schema = sf.read()
 sf.close()
-cursor.executescript(schema)
-conn.commit()
 
-for i, p in importers.iteritems():
+from traceback import print_exc
+
+for icls, p in importers.iteritems():
     try:
-        i.run(root + p)
+        conn = sqlite.connect(sys.argv[1] + '/../data/ten-%s.db' % p[0])
+        cursor = conn.cursor()
+        cursor.executescript(schema)
+        conn.commit()
+        i = icls(conn, pocls)
+        i.run(root + p[1])
+        conn.commit()
+        conn.close()
     except Exception, inst:
+        print_exc()
         sys.stderr.write('%s failed: %s\n' % (p, str(inst)))
 
-conn.commit()
-conn.close()
