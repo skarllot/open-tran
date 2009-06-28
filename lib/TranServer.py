@@ -16,7 +16,8 @@
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
 from PremiumHTTPServer import PremiumServer, PremiumRequestHandler, \
-    PremiumActionRedirect, PremiumActionCustom, PremiumActionServeFile
+    PremiumActionRedirect, PremiumActionCustom, PremiumActionServeFile, \
+    PremiumActionJSON
 from datetime import datetime
 from suggest import TranDB
 from tempfile import NamedTemporaryFile
@@ -273,6 +274,8 @@ class TranRequestHandler(PremiumRequestHandler):
         lambda request, match: request.send_search_xml()))
     PremiumRequestHandler.actions.append(PremiumActionCustom('^/words.html', \
         lambda request, match: request.send_words()))
+    PremiumRequestHandler.actions.append(PremiumActionJSON('^/json/suggest', \
+        lambda request: request.json_suggest()))
     PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
 
@@ -578,12 +581,12 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
 
 
 
-    def get_query(self):
+    def get_query(self, prefix_len = 8):
         query = None
         plen = len(self.path)
-        if plen > 8 and self.path[8] == '/':
-            query = urllib.unquote(self.path[9:])
-        elif plen > 8 and self.path[8] == '?':
+        if plen > prefix_len and self.path[prefix_len] == '/':
+            query = urllib.unquote(self.path[prefix_len + 1:])
+        elif plen > prefix_len and self.path[prefix_len] == '?':
             try:
                 urlquery = urlparse(self.path)[4]
                 vars = [x.strip().split('=') for x in urlquery.split('&')]
@@ -599,11 +602,10 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
     def send_search_head(self):
         query = self.get_query()
         if query == None:
-            self.shutdown(404)
+            return self.shutdown(404)
         response = self.dump([self.suggest(query, self.srclang, self.dstlang)], self.srclang, self.dstlang).encode('utf-8')
         response += self.dump([self.suggest(query, self.dstlang, self.srclang)], self.dstlang, self.srclang).encode('utf-8')
         return self.embed_in_template(response)
-
 
 
     def dump_word(self, num, word, cnt):
@@ -642,7 +644,7 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
     def send_compare_head(self):
         query = self.get_query()
         if query == None:
-            self.shutdown(404)
+            return self.shutdown(404)
         suggs = self.server.storage.compare2(query, self.srclang, self.dstlang)
         response = self.dump_compare(suggs, self.srclang).encode('utf-8')
         return self.embed_in_template(response)
@@ -652,6 +654,13 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
         template = PremiumRequestHandler.translate_path(self, '/search.xml')
         return self.embed_in_given_template('', template, 200, 'text/xml')
         
+
+    def json_suggest(self):
+        query = self.get_query(13)
+        if query == None:
+            return self.shutdown(404)
+        return self.server.storage.suggest2(query, self.srclang, self.dstlang)
+
 
     def request_init(self):
         self.get_languages()

@@ -39,6 +39,22 @@ def rw_handler(signum, frame):
     raise IOError, 'Read/Write Timeout'
 
 
+def to_json(obj):
+    if obj is None:
+        return "null"
+    if type(obj) is str or type(obj) is unicode:
+        return "'" + obj.replace("'", "\\'").replace('\n', '\\n').encode('utf-8') + "'"
+    if type(obj) in (int, float, long, bool):
+        return str(obj).lower()
+    try:
+        return "[" + ", ".join([to_json(e) for e in obj]) + "]"
+    except TypeError:
+        return "{" + ", ".join(["'" + a + "': " + to_json(getattr(obj, a))
+                                for a in dir(obj)
+                                if a[0] != '_'
+                                and not callable(getattr(obj, a))]) + "}"
+
+
 class FileWrapper:
     def __init__(self, socket):
         self.socket = socket
@@ -109,6 +125,26 @@ class PremiumActionServeFile(PremiumAction):
         else:
             request.send_plain_headers(200, ctype, fs[stat.ST_SIZE], fs[stat.ST_INO])
         return f
+
+
+class PremiumActionJSON(PremiumAction):
+    def __init__(self, regex, method):
+        self.regex = re.compile(regex)
+        self.method = method
+
+
+    def execute(self, request, match):
+        try:
+            f = StringIO()
+            result = self.method(request)
+            f.write(to_json(result))
+            f.seek(0)
+            request.send_plain_headers(200, "application/json", 0, 0)
+            return f
+        except Exception, inst:
+            request.send_error(500, str(inst))
+            print_exc()
+            return None
 
 
 class PremiumActionCustom(PremiumAction):
