@@ -361,8 +361,6 @@ importers = {
     Gnome_Importer : ('gnome', '/gnome-po'),
     Inkscape_Importer : ('ink', '/inkscape'),
     KDE_Importer : ('kde', '/l10n-kde4'),
-    Mozilla_Importer : ('moz', '/mozilla-po'),
-    OO_Importer : ('oo', '/oo-po'),
     Suse_Importer : ('suse', '/suse-i18n'),
     Xfce_Importer : ('xfce', '/xfce')
     }
