@@ -9,6 +9,7 @@
 <ol>
   <li><a href="#API">API</a>
     <ol>
+      <li><a href="#JS">JavaScript</a></li>
       <li><a href="#Python">Python</a></li>
       <li><a href="#C">C</a></li>
       <li><a href="#Java">Java</a></li>
@@ -28,19 +29,31 @@
 <p>
   Open-Tran had an open API since its creation in February 2007.
   The interface is exported through
-  the <a href="http://www.xmlrpc.com">XML-RPC</a> protocol.
+  the <a href="http://www.xmlrpc.com">XML-RPC</a> and 
+  <a href="http://json.com">JSON</a> protocols.
   You can fetch the suggestions from the server using your
-  own software by sending a request to the server and fetching an XML
-  response with the results.  The following link will take you to 
-  <a href="/RPC2">the documentation of all exported functions</a>.
-  An example response from the server (for the execution of
-  <tt>suggest("save as", "pl")</tt> is here:
+  own software by sending a request to the server and fetching an
+  XML or JavaScript response with the results.  The following link
+  will take you to <a href="/RPC2">the documentation of all exported
+  functions</a>.  An example response from the server (for the
+  execution of <tt>suggest("save as", "pl")</tt> is here:
   <a href="save_as.xml">save_as.xml</a>.
 </p>
 <p>
   Below is the list of programming languages with code snippets (or
   links to such) that give an example of how to access the Open-Tran
   service with it.
+</p>
+
+<a name="JS"></a>
+<h3>JavaScript</h3>
+<p>
+  You can fetch the suggestions in the JSON format by requesting the
+  results from a URL in the format exemplified here:
+  <a href="http://en.es.open-tran.eu/json/suggest/file">http://en.es.open-tran.eu/json/suggest/file</a>.<br/>
+  In response, you will receive a list with the suggestions.  Every
+  suggestion is an object described in <a href="/RPC2">the
+  documentation of the XML-RPC calls</a>.
 </p>
 
 <a name="Python"></a>
