@@ -2,4 +2,5 @@ User-Agent: *
 Disallow: /suggest
 Disallow: /setlang
 Disallow: /compare
+Disallow: /json
 Disallow: /words.html
