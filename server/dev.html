@@ -7,9 +7,15 @@
 
 <h2>Contents</h2>
 <ol>
-  <li><a href="#API">API</a>
+  <li><a href="#API">API Introduction</a>
     <ol>
-      <li><a href="#JS">JavaScript</a></li>
+      <li><a href="#Suggestion">Suggestions</a></li>
+      <li><a href="#Example">Example</a></li>
+    </ol>
+  </li>
+  <li><a href="#JSON">JSON API</a></li>
+  <li><a href="#XML-RPC">XML-RPC API</a>
+    <ol>
       <li><a href="#Python">Python</a></li>
       <li><a href="#C">C</a></li>
       <li><a href="#Java">Java</a></li>
@@ -25,16 +31,151 @@
 </ol>
 
 <a name="API"></a>
-<h2>API</h2>
+<h2>API Introduction</h2>
 <p>
-  Open-Tran had an open API since its creation in February 2007.
+  Open-Tran.eu has been providing an API since its inception in
+  February, 2007.  This section tries to describe the fundamental
+  concepts and illustrate them with an example.
+</p>
+
+<a name="Suggestion"></a>
+<h3>Suggestions</h3>
+<p>
+  Whenever translation suggestions are requested, the
+  server prepares the result as a set of objects.  These objects are
+  then either rendered in HTML (if the request came from user's
+  browser) or serialized into JSON or XML.  However they wouldn't be
+  sent, every suggestion in the list have the same set of fields
+  described below.
+</p>
+<ul class="hof">
+  <li><b>text</b>: <i>string</i> is the suggested translation in the
+    destination language</li>
+  <li><b>value</b>: <i>integer</i> is the numeric value assigned to this
+    suggestion; the lower the number, the more accurate the
+    suggestion is</li>
+  <li><b>count</b>: <i>integer</i> is the number of total occurences of
+    this phrase accross all projects; it is equal to the sum of the
+    counts on the <b>projects</b> list</li>
+  <li><b>projects</b>: <i>list</i> is a list of projects containing this
+    phrase as a translation; for every possible combination of phrase
+    in the source language and input file, an object with the
+    following fields is provided:
+    <ul>
+      <li><b>orig_phrase</b>: <i>string</i> is the phrase in the
+	source language</li>
+      <li><b>path</b>: <i>string</i> is the name of the file that
+	contains the relevant translation (see 
+	<a href="#Example">example</a> for details)</li>
+      <li><b>name</b>: <i>string</i> is the name of the project
+	(e.g. GNOME, Mozilla, etc.)</li>
+      <li><b>count</b>: <i>integer</i> is the number of occurences of
+	the <b>orig_phrase</b> in the <b>path</b></li>
+      <li><b>flags</b>: <i>integer</i> is either 0 (meaning nothing)
+	or 1 (meaning that this translation is fuzzy)</li>
+    </ul>
+  </li>
+</ul>
+
+<a name="Example"></a>
+<h3>Example</h3>
+<p>
+  As an example, consider the excerpt of the results from
+  <a href="http://en.es.open-tran.eu/suggest/file">http://en.es.open-tran.eu/suggest/file</a>:<br/>
+  <img src="/images/api-example.png" alt="API example"/><br/>
+  Notice, that different spellings of the word <em>archivo</em> are
+  separated from each other.  Every distinctive spelling is a separate
+  suggestion.  So let us first dive into the marked suggestions:
+</p>
+<ol>
+  <li><em>archivo %S</em>
+    <ul>
+      <li>text = "archivo %S"</li>
+      <li>value = 1</li>
+      <li>count = 1</li>
+      <li>projects = 
+	<ol>
+	  <li>
+	    <ul>
+	      <li>orig_phrase = "%S file"</li>
+	      <li>path = "M/preferences.properties"</li>
+	      <li>name = "Mozilla"</li>
+	      <li>count = 1</li>
+	      <li>flags = 0</li>
+	    </ul>
+	  </li>
+	</ol>
+    </ul>
+  </li>
+  <li><em>Tipo de archivo</em>
+    <ul>
+      <li>text = "Tipo de archivo"</li>
+      <li>value = 2</li>
+      <li>count = 14</li>
+      <li>projects = 
+	<ol>
+	  <li>
+	    <ul>
+	      <li>orig_phrase = "File Type"</li>
+	      <li>path = "G/gnome-commander"</li>
+	      <li>name = "GNOME"</li>
+	      <li>count = 8</li>
+	      <li>flags = 0</li>
+	    </ul>
+	  </li>
+	  <li>
+	    <ul>
+	      <li>orig_phrase = "File type"</li>
+	      <li>path = "K/amarok"</li>
+	      <li>name = "KDE"</li>
+	      <li>count = 6</li>
+	      <li>flags = 0</li>
+	    </ul>
+	  </li>
+	</ol>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<a name="JS"></a>
+<h2>JSON API</h2>
+<p>
+  You can fetch the suggestions in
+  the <a href="http://json.com">JSON</a> format by requesting the
+  results from a URL in the format exemplified here:
+</p>
+<pre>
+  <a href="http://en.es.open-tran.eu/json/suggest/file">http://en.es.open-tran.eu/json/suggest/file</a>
+</pre>
+<p>
+  The above URL requests that the server provides suggestions of
+  translations of the word <tt>file</tt> from English into Spanish.
+  In response, the server sends a list with the suggestions.  Every
+  suggestion is an object described in <a href="/RPC2">the
+  documentation of the XML-RPC calls</a>.  You may also refer to a
+  <a href="/save_as.js">commented excerpt</a> of an output for the
+  request 
+  <a href="http://en.id.open-tran.eu/json/suggest/save as">http://en.id.open-tran.eu/json/suggest/save as</a>.
+</p>
+<p>
+  Additionally, you can fetch a list of all supported languages by
+  requesting the URL:
+</p>
+<pre>
+  <a href="/json/supported">http://open-tran.eu/json/supported</a>
+</pre>
+
+
+<a name="XML-RPC"></a>
+<h2>XML-RPC API</h2>
+<p>
   The interface is exported through
-  the <a href="http://www.xmlrpc.com">XML-RPC</a> and 
-  <a href="http://json.com">JSON</a> protocols.
+  the <a href="http://www.xmlrpc.com">XML-RPC</a> protocol.
   You can fetch the suggestions from the server using your
   own software by sending a request to the server and fetching an
-  XML or JavaScript response with the results.  The following link
-  will take you to <a href="/RPC2">the documentation of all exported
+  XML response with the results.  The following link will take you
+  to <a href="/RPC2">the documentation of all exported
   functions</a>.  An example response from the server (for the
   execution of <tt>suggest("save as", "pl")</tt> is here:
   <a href="save_as.xml">save_as.xml</a>.
@@ -43,20 +184,6 @@
   Below is the list of programming languages with code snippets (or
   links to such) that give an example of how to access the Open-Tran
   service with it.
-</p>
-
-<a name="JS"></a>
-<h3>JavaScript</h3>
-<p>
-  You can fetch the suggestions in the JSON format by requesting the
-  results from a URL in the format exemplified here:
-  <a href="http://en.es.open-tran.eu/json/suggest/file">http://en.es.open-tran.eu/json/suggest/file</a>.<br/>
-  In response, you will receive a list with the suggestions.  Every
-  suggestion is an object described in <a href="/RPC2">the
-  documentation of the XML-RPC calls</a>.  You may also refer to a
-  <a href="/save_as.js">commented excerpt</a> of an output for the
-  request 
-  <a href="http://en.id.open-tran.eu/json/suggest/save as">http://en.id.open-tran.eu/json/suggest/save as</a>.
 </p>
 
 <a name="Python"></a>
