@@ -276,6 +276,8 @@ class TranRequestHandler(PremiumRequestHandler):
         lambda request, match: request.send_words()))
     PremiumRequestHandler.actions.append(PremiumActionJSON('^/json/suggest', \
         lambda request: request.json_suggest()))
+    PremiumRequestHandler.actions.append(PremiumActionJSON('^/json/supported', \
+        lambda request: request.json_supported()))
     PremiumRequestHandler.actions.append(PremiumActionServeFile('^/'))
 
 
@@ -660,6 +662,10 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
         if query == None:
             return self.shutdown(404)
         return self.server.storage.suggest2(query, self.srclang, self.dstlang)
+
+
+    def json_supported(self):
+        return LANGUAGES
 
 
     def request_init(self):
