@@ -42,9 +42,48 @@ def get_lsubdirs(dir):
     return get_subdirs(dir)
 
 
+class GlobalId(object):
+    _id = 0
+    
+    @staticmethod
+    def next():
+        GlobalId._id += 1
+        return GlobalId._id
+
+
+class ImporterProject(object):
+    def __init__(self, importer, project_id):
+        self.phrase_ids = {}
+        self.importer = importer
+        self.project_id = project_id
+
+    def load_file(self, fname, lang):
+        fname = fname.replace('/fr/', '/' + lang + '/', 1)
+        fname = fname.replace('_fr.po', '_' + lang + '.po', 1)
+        fname = fname.replace('.fr.po', '.' + lang + '.po', 1)
+        store = self.importer.parser_class.parsefile(fname)
+        mlang = self.importer.lang_hygiene(lang)
+        for unit in store.units:
+            src = unit.source.encode('utf-8')
+            dst = unit.target.encode('utf-8')
+            key = (src, '::'.join(unit.getlocations()))
+            if len(src) > 0:
+                if key in self.phrase_ids:
+                    pid = self.phrase_ids[key]
+                else:
+                    pid = GlobalId.next()
+                    self.importer.store_phrase(self.project_id, pid,
+                                               src, 0, "en")
+                    self.phrase_ids[key] = pid
+                self.importer.store_phrase(self.project_id, pid,
+                                           dst, unit.isfuzzy(), lang)
+        return len(store.units)
+
+
+
+
 class Importer(object):
     global_pid = 0
-    global_loc = 0
     lang_dict = {
         'as_in' : 'as',
         'be_by' : 'be',
@@ -106,39 +145,23 @@ values
         for source, ls in phrases.iteritems():
             if len(source) < 2:
                 continue
-            Importer.global_loc += 1
-            self.store_phrase(pid, Importer.global_loc, source, 0, "en")
+            phrase_id = GlobalId.next()
+            self.store_phrase(pid, phrase_id, source, 0, "en")
             for lang, target in ls.iteritems():
-                self.store_phrase(pid, Importer.global_loc, target[0], target[1], lang)
+                self.store_phrase(pid, phrase_id, target[0], target[1], lang)
         self.conn.commit()
 
 
-    def load_file(self, phrases, fname, lang):
-        fname = fname.replace('/fr/', '/' + lang + '/', 1)
-        fname = fname.replace('_fr.po', '_' + lang + '.po', 1)
-        fname = fname.replace('.fr.po', '.' + lang + '.po', 1)
-        store = self.parser_class.parsefile(fname)
-        mlang = self.lang_hygiene(lang)
-        for unit in store.units:
-            src = unit.source.encode('utf-8')
-            dst = unit.target.encode('utf-8')
-            if len(src) > 0:
-                l = phrases.setdefault(src, {})
-                l[mlang] = (dst, unit.isfuzzy())
-        return len(store.units)
-
-
     def store_file(self, pid, fname):
-        phrases = {}
+        ip = ImporterProject(self, pid)
         for lang in self.langs:
             log("  + %s..." % lang, True)
             try:
-                cnt = self.load_file(phrases, fname, lang)
+                cnt = ip.load_file(fname, lang)
                 log("ok (%d)" % cnt)
-            except:
+            except IOError:
                 log("failed.")
-        log("  phrases: %d" % len(phrases))
-        self.store_phrases(pid, phrases)
+        self.conn.commit()
         
 
     def run_langs(self, dir):
@@ -152,8 +175,6 @@ values
                     pid = self.store_project(name)
                     self.store_file(pid, os.path.join(root, f))
                     gc.collect()
-                else:
-                    print f, "is not a resource"
             if '.svn' in dirs:
                 dirs.remove('.svn')
 
@@ -369,19 +390,20 @@ sf = open(sys.argv[1] + '/../import/step1.sql')
 schema = sf.read()
 sf.close()
 
+conn = sqlite.connect(sys.argv[1] + '/../data/ten.db')
+cursor = conn.cursor()
+cursor.executescript(schema)
+conn.commit()
+
 from traceback import print_exc
 
 for icls, p in importers.iteritems():
     try:
-        conn = sqlite.connect(sys.argv[1] + '/../data/ten-%s.db' % p[0])
-        cursor = conn.cursor()
-        cursor.executescript(schema)
-        conn.commit()
         i = icls(conn, pocls)
         i.run(root + p[1])
         conn.commit()
-        conn.close()
     except Exception, inst:
         print_exc()
         sys.stderr.write('%s failed: %s\n' % (p, str(inst)))
 
+conn.close()
