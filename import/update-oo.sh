@@ -26,7 +26,7 @@ rm -rf *
 echo "done"
 
 echo -n "get en-US..."
-wget -o /dev/null ftp://ftp.linux.cz/pub/localization/OpenOffice.org/latest/GSI/en-US.sdf
+wget -o /dev/null ftp://ftp.linux.cz/pub/localization/OpenOffice.org/3.0.0/GSI/en-US.sdf
 echo "done."
 
 cd $oo_l10n
