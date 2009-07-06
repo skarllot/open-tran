@@ -92,7 +92,7 @@ class renderer(object):
             self.projects.append(project)
 
     def render_icon(self):
-        return '<img src="%s" alt=""/>' % self.icon_path
+        return '<img src="%s" alt="%s"/>' % (self.icon_path, self.name)
 
     def render_count(self, needplus):
         cnt = reduce(lambda x,y: x + y.count, self.projects, 0)
