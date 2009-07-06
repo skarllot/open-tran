@@ -92,7 +92,7 @@ class renderer(object):
             self.projects.append(project)
 
     def render_icon(self):
-        return '<img src="%s" alt="%s"/>' % (self.icon_path, self.name)
+        return '<img src="%s" alt=""/>' % (self.icon_path, self.name)
 
     def render_count(self, needplus):
         cnt = reduce(lambda x,y: x + y.count, self.projects, 0)
@@ -541,14 +541,14 @@ class TranRequestHandler(PremiumRequestHandler):
             prefix = "sel-"
         f.write(("""
       <a href="javascript:;" class="jslink" onclick="return visibility_switch('lang_choice');">
-        <img src="/images/%sflag-%s.png" alt="%s"/>&nbsp;%s</a>
+        <img src="/images/%sflag-%s.png" alt=""/>&nbsp;%s</a>
 """ % (prefix, lang, lang, LANGUAGES[lang])).encode('utf-8'))
 
 
     def write_iface_select(self, f):
 	for lang in sorted(SUGGESTIONS_TXT.keys()):
 	    f.write(('''
-<li><a href="/setlang?lang=%s" class="jslink"><img src="/images/flag-%s.png" alt="%s"/>&nbsp;%s</a></li>
+<li><a href="/setlang?lang=%s" class="jslink"><img src="/images/flag-%s.png" alt=""/>&nbsp;%s</a></li>
 ''' % (lang, lang, lang, LANGUAGES[lang])).encode('utf-8'))
 
 
