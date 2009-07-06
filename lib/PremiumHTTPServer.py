@@ -87,7 +87,7 @@ class ActionError(Exception):
     pass
 
 
-class PremiumAction:
+class PremiumAction(object):
     def __init__(self):
         self.regex = ''
 
@@ -174,7 +174,7 @@ class PremiumActionRedirect(PremiumAction):
     def execute(self, request, match):
         for i in range(match.lastindex + 1):
             if match.groups()[i]:
-                request.redirect(self.mapping[i][1])
+                request.permanent_redirect(self.mapping[i][1])
                 return None
         raise ActionError, 'None of the redirection mappings executed'
 
@@ -203,8 +203,14 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
         self.connection.shutdown(1)
 
 
-    def redirect(self, path):
+    def permanent_redirect(self, path):
         self.send_response(301)
+        self.send_header('Location', path)
+        self.end_headers()
+        
+
+    def redirect(self, path):
+        self.send_response(303)
         self.send_header('Location', path)
         self.end_headers()
         
