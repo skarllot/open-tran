@@ -52,38 +52,6 @@ class GlobalId(object):
 
 
 class ImporterProject(object):
-    def __init__(self, importer, project_id):
-        self.phrase_ids = {}
-        self.importer = importer
-        self.project_id = project_id
-
-    def load_file(self, fname, lang):
-        fname = fname.replace('/fr/', '/' + lang + '/', 1)
-        fname = fname.replace('_fr.po', '_' + lang + '.po', 1)
-        fname = fname.replace('.fr.po', '.' + lang + '.po', 1)
-        store = self.importer.parser_class.parsefile(fname)
-        mlang = self.importer.lang_hygiene(lang)
-        for unit in store.units:
-            src = unit.source.encode('utf-8')
-            dst = unit.target.encode('utf-8')
-            key = (src, '::'.join(unit.getlocations()))
-            if len(src) > 0:
-                if key in self.phrase_ids:
-                    pid = self.phrase_ids[key]
-                else:
-                    pid = GlobalId.next()
-                    self.importer.store_phrase(self.project_id, pid,
-                                               src, 0, "en")
-                    self.phrase_ids[key] = pid
-                self.importer.store_phrase(self.project_id, pid,
-                                           dst, unit.isfuzzy(), lang)
-        return len(store.units)
-
-
-
-
-class Importer(object):
-    global_pid = 0
     lang_dict = {
         'as_in' : 'as',
         'be_by' : 'be',
@@ -107,27 +75,16 @@ class Importer(object):
         }
         
     
-    def __init__(self, conn, parser_class):
-        self.conn = conn
-        self.cursor = self.conn.cursor()
-        self.parser_class = parser_class
-    
-
-    def lang_hygiene(self, lang):
-        lang = lang.replace('@', '_').lower()
-        if lang[:2] == lang[3:].lower():
-            return lang[:2]
-        lang = lang.replace('-', '_')
-        lang = lang.replace('ooo_build_', '')
-        if lang in Importer.lang_dict:
-            lang = Importer.lang_dict[lang]
-        return lang
+    def __init__(self, cursor, project_id):
+        self.phrase_ids = {}
+        self.cursor = cursor
+        self.project_id = project_id
 
 
-    def store_phrase(self, pid, lid, sentence, flags, lang):
+    def __store_phrase(self, pid, lid, sentence, flags, lang):
         phrase = Phrase(sentence, lang[:2])
         length = phrase.length()
-        if length == 0 or len(sentence) < 2 or length > 7:
+        if length == 0 or len(sentence) < 2 or length > 10:
             return
         if flags:
             flags = 1
@@ -141,23 +98,60 @@ values
 """, (pid, lid, lang, length, sentence.decode('utf-8'), flags))
 
 
-    def store_phrases(self, pid, phrases):
-        for source, ls in phrases.iteritems():
-            if len(source) < 2:
-                continue
-            phrase_id = GlobalId.next()
-            self.store_phrase(pid, phrase_id, source, 0, "en")
-            for lang, target in ls.iteritems():
-                self.store_phrase(pid, phrase_id, target[0], target[1], lang)
-        self.conn.commit()
+    def __lang_hygiene(self, lang):
+        lang = lang.replace('@', '_').lower()
+        if lang[:2] == lang[3:].lower():
+            return lang[:2]
+        lang = lang.replace('-', '_')
+        lang = lang.replace('ooo_build_', '')
+        if lang in ImporterProject.lang_dict:
+            lang = ImporterProject.lang_dict[lang]
+        return lang
 
+
+    def load_file(self, fname, lang):
+        store = factory.getclass('a.po').parsefile(fname)
+        mlang = self.__lang_hygiene(lang)
+        for unit in store.units:
+            src = unit.source.encode('utf-8')
+            dst = unit.target.encode('utf-8')
+            key = (src, '::'.join(unit.getlocations())
+                   + '::::' + unit.getcontext())
+            if len(src) > 0:
+                if key in self.phrase_ids:
+                    pid = self.phrase_ids[key]
+                else:
+                    pid = GlobalId.next()
+                    self.__store_phrase(self.project_id, pid, src, 0, "en")
+                    self.phrase_ids[key] = pid
+                self.__store_phrase(self.project_id, pid,
+                                    dst, unit.isfuzzy(), lang)
+        return len(store.units)
+
+
+    def load_lang_file(self, fname, lang):
+        fname = fname.replace('/fr/', '/' + lang + '/', 1)
+        fname = fname.replace('_fr.po', '_' + lang + '.po', 1)
+        fname = fname.replace('.fr.po', '.' + lang + '.po', 1)
+        return self.load_file(fname, lang)
+
+
+
+
+class Importer(object):
+    global_pid = 0
+
+    def __init__(self, conn):
+        self.conn = conn
+        self.cursor = self.conn.cursor()
+    
 
     def store_file(self, pid, fname):
-        ip = ImporterProject(self, pid)
+        ip = ImporterProject(self.cursor, pid)
         for lang in self.langs:
             log("  + %s..." % lang, True)
             try:
-                cnt = ip.load_file(fname, lang)
+                cnt = ip.load_lang_file(fname, lang)
                 log("ok (%d)" % cnt)
             except IOError:
                 log("failed.")
@@ -179,37 +173,25 @@ values
                 dirs.remove('.svn')
 
 
-    def load_project_file(self, phrases, project, project_file):
-        store = self.parser_class.parsefile(project_file)
-        lang = self.get_language(project)
-        lang = self.lang_hygiene(lang)
-        for unit in store.units:
-            src = unit.source.encode('utf-8')
-            dst = unit.target.encode('utf-8')
-            if len(src) > 0:
-                l = phrases.setdefault(src, {})
-                l[lang] = (dst, unit.isfuzzy())
-        return len(store.units)
-
-
-    def run_project(self, dir, proj):
+    def run_project(self, directory, proj):
         log("Importing %s..." % proj)
         self.cursor = self.conn.cursor()
-        phrases = {}
-        proj_file_name = os.path.join(dir, proj)
+        proj_file_name = os.path.join(directory, proj)
+        name = self.get_path(proj_file_name, proj)
+        pid = self.store_project(name)
+        ip = ImporterProject(self.cursor, pid)
         for lang in os.listdir(proj_file_name):
             if not self.is_resource(lang):
                 continue
             log("  + %s..." % lang, True)
             try:
-                cnt = self.load_project_file(phrases, lang, os.path.join(proj_file_name, lang))
+                fname = os.path.join(proj_file_name, lang)
+                lang = lang[:-3].replace('@', '_').lower()
+                cnt = ip.load_file(fname, lang)
                 log("ok (%d)" % cnt)
             except:
                 log("failed.")
-        log("  phrases: %d" % len(phrases))
-        name = self.get_path(proj_file_name, os.path.basename(proj_file_name))
-        pid = self.store_project(name)
-        self.store_phrases(pid, phrases)
+        gc.collect()
         
 
     def run_projects(self, dir):
@@ -268,7 +250,7 @@ class Gnome_Importer(Importer):
         return fname.endswith('.po')
     
     def get_language(self, project):
-        return project[:-3].replace('@', '_').lower()
+        return 
     
     def run(self, path):
         Importer.run_projects(self, path)
@@ -375,15 +357,16 @@ class OO_Importer(Importer):
 
 shortlist = None #['fy', 'fy-NL']
 root = sys.argv[1]
-pocls = factory.getclass("kde.po")
 importers = {
-    DI_Importer : ('di', '/debian-installer'),
-    FY_Importer : ('fy', '/fy/kompjtr2.txt'),
-    Gnome_Importer : ('gnome', '/gnome-po'),
-    Inkscape_Importer : ('ink', '/inkscape'),
-    KDE_Importer : ('kde', '/l10n-kde4'),
-    Suse_Importer : ('suse', '/suse-i18n'),
-    Xfce_Importer : ('xfce', '/xfce')
+    DI_Importer : '/debian-installer',
+    FY_Importer : '/fy/kompjtr2.txt',
+    Gnome_Importer : '/gnome-po',
+    Inkscape_Importer : '/inkscape',
+    KDE_Importer : '/l10n-kde4',
+    Suse_Importer : '/suse-i18n',
+    Xfce_Importer : '/xfce',
+    Mozilla_Importer : '/mozilla-po',
+    OO_Importer : '/oo-po'
     }
 
 sf = open(sys.argv[1] + '/../import/step1.sql')
@@ -395,12 +378,18 @@ cursor = conn.cursor()
 cursor.executescript(schema)
 conn.commit()
 
+mo = len(sys.argv) > 2 and sys.argv[2] == 'mo'
+
 from traceback import print_exc
 
 for icls, p in importers.iteritems():
+    if mo and icls not in (Mozilla_Importer, OO_Importer):
+        continue
+    if not mo and icls in (Mozilla_Importer, OO_Importer):
+        continue
     try:
-        i = icls(conn, pocls)
-        i.run(root + p[1])
+        i = icls(conn)
+        i.run(root + p)
         conn.commit()
     except Exception, inst:
         print_exc()

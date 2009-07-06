@@ -115,7 +115,12 @@ print "Creating index...",
 icur.execute("CREATE INDEX IF NOT EXISTS idx ON phrases(lang);")
 print "done."
 
-for lang in sorted(LANGUAGES):
+if len(sys.argv) > 2 and sys.argv[2] == 'local':
+    langs = ['de', 'en', 'pl']
+else:
+    langs = sorted(LANGUAGES)
+
+for lang in langs:
     oconn = sqlite.connect(datadir + '/ten-' + lang + '.db')
     ocur = oconn.cursor()
     print "Moving %s phrases..." % lang,

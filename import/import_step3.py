@@ -47,7 +47,12 @@ ORDER BY word
 
 
 
-for lang in sorted(LANGUAGES):
+if len(sys.argv) > 2 and sys.argv[2] == 'local':
+    langs = ['de', 'en', 'pl']
+else:
+    langs = sorted(LANGUAGES)
+
+for lang in langs:
     conn = sqlite.connect(datadir + '/ten-' + lang + '.db')
     cur = conn.cursor()
     print "Moving %s words..." % lang,
