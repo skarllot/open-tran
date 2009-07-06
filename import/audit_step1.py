@@ -131,8 +131,8 @@ for project in projs:
     if not project.total:
         continue
     print '<tr>'
-    print '\t<td><a href="%s"><img src="%s" alt="%s"/> %s</a></td>' \
-        % (project.url, project.icon, project.name, project.name)
+    print '\t<td><a href="%s"><img src="%s" alt=""/> %s</a></td>' \
+        % (project.url, project.icon, project.name)
     print '\t<td>%s</td>' % project.branch
     print '\t<td align="right">%s</td>' % pretty_int(project.eng)
     print '\t<td align="right">%s</td>' % pretty_int(project.total)
