@@ -41,7 +41,7 @@ projects = {
     'K': Project("KDE", "http://www.kde.org", "/images/kde-logo.png",
                  "trunk", '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>(<a href="http://en.wikipedia.org/wiki/KDE#Licensing_issues" rel="nofollow">issues</a>)'),
     'M': Project("Mozilla", "http://www.mozilla.org",
-                 "/images/mozilla-logo.png", "MOZILLA_1_8_BRANCH",
+                 "/images/mozilla-logo.png", "trunk",
                  '<a href="http://www.mozilla.org/MPL/">MPL</a>/<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a> (<a href="http://en.wikipedia.org/wiki/Mozilla_Firefox#Licensing" rel="nofollow">issues</a>)'),
     'G': Project("GNOME", "http://www.gnome.org", "/images/gnome-logo.png",
                  "trunk", '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>'),
