@@ -19,6 +19,7 @@ import sys
 from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES, pretty_int
 from datetime import date
+from os import stat
 
 datadir = sys.argv[1]
 
@@ -124,7 +125,7 @@ print '''
     <th>Languages</th>
     <th>License</th>
   </tr>
-''' % date.fromtimestamp(datadir + '/ten.db').strftime('%B %d, %Y')
+''' % date.fromtimestamp(stat(datadir + '/ten.db').st_ctime).strftime('%B %d, %Y')
 
 projs = sorted(projects.values(), key = lambda p: p.total, reverse = True)
 for project in projs:
