@@ -30,16 +30,18 @@ def log(text, nonline=False):
     sys.stdout.flush()
 
 
-def get_subdirs(dir):
-    for r, dirs, files in os.walk(dir):
+def get_subdirs(directory):
+    for r, dirs, files in os.walk(directory):
         if '.svn' in dirs:
             dirs.remove('.svn')
+        if '.git' in dirs:
+            dirs.remove('.git')
         return dirs
 
-def get_lsubdirs(dir):
+def get_lsubdirs(directory):
     if shortlist:
         return shortlist
-    return get_subdirs(dir)
+    return get_subdirs(directory)
 
 
 class GlobalId(object):
@@ -81,7 +83,7 @@ class ImporterProject(object):
         self.project_id = project_id
 
 
-    def __store_phrase(self, pid, lid, sentence, flags, lang):
+    def store_phrase(self, pid, lid, sentence, flags, lang):
         phrase = Phrase(sentence, lang[:2])
         length = phrase.length()
         if length == 0 or len(sentence) < 2 or length > 10:
@@ -122,10 +124,10 @@ values
                     pid = self.phrase_ids[key]
                 else:
                     pid = GlobalId.next()
-                    self.__store_phrase(self.project_id, pid, src, 0, "en")
+                    self.store_phrase(self.project_id, pid, src, 0, "en")
                     self.phrase_ids[key] = pid
-                self.__store_phrase(self.project_id, pid,
-                                    dst, unit.isfuzzy(), lang)
+                self.store_phrase(self.project_id, pid,
+                                  dst, unit.isfuzzy(), lang)
         return len(store.units)
 
 
@@ -158,12 +160,12 @@ class Importer(object):
         self.conn.commit()
         
 
-    def run_langs(self, dir):
-        self.langs = get_lsubdirs(dir)
-        for root, dirs, files in os.walk(os.path.join(dir, 'fr')):
+    def run_langs(self, directory):
+        self.langs = get_lsubdirs(directory)
+        for root, dirs, files in os.walk(os.path.join(directory, 'fr')):
             for f in files:
                 if self.is_resource(f):
-                    rel = root[len(dir) + 1:]
+                    rel = root[len(directory) + 1:]
                     name = self.get_path(rel, f)
                     log("Importing %s..." % f)
                     pid = self.store_project(name)
@@ -194,13 +196,13 @@ class Importer(object):
         gc.collect()
         
 
-    def run_projects(self, dir):
-        for proj in get_subdirs(dir):
-            self.run_project(dir, proj)
+    def run_projects(self, directory):
+        for proj in get_subdirs(directory):
+            self.run_project(directory, proj)
             gc.collect()
 
 
-    def get_path(self, dir, name):
+    def get_path(self, directory, name):
         if name.endswith(".fr.po"):
             name = name[:-6]
         if name.endswith(".po"):
@@ -265,12 +267,13 @@ class FY_Importer(Importer):
         items = {}
         f = open(path)
         self.cursor = self.conn.cursor()
+        pid = Importer.store_project(self, "F/")
+        ip = ImporterProject(self.conn.cursor(), pid)
         for line in f:
             en, fy = line.rstrip().split(" | ")
-            items[en] = { "fy" : (fy, 0) }
-        pid = Importer.store_project(self, "F/")
-        self.store_phrases(pid, items)
-
+            lid = GlobalId.next()
+            ip.store_phrase(pid, lid, en, 0, "en")
+            ip.store_phrase(pid, lid, fy, 0, "fy")
 
         
 class DI_Importer(Importer):
@@ -340,18 +343,36 @@ class OO_Importer(Importer):
     def getprefix(self):
         return "O"
 
-    def get_path(self, dir, name):
-        dir = dir[3:]
-        idx = dir.find('/')
+    def get_path(self, directory, name):
+        directory = directory[3:]
+        idx = directory.find('/')
         if idx >= 0:
-            dir = dir[:idx]
-        return self.getprefix() + "/" + dir + "/" + name[:-3]
+            directory = directory[:idx]
+        return self.getprefix() + "/" + directory + "/" + name[:-3]
     
     def is_resource(self, fname):
         return fname.endswith('.po')
     
     def run(self, path):
         Importer.run_langs(self, path)
+
+
+
+class Fedora_Importer(Importer):
+    def getprefix(self):
+        return "R"
+    
+    def is_resource(self, fname):
+        if shortlist:
+            return fname in shortlist
+        return fname.endswith('.po')
+    
+    def get_language(self, project):
+        return project[:-3].replace('@', '_').lower()
+    
+    def run(self, path):
+        Importer.run_projects(self, path)
+
 
 
 
@@ -365,8 +386,9 @@ importers = {
     KDE_Importer : '/l10n-kde4',
     Suse_Importer : '/suse-i18n',
     Xfce_Importer : '/xfce',
-    Mozilla_Importer : '/mozilla-po',
-    OO_Importer : '/oo-po'
+#    Mozilla_Importer : '/mozilla-po',
+#    OO_Importer : '/oo-po',
+#    Fedora_Importer : '/fedora'
     }
 
 sf = open(sys.argv[1] + '/../import/step1.sql')
