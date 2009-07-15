@@ -33,6 +33,7 @@ update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inksca
 update kde
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
+update fedora
 
 rm -rf $data_root/../data/*
 

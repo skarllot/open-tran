@@ -175,10 +175,11 @@ class Importer(object):
                 dirs.remove('.svn')
 
 
-    def run_project(self, directory, proj):
+    def run_project(self, directory, proj, proj_file_name = None):
         log("Importing %s..." % proj)
         self.cursor = self.conn.cursor()
-        proj_file_name = os.path.join(directory, proj)
+        if not proj_file_name:
+            proj_file_name = os.path.join(directory, proj)
         name = self.get_path(proj_file_name, proj)
         pid = self.store_project(name)
         ip = ImporterProject(self.cursor, pid)
@@ -200,6 +201,15 @@ class Importer(object):
         for proj in get_subdirs(directory):
             self.run_project(directory, proj)
             gc.collect()
+
+
+    def run_git_projects(self, directory):
+        for r, dirs, files in os.walk(directory):
+            if '.git' in dirs:
+                dirs.remove('.git')
+            if 'po' in dirs:
+                self.run_project(directory, r, os.path.join(r, 'po'))
+                gc.collect()
 
 
     def get_path(self, directory, name):
@@ -362,6 +372,9 @@ class Fedora_Importer(Importer):
     def getprefix(self):
         return "R"
     
+    def get_path(self, directory, name):
+        return self.getprefix() + directory
+    
     def is_resource(self, fname):
         if shortlist:
             return fname in shortlist
@@ -371,7 +384,7 @@ class Fedora_Importer(Importer):
         return project[:-3].replace('@', '_').lower()
     
     def run(self, path):
-        Importer.run_projects(self, path)
+        Importer.run_git_projects(self, path)
 
 
 
@@ -379,16 +392,16 @@ class Fedora_Importer(Importer):
 shortlist = None #['fy', 'fy-NL']
 root = sys.argv[1]
 importers = {
-    DI_Importer : '/debian-installer',
+#    DI_Importer : '/debian-installer',
     FY_Importer : '/fy/kompjtr2.txt',
-    Gnome_Importer : '/gnome-po',
-    Inkscape_Importer : '/inkscape',
-    KDE_Importer : '/l10n-kde4',
-    Suse_Importer : '/suse-i18n',
-    Xfce_Importer : '/xfce',
+#    Gnome_Importer : '/gnome-po',
+#    Inkscape_Importer : '/inkscape',
+#    KDE_Importer : '/l10n-kde4',
+#    Suse_Importer : '/suse-i18n',
+#    Xfce_Importer : '/xfce',
 #    Mozilla_Importer : '/mozilla-po',
 #    OO_Importer : '/oo-po',
-#    Fedora_Importer : '/fedora'
+    Fedora_Importer : '/fedora'
     }
 
 sf = open(sys.argv[1] + '/../import/step1.sql')
