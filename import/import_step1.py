@@ -392,13 +392,13 @@ class Fedora_Importer(Importer):
 shortlist = None #['fy', 'fy-NL']
 root = sys.argv[1]
 importers = {
-#    DI_Importer : '/debian-installer',
+    DI_Importer : '/debian-installer',
     FY_Importer : '/fy/kompjtr2.txt',
-#    Gnome_Importer : '/gnome-po',
-#    Inkscape_Importer : '/inkscape',
-#    KDE_Importer : '/l10n-kde4',
-#    Suse_Importer : '/suse-i18n',
-#    Xfce_Importer : '/xfce',
+    Gnome_Importer : '/gnome-po',
+    Inkscape_Importer : '/inkscape',
+    KDE_Importer : '/l10n-kde4',
+    Suse_Importer : '/suse-i18n',
+    Xfce_Importer : '/xfce',
 #    Mozilla_Importer : '/mozilla-po',
 #    OO_Importer : '/oo-po',
     Fedora_Importer : '/fedora'
