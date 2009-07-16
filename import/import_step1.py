@@ -373,7 +373,8 @@ class Fedora_Importer(Importer):
         return "R"
     
     def get_path(self, directory, name):
-        return self.getprefix() + directory
+        name = directory.split('/')[-2].replace('.git', '')
+        return self.getprefix() + '/' + name
     
     def is_resource(self, fname):
         if shortlist:

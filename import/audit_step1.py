@@ -64,7 +64,10 @@ projects = {
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
     'O': Project("OpenOffice.org", "http://www.openoffice.org",
                  "/images/oo-logo.png", "",
-                 '<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>')
+                 '<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>'),
+    'R': Project("Fedora", "http://fedoraproject.org"
+                 "/images/fedora-logo.png", "master",
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>')
     }
 
 
