@@ -24,6 +24,9 @@
 	</ul>
       </div> <!-- lang_choice -->
     </div> <!-- locale -->
+  <script language="JavaScript">
+    visibility_switch('lang_choice');
+  </script>
 
 <div id="logo">
   <a href="/"><img src="/images/logo2.png" alt="open-tran // consistency matters"/></a>

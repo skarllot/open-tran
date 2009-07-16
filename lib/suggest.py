@@ -28,6 +28,7 @@ PROJS = {
     'K': 'KDE',
     'M': 'Mozilla',
     'O': 'OpenOffice.org',
+    'R': 'Fedora',
     'S': 'SUSE',
     'X': 'XFCE'
     }

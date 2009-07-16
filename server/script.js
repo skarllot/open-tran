@@ -117,10 +117,6 @@ function get_cookie(name, def)
 
 function initialize()
 {
-        visibility_switch('lang_choice');
-        for (i = 1; i < 1000; i++){
-                visibility_switch('sug' + i);
-        }
         document.search_form.mode.value = get_cookie("mode", "suggest");
         refresh_mode();
         document.search_form.q.focus();

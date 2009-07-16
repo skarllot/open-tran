@@ -220,6 +220,19 @@ class openoffice_renderer(renderer):
         return '<a href="http://l10n.openoffice.org">%s</a>' % project
 
 
+class fedora_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "Fedora"
+        self.icon_path = "/images/fedora-logo.png"
+
+    def render_link(self, project):
+        return '<a href="https://translate.fedoraproject.org/">%s</a>' % project
+
+    def feed(self, project):
+        if project.path[0] == 'R':
+            self.projects.append(project)
+
 
 class Suggestion:
     def __init__(self, source, target):
@@ -229,6 +242,7 @@ class Suggestion:
 
 RENDERERS = [
     di_renderer(),
+    fedora_renderer(),
     fy_renderer(),
     gnome_renderer(),
     inkscape_renderer(),
@@ -344,6 +358,7 @@ class TranRequestHandler(PremiumRequestHandler):
             result.append(')</a>')
             result.append(self.render_div(self.idx, dstlang))
             result.append('</li>\n')
+            result.append('<script language="JavaScript">visibility_switch("sug%d");</script>' % self.idx)
             self.idx += 1
         result.append('</ol>\n')
         return u''.join(result)
