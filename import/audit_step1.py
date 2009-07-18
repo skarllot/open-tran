@@ -39,34 +39,64 @@ class Project:
 
 
 projects = {
-    'K': Project("KDE", "http://www.kde.org", "/images/kde-logo.png",
-                 "trunk", '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>(<a href="http://en.wikipedia.org/wiki/KDE#Licensing_issues" rel="nofollow">issues</a>)'),
-    'M': Project("Mozilla", "http://www.mozilla.org",
-                 "/images/mozilla-logo.png", "trunk",
+    'K': Project("KDE",
+                 "http://www.kde.org",
+                 "/images/kde-logo.png",
+                 "trunk",
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>(<a href="http://en.wikipedia.org/wiki/KDE#Licensing_issues" rel="nofollow">issues</a>)'),
+
+    'M': Project("Mozilla",
+                 "http://www.mozilla.org",
+                 "/images/mozilla-logo.png",
+                 "trunk",
                  '<a href="http://www.mozilla.org/MPL/">MPL</a>/<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a> (<a href="http://en.wikipedia.org/wiki/Mozilla_Firefox#Licensing" rel="nofollow">issues</a>)'),
-    'G': Project("GNOME", "http://www.gnome.org", "/images/gnome-logo.png",
-                 "trunk", '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>'),
+
+    'G': Project("GNOME",
+                 "http://www.gnome.org",
+                 "/images/gnome-logo.png",
+                 "trunk",
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>'),
+
     'D': Project("Debian Installer",
                  "http://www.debian.org/devel/debian-installer/",
-                 "/images/debian-logo.png", "level1",
+                 "/images/debian-logo.png",
+                 "level1",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
+
     'F': Project("Cor Jousma",
                  "http://members.chello.nl/~s.hiemstra/kompjtr.htm",
-                 "/images/pompelyts.png", "",
+                 "/images/pompelyts.png",
+                 "",
                  '<a href="http://www.gnu.org/copyleft">Copyleft</a>'),
-    'S': Project("openSUSE", "http://www.opensuse.org",
-                 "/images/suse-logo.png", "trunk",
+
+    'S': Project("openSUSE",
+                 "http://www.opensuse.org",
+                 "/images/suse-logo.png",
+                 "trunk",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
-    'X': Project("XFCE", "http://www.xfce.org", "/images/xfce-logo.png",
-                 "trunk", '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/copyleft/lgpl.html">LGPL</a>'),
-    'I': Project("Inkscape", "http://www.inkscape.org",
-                 "/images/inkscape-logo.png", "trunk",
+
+    'X': Project("XFCE",
+                 "http://www.xfce.org",
+                 "/images/xfce-logo.png",
+                 "trunk",
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/copyleft/lgpl.html">LGPL</a>'),
+
+    'I': Project("Inkscape",
+                 "http://www.inkscape.org",b
+                 "/images/inkscape-logo.png",
+                 "trunk",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
-    'O': Project("OpenOffice.org", "http://www.openoffice.org",
-                 "/images/oo-logo.png", "",
+
+    'O': Project("OpenOffice.org",
+                 "http://www.openoffice.org",
+                 "/images/oo-logo.png",
+                 "",
                  '<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>'),
-    'R': Project("Fedora", "http://fedoraproject.org"
-                 "/images/fedora-logo.png", "master",
+
+    'R': Project("Fedora",
+                 "http://fedoraproject.org"
+                 "/images/fedora-logo.png",
+                 "master",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>')
     }
 
