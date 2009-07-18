@@ -25,12 +25,13 @@ datadir = sys.argv[1]
 
 
 class Project:
-    def __init__(self, name, url, icon, branch, lic):
+    def __init__(self, name, url, icon, branch, lic, expected):
         self.name = name
         self.url = url
         self.icon = icon
         self.branch = branch
         self.lic = lic
+        self.expected = expected
         self.min = -1
         self.max = -1
         self.langs = 0
@@ -43,61 +44,78 @@ projects = {
                  "http://www.kde.org",
                  "/images/kde-logo.png",
                  "trunk",
-                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>(<a href="http://en.wikipedia.org/wiki/KDE#Licensing_issues" rel="nofollow">issues</a>)'),
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>(<a href="http://en.wikipedia.org/wiki/KDE#Licensing_issues" rel="nofollow">issues</a>)',
+                 170000),
 
     'M': Project("Mozilla",
                  "http://www.mozilla.org",
                  "/images/mozilla-logo.png",
                  "trunk",
-                 '<a href="http://www.mozilla.org/MPL/">MPL</a>/<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a> (<a href="http://en.wikipedia.org/wiki/Mozilla_Firefox#Licensing" rel="nofollow">issues</a>)'),
+                 '<a href="http://www.mozilla.org/MPL/">MPL</a>/<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a> (<a href="http://en.wikipedia.org/wiki/Mozilla_Firefox#Licensing" rel="nofollow">issues</a>)',
+                 15000),
 
     'G': Project("GNOME",
                  "http://www.gnome.org",
                  "/images/gnome-logo.png",
                  "trunk",
-                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>'),
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>',
+                 500000),
 
     'D': Project("Debian Installer",
                  "http://www.debian.org/devel/debian-installer/",
                  "/images/debian-logo.png",
                  "level1",
-                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>',
+                 1000),
 
     'F': Project("Cor Jousma",
                  "http://members.chello.nl/~s.hiemstra/kompjtr.htm",
                  "/images/pompelyts.png",
                  "",
-                 '<a href="http://www.gnu.org/copyleft">Copyleft</a>'),
+                 '<a href="http://www.gnu.org/copyleft">Copyleft</a>',
+                 224),
 
     'S': Project("openSUSE",
                  "http://www.opensuse.org",
                  "/images/suse-logo.png",
                  "trunk",
-                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>',
+                 35000),
 
     'X': Project("XFCE",
                  "http://www.xfce.org",
                  "/images/xfce-logo.png",
                  "trunk",
-                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/copyleft/lgpl.html">LGPL</a>'),
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/copyleft/lgpl.html">LGPL</a>',
+                 9000),
 
     'I': Project("Inkscape",
                  "http://www.inkscape.org",
                  "/images/inkscape-logo.png",
                  "trunk",
-                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>',
+                 5000),
 
     'O': Project("OpenOffice.org",
                  "http://www.openoffice.org",
                  "/images/oo-logo.png",
                  "",
-                 '<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>'),
+                 '<a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>',
+                 38000),
 
     'R': Project("Fedora",
                  "http://fedoraproject.org",
                  "/images/fedora-logo.png",
                  "master",
-                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>')
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>',
+                 10000),
+
+    'A': Project("Mandriva",
+                 "http://www.mandriva.com",
+                 "/images/mandriva-logo.png",
+                 "trunk",
+                 '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>',
+                 25000)
     }
 
 
@@ -178,3 +196,11 @@ print '''
 </table>
 </div>
 '''
+
+fails = [proj for proj in projs if proj.eng < proj.expected]
+if fails:
+    with open(datadir + '/failed.txt', 'w') as f:
+        for fail in fails:
+            f.write('%s: %d\n' % (fail.name, fail.eng))
+    sys.exit(1)
+
