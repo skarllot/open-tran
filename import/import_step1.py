@@ -127,7 +127,7 @@ values
                     self.store_phrase(self.project_id, pid, src, 0, "en")
                     self.phrase_ids[key] = pid
                 self.store_phrase(self.project_id, pid,
-                                  dst, unit.isfuzzy(), lang)
+                                  dst, unit.isfuzzy(), mlang)
         return len(store.units)
 
 
