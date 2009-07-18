@@ -234,6 +234,20 @@ class fedora_renderer(renderer):
             self.projects.append(project)
 
 
+class mandriva_renderer(renderer):
+    def __init__(self):
+        renderer.__init__(self)
+        self.name = "Mandriva"
+        self.icon_path = "/images/mandriva-logo.png"
+
+    def render_link(self, project):
+        return '<a href="http://wiki.mandriva.com/en/Development/Tasks/Translating">%s</a>' % project
+
+    def feed(self, project):
+        if project.path[0] == 'A':
+            self.projects.append(project)
+
+
 class Suggestion:
     def __init__(self, source, target):
         self.source = source
@@ -247,6 +261,7 @@ RENDERERS = [
     gnome_renderer(),
     inkscape_renderer(),
     kde_renderer(),
+    mandriva_renderer(),
     mozilla_renderer(),
     openoffice_renderer(),
     suse_renderer(),

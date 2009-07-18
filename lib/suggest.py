@@ -21,6 +21,7 @@ from phrase import Phrase
 import sys, os
 
 PROJS = {
+    'A': 'Mandriva',
     'D': 'Debian Installer',
     'F': 'FY',
     'G': 'GNOME',
