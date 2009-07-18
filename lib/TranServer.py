@@ -382,6 +382,7 @@ class TranRequestHandler(PremiumRequestHandler):
             result.append('<li value="%d">%s<a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, fuzzy, self.idx, _replace_html(s.text)))
             result.append(self.render_div(self.idx, srclang))
             result.append('</li>\n')
+            result.append('<script language="JavaScript">visibility_switch("sug%d");</script>' % self.idx)
             self.idx += 1
         result.append('</ol>\n')
         return u''.join(result)
