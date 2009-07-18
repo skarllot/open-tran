@@ -261,9 +261,6 @@ class Gnome_Importer(Importer):
             return fname in map(lambda x: x + '.po', shortlist)
         return fname.endswith('.po')
     
-    def get_language(self, project):
-        return 
-    
     def run(self, path):
         Importer.run_projects(self, path)
 
@@ -295,9 +292,6 @@ class DI_Importer(Importer):
             return fname in shortlist
         return fname.endswith('.po')
     
-    def get_language(self, project):
-        return project[:-3].replace('@', '_').lower()
-    
     def run(self, path):
         Importer.run_projects(self, path)
 
@@ -325,9 +319,6 @@ class Xfce_Importer(Importer):
             return fname in map(lambda x: x + '.po', shortlist)
         return fname.endswith('.po')
 
-    def get_language(self, project):
-        return project[:-3].replace('@', '_').lower()
-    
     def run(self, path):
         Importer.run_projects(self, path)
 
@@ -341,9 +332,6 @@ class Inkscape_Importer(Importer):
             return fname in map(lambda x: x + '.po', shortlist)
         return fname.endswith('.po')
 
-    def get_language(self, project):
-        return project[:-3].replace('@', '_').lower()
-    
     def run(self, path):
         Importer.run_project(self, path, '')
 
@@ -381,11 +369,23 @@ class Fedora_Importer(Importer):
             return fname in shortlist
         return fname.endswith('.po')
     
-    def get_language(self, project):
-        return project[:-3].replace('@', '_').lower()
-    
     def run(self, path):
         Importer.run_git_projects(self, path)
+
+
+
+class Mandriva_Importer(Importer):
+    def getprefix(self):
+        return "A"
+    
+    def is_resource(self, fname):
+        if shortlist:
+            return fname in map(lambda x: x + '.po', shortlist)
+        return fname.endswith('.po')
+    
+    def run(self, path):
+        Importer.run_projects(self, path)
+
 
 
 
@@ -402,7 +402,8 @@ importers = {
     Xfce_Importer : '/xfce',
 #    Mozilla_Importer : '/mozilla-po',
 #    OO_Importer : '/oo-po',
-    Fedora_Importer : '/fedora'
+    Fedora_Importer : '/fedora',
+    Mandriva_Importer : '/mandriva'
     }
 
 sf = open(sys.argv[1] + '/../import/step1.sql')

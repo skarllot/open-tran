@@ -34,6 +34,7 @@ update kde
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
 update fedora
+update mandriva
 
 rm -rf $data_root/../data/*
 

@@ -17,7 +17,7 @@ for m in $modules; do
     if test -d $m; then
 	cd $m
 
-	echo -n "up $m..."
+	echo -n "clean $m..."
 	svn cleanup > /dev/null || true
 	echo "done."
 
