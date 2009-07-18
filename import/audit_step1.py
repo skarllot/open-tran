@@ -82,7 +82,7 @@ projects = {
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/copyleft/lgpl.html">LGPL</a>'),
 
     'I': Project("Inkscape",
-                 "http://www.inkscape.org",b
+                 "http://www.inkscape.org",
                  "/images/inkscape-logo.png",
                  "trunk",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>'),
