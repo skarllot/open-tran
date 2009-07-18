@@ -102,7 +102,7 @@ values
 
     def __lang_hygiene(self, lang):
         lang = lang.replace('@', '_').lower()
-        if lang[:2] == lang[3:].lower():
+        if lang[:2] == lang[3:]:
             return lang[:2]
         lang = lang.replace('-', '_')
         lang = lang.replace('ooo_build_', '')
