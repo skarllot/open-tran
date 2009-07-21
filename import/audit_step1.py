@@ -194,6 +194,12 @@ for project in projs:
 
 print '''
 </table>
+<p>
+  Notice that some of the logos might be copyrighted and their use
+  might be restricted.  Open-Tran hosts them in order to make sure
+  that they are always available from the same location and in order
+  to avoid so-called hot-linking.
+</p>
 </div>
 '''
 
