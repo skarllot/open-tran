@@ -199,8 +199,9 @@ print '''
 
 fails = [proj for proj in projs if proj.eng < proj.expected]
 if fails:
-    with open(datadir + '/failed.txt', 'w') as f:
-        for fail in fails:
-            f.write('%s: %d\n' % (fail.name, fail.eng))
+    f = open(datadir + '/failed.txt', 'w')
+    for fail in fails:
+        f.write('%s: %d\n' % (fail.name, fail.eng))
+    f.close()
     sys.exit(1)
 
