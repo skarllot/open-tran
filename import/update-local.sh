@@ -51,3 +51,6 @@ $local_dir/import/import_step3.py $newdir >> $logout 2>> $errout
 
 echo -n "########## Finished " >> $logout
 date >> $logout
+
+$local_dir/import/update-switch.sh $local_dir/import
+

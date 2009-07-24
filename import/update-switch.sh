@@ -26,7 +26,7 @@ $IMPORTDIR/audit_step1.py $IMPORTDIR/../$newdir > /tmp/projects.html
 $IMPORTDIR/audit_step2.py $IMPORTDIR/../$newdir > /tmp/languages.html
 
 cd "$IMPORTDIR/.."
-rm data
-ln -s "$newdir" data
 mv /tmp/projects.html server
 mv /tmp/languages.html server
+rm data
+ln -s "$newdir" data
