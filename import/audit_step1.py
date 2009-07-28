@@ -94,7 +94,7 @@ projects = {
                  "/images/inkscape-logo.png",
                  "trunk",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>',
-                 5000),
+                 4500),
 
     'O': Project("OpenOffice.org",
                  "http://www.openoffice.org",
