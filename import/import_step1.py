@@ -75,6 +75,11 @@ class ImporterProject(object):
         'te_in' : 'te',
         'ven' : 've'
         }
+
+    discarded_phrases = frozenset([
+        'Your names',
+        'Your emails',
+        ])
         
     
     def __init__(self, cursor, project_id):
@@ -119,6 +124,8 @@ values
             dst = unit.target.encode('utf-8')
             key = (src, '::'.join(unit.getlocations())
                    + '::::' + unit.getcontext())
+            if src in ImporterProject.discarded_phrases:
+                continue
             if len(src) > 0:
                 if key in self.phrase_ids:
                     pid = self.phrase_ids[key]
