@@ -3,45 +3,30 @@
 data_root="$1"
 xfce_root="$data_root/xfce"
 
+if [ -d $xfce_root/xfwm4/.svn ]; then
+    rm -rf $xfce_root
+fi
+
 if [ ! -d $xfce_root ]; then
     mkdir $xfce_root
 fi
 
 cd $xfce_root
 
-xmodules=`svn ls http://svn.xfce.org/svn/xfce/`
+xmodules=`wget -o /dev/null -O- http://git.xfce.org | grep 'sublevel-repo[^~]*$' | sed "s/^.*href='\([^']*\)'.*$/\1/"`
 for m in $xmodules; do
-    if test -d $m; then
-	cd $m
+    dir=`echo $m | sed 's/.*\/\(.*\)\/$/\1/'`
+    if test -d $dir; then
+	cd $dir
 
-	echo -n "cleanup $m..."
-	svn cleanup > /dev/null || true
-	echo "done."
-
-	echo -n "up $m..."
-	svn up > /dev/null || true
+	echo -n "pull $m..."
+	git pull > /dev/null || true
 	echo "done."
 
 	cd ..
     else
-	echo -n "co $m..."
-	svn co http://svn.xfce.org/svn/xfce/${m}trunk/po $m > /dev/null || true
+	echo -n "clone $m..."
+	git clone "git://git.xfce.org$m" > /dev/null || true
 	echo "done."
     fi
 done
-
-goodies=`wget -o /dev/null -O- http://svn.xfce.org/index.cgi/goodies | grep 'a href="/index.cgi/goodies/[^?]' | sed 's/.*\/goodies\/\([^\/]*\)\/.*/\1/'`
-for m in $goodies; do
-    if test -d $m; then
-	cd $m
-	echo -n "up $m..."
-	svn up > /dev/null || true
-	echo "done."
-	cd ..
-    else
-	echo -n "co $m..."
-	svn co http://svn.xfce.org/svn/goodies/${m}/trunk/po $m > /dev/null || true
-	echo "done."
-    fi
-done
-

@@ -321,13 +321,17 @@ class Xfce_Importer(Importer):
     def getprefix(self):
         return "X"
 
+    def get_path(self, directory, name):
+        name = directory.split('/')[-2].replace('.git', '')
+        return self.getprefix() + '/' + name
+    
     def is_resource(self, fname):
         if shortlist:
-            return fname in map(lambda x: x + '.po', shortlist)
+            return fname in shortlist
         return fname.endswith('.po')
-
+    
     def run(self, path):
-        Importer.run_projects(self, path)
+        Importer.run_git_projects(self, path)
 
 
 class Inkscape_Importer(Importer):
@@ -407,8 +411,8 @@ importers = {
     KDE_Importer : '/l10n-kde4',
     Suse_Importer : '/suse-i18n',
     Xfce_Importer : '/xfce',
-#    Mozilla_Importer : '/mozilla-po',
-#    OO_Importer : '/oo-po',
+    Mozilla_Importer : '/mozilla-po',
+    OO_Importer : '/oo-po',
     Fedora_Importer : '/fedora',
     Mandriva_Importer : '/mandriva'
     }
