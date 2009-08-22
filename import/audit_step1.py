@@ -85,7 +85,7 @@ projects = {
     'X': Project("XFCE",
                  "http://www.xfce.org",
                  "/images/xfce-logo.png",
-                 "trunk",
+                 "master",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>/<a href="http://www.gnu.org/copyleft/lgpl.html">LGPL</a>',
                  9000),
 
