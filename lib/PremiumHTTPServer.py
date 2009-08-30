@@ -43,13 +43,13 @@ def to_json(obj):
     if obj is None:
         return "null"
     if type(obj) is str or type(obj) is unicode:
-        return "'" + obj.replace("'", "\\'").replace('\n', '\\n').encode('utf-8') + "'"
+        return '"' + obj.replace('"', '\\"').replace('\n', '\\n').replace('\\', '\\\\').encode('utf-8') + '"'
     if type(obj) in (int, float, long, bool):
         return str(obj).lower()
     try:
-        return "[" + ", ".join([to_json(e) for e in obj]) + "]"
+        return "[" + ",".join([to_json(e) for e in obj]) + "]"
     except TypeError:
-        return "{" + ", ".join(["'" + a + "': " + to_json(getattr(obj, a))
+        return "{" + ",".join(['"' + a + '":' + to_json(getattr(obj, a))
                                 for a in dir(obj)
                                 if a[0] != '_'
                                 and not callable(getattr(obj, a))]) + "}"
