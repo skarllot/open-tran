@@ -43,7 +43,7 @@ def to_json(obj):
     if obj is None:
         return "null"
     if type(obj) is str or type(obj) is unicode:
-        return '"' + obj.replace('"', '\\"').replace('\n', '\\n').replace('\\', '\\\\').encode('utf-8') + '"'
+        return '"' + obj.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').encode('utf-8') + '"'
     if type(obj) in (int, float, long, bool):
         return str(obj).lower()
     try:
