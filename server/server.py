@@ -17,12 +17,17 @@
 
 import sys
 import signal
+import os
 from TranServer import TranServer
 
 print "loading...",
 sys.stdout.flush()
 
 server = TranServer(("", 8080))
+
+f = open(os.path.join(os.path.dirname(sys.argv[0]), 'server.pid'), 'w')
+f.write(str(os.getpid()))
+f.close()
 
 print "done."
 sys.stdout.flush()
