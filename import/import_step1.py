@@ -161,6 +161,9 @@ class Importer(object):
             log("  + %s..." % lang, True)
             try:
                 cnt = ip.load_lang_file(fname, lang)
+                if cnt > 10000:
+                    log("too large (%d)" % cnt)
+                    return
                 log("ok (%d)" % cnt)
             except IOError:
                 log("failed.")
@@ -198,6 +201,9 @@ class Importer(object):
                 fname = os.path.join(proj_file_name, lang)
                 lang = lang[:-3].replace('@', '_').lower()
                 cnt = ip.load_file(fname, lang)
+                if cnt > 10000:
+                    log("too large (%d)" % cnt)
+                    return
                 log("ok (%d)" % cnt)
             except:
                 log("failed.")
