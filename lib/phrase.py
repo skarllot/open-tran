@@ -105,7 +105,7 @@ class Phrase:
         self._phrase = phrase
         self._wordlist = filter(lambda x: self.__filterfun(x, handler), \
                                 map(lambda x: x.replace('_', '').lower(), \
-                                    self.wre.findall(phrase)))
+                                    self.wre.findall(phrase)))[:10]
         if sort:
             self._wordlist.sort()
 
@@ -119,4 +119,4 @@ class Phrase:
         return self._wordlist
 
     def required(self):
-        return [m[1:-1] for m in self.qre.findall(self._phrase)]
+        return [m[1:-1] for m in self.qre.findall(self._phrase)][:5]
