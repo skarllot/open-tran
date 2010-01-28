@@ -711,7 +711,27 @@ class TranServer(PremiumServer):
 Checks if the service is capable of suggesting translations from or to
 'lang' and returns True if it is.
 """
+        logging.log(logging.DEBUG, 'supported(%s)' % lang)
         return lang in LANGUAGES
+
+    def suggest3(self, text, srclang, dstlang, maxcount):
+        logging.log(logging.DEBUG, 'suggest(%s, %s, %s, %d)'\
+                        % (text, srclang, dstlang, maxcount))
+        return self.storage.suggest3(text, srclang, dstlang, maxcount)
+
+    def suggest2(self, text, srclang, dstlang):
+        return self.suggest3(text, srclang, dstlang, 100)
+
+    def suggest(self, text, dstlang):
+        return self.suggest3(text, "en", dstlang, 100)
+
+    def compare(self, text, lang):
+        logging.log(logging.DEBUG, 'compare(%s, %s)' % (text, lang))
+        return self.storage.compare(text, lang)    
+    
+    def words(self, lang, offset = 0, limit = 50):
+        logging.log(logging.DEBUG, 'words(%s, %d, %d)' % (lang, offset, limit))
+        return self.storage.words(lang, offset, limit)
 
     def __init__(self, addr):
         PremiumServer.__init__(self, addr, TranRequestHandler)
@@ -721,10 +741,10 @@ Checks if the service is capable of suggesting translations from or to
 This server exports the following methods through the XML-RPC protocol.
 ''')
         self.storage = TranDB('../data/')
-        self.register_function(self.storage.suggest3, 'suggest3')
-        self.register_function(self.storage.suggest2, 'suggest2')
-        self.register_function(self.storage.suggest, 'suggest')
-        self.register_function(self.storage.compare, 'compare')
-        self.register_function(self.storage.words, 'words')
+        self.register_function(self.suggest3, 'suggest3')
+        self.register_function(self.suggest2, 'suggest2')
+        self.register_function(self.suggest, 'suggest')
+        self.register_function(self.compare, 'compare')
+        self.register_function(self.words, 'words')
         self.register_function(self.supported, 'supported')
         self.register_introspection_functions()
