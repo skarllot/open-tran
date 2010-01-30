@@ -22,6 +22,7 @@ from StringIO import StringIO
 from signal import signal, alarm, SIGPIPE, SIGALRM, SIG_IGN
 from traceback import print_exc
 from urlparse import urlparse
+from multiprocessing import Lock, Array
 
 import re
 import os
@@ -299,7 +300,16 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     def do_POST(self):
         self.request_init()
         if self.path == '/RPC2':
-            return DocXMLRPCRequestHandler.do_POST(self)
+            host = self.client_address[0]
+            addr = [int(b) for b in host.split('.')]
+            addr = (addr[0] << 24) | (addr[1] << 16) | (addr[2] << 8) | addr[3]
+            if self.server.add_post_host(addr):
+                print "error"
+                return self.send_error(409, "Concurrent API alls not allowed")
+            try:
+                return DocXMLRPCRequestHandler.do_POST(self)
+            finally:
+                self.server.del_post_host(addr)
         try:
             fname = "post_" + self.path[1:].replace('-', '_')
             if hasattr(self, fname):
@@ -331,7 +341,28 @@ class PremiumServer(ForkingMixIn, DocXMLRPCServer):
     max_children = 70
     allow_reuse_address = True
 
+
+    def add_post_host(self, host):
+        idx = -1
+        for (i, x) in enumerate(self.serving_posts):
+            if x == host:
+                return True
+            if x == 0 and idx == -1:
+                idx = i
+        self.serving_posts[idx] = host
+        return False
+        
+
+    def del_post_host(self, host):
+        idx = -1
+        for (i, x) in enumerate(self.serving_posts):
+            if x == host:
+                idx = i
+                break
+        self.serving_posts[idx] = 0
+
     def __init__(self, addr, handler):
         signal(SIGPIPE, SIG_IGN)
         DocXMLRPCServer.__init__(self, addr, handler)
+        self.serving_posts = Array('i', 70)
         self.set_server_title('Premium HTTP Server')
