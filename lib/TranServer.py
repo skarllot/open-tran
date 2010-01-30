@@ -715,21 +715,96 @@ Checks if the service is capable of suggesting translations from or to
         return lang in LANGUAGES
 
     def suggest3(self, text, srclang, dstlang, maxcount):
+        '''
+Is equivalent to calling suggest2(text, srclang, dstlang) and limiting
+the number of returned records to maxcount.
+'''
         logging.log(logging.DEBUG, 'suggest(%s, %s, %s, %d)'\
                         % (text, srclang, dstlang, maxcount))
         return self.storage.suggest3(text, srclang, dstlang, maxcount)
 
     def suggest2(self, text, srclang, dstlang):
+        '''
+Translates text from srclang to dstlang.  Each language code must be one
+of those displayed in the drop-down list in the search form.
+
+Server sends back a result in the following form:
+ * count: integer
+ * text: string
+ * value: integer
+ * projects: list
+   * count: integer
+   * name: string
+   * path: string
+   * orig_phrase: string
+   * flags: integer
+
+Identical translations are grouped together as one suggestion - the 'count'
+tells, how many of them there are.  The value indicates, how good the result
+is - the lower, the better.  And the list contains quadruples: name of the
+project name, original phrase, count and flags.  The sum of counts in the list
+of projects equals the count stored in the suggestion object.  The flags are
+currently only used to indicate if the translation is fuzzy (1) or not (0).
+
+As an example consider a call: suggest2("save as", "en", "pl").  The server would
+send a list of elements containing the following one:
+ * count: 20
+ * text: Zapisz jako...
+ * value: 1
+ * projects[0]:
+   * name: GNOME
+   * path: G/drgeo
+   * orig_phrase: Save As...
+   * count: 13
+   * flags: 0
+ * projects[1]:
+   * name: GNOME
+   * path: G/gxsnmp
+   * orig_phrase: Save as...
+   * count: 4
+   * flags: 0
+ * projects[2]:
+   * name: SUSE
+   * path: S/kpowersave
+   * orig_phrase: Save As ...
+   * count: 1
+   * flags: 0
+ * projects[3]:
+   * name: KDE
+   * path: K/koffice
+   * orig_phrase: Save Document As
+   * count: 1
+   * flags: 0
+ * projects[4]:
+   * name: GNOME
+   * path: G/gedit
+   * orig_phrase: Save As…
+   * count: 1
+   * flags: 0
+'''
         return self.suggest3(text, srclang, dstlang, 100)
 
     def suggest(self, text, dstlang):
+        '''
+Is equivalent to calling suggest2(text, "en", dstlang)
+'''
         return self.suggest3(text, "en", dstlang, 100)
 
     def compare(self, text, lang):
+        '''
+Returns the same results as suggest, but grouped by the projects.
+'''
         logging.log(logging.DEBUG, 'compare(%s, %s)' % (text, lang))
         return self.storage.compare(text, lang)    
     
     def words(self, lang, offset = 0, limit = 50):
+        """
+Returns the list of most popular words for the given language.
+The server will skip offset records from start and return at
+most limit records.  Every record in the result set is a pair:
+(word, count) where count is the number of occurences of the
+word in the database.
+"""
         logging.log(logging.DEBUG, 'words(%s, %d, %d)' % (lang, offset, limit))
         return self.storage.words(lang, offset, limit)
 
