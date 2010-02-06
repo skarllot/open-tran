@@ -185,7 +185,7 @@ JOIN (
      WHERE word IN %s
      GROUP BY p.id
      ORDER BY value
-     LIMIT 200
+     LIMIT 100
 ) val ON srcl.phraseid = val.id
 JOIN dest.locations dstl ON srcl.locationid = dstl.locationid
 JOIN dest.phrases dst ON dstl.phraseid = dst.id
