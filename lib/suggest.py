@@ -47,8 +47,12 @@ class TmpSug:
         self.value = value
         self.flags = flags
 
+    __getitem__ = lambda x, y: getattr(x, y)
+
+
 class Project:
-    pass
+    __getitem__ = lambda x, y: getattr(x, y)
+
 
 class Suggestion:
     def __init__ (self, text):
@@ -56,6 +60,8 @@ class Suggestion:
         self.value = 1000000
         self.text = text
         self.projects = {}
+
+    __getitem__ = lambda x, y: getattr(x, y)
 
     def __proj_zip__(self):
         res = {}

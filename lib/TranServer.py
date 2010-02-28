@@ -89,14 +89,14 @@ class renderer(object):
         self.projects = []
 
     def feed(self, project):
-        if project.path[0] == self.name[0]:
+        if project["path"][0] == self.name[0]:
             self.projects.append(project)
 
     def render_icon(self):
         return '<img src="%s" alt="%s"/>' % (self.icon_path, self.name)
 
     def render_count(self, needplus):
-        cnt = reduce(lambda x,y: x + y.count, self.projects, 0)
+        cnt = reduce(lambda x,y: x + y["count"], self.projects, 0)
         if cnt == 0:
             return None
         if needplus:
@@ -116,13 +116,13 @@ class renderer(object):
     def render_links(self, lang):
         result = []
         for project in self.projects:
-            if project.count > 1:
-                result.append("%d&times;" % project.count)
-            path = self.name + " " + project.path[2:]
-            if project.flags == 1:
+            if project["count"] > 1:
+                result.append("%d&times;" % project["count"])
+            path = self.name + " " + project["path"][2:]
+            if project["flags"] == 1:
                 result.append('<span class="fuzzy">')
-            result.append("%s: %s<br/>\n" % (self.render_link(path), _replace_html(project.orig_phrase)))
-            if project.flags == 1:
+            result.append("%s: %s<br/>\n" % (self.render_link(path), _replace_html(project["orig_phrase"])))
+            if project["flags"] == 1:
                 result.append('</span>')
         return ''.join(result)
 
@@ -231,7 +231,7 @@ class fedora_renderer(renderer):
         return '<a href="https://translate.fedoraproject.org/">%s</a>' % project
 
     def feed(self, project):
-        if project.path[0] == 'R':
+        if project["path"][0] == 'R':
             self.projects.append(project)
 
 
@@ -245,7 +245,7 @@ class mandriva_renderer(renderer):
         return '<a href="http://wiki.mandriva.com/en/Development/Tasks/Translating">%s</a>' % project
 
     def feed(self, project):
-        if project.path[0] == 'A':
+        if project["path"][0] == 'A':
             self.projects.append(project)
 
 
@@ -363,11 +363,11 @@ class TranRequestHandler(PremiumRequestHandler):
     def render_suggestions(self, suggs, dstlang):
         result = ['<ol>\n']
         for s in suggs:
-            fuzzy = reduce(lambda s, p: p.flags == 1 and s or '', s.projects, 'class="fuzzy"')
-            result.append('<li value="%d"><a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s (' % (s.value, fuzzy, self.idx, _replace_html(s.text)))
+            fuzzy = reduce(lambda s, p: p["flags"] == 1 and s or '', s["projects"], 'class="fuzzy"')
+            result.append('<li value="%d"><a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s (' % (s["value"], fuzzy, self.idx, _replace_html(s["text"])))
             for r in RENDERERS:
                 r.clear()
-            for p in s.projects:
+            for p in s["projects"]:
                 for r in RENDERERS:
                     r.feed(p)
             result.append(self.render_all())
@@ -381,13 +381,13 @@ class TranRequestHandler(PremiumRequestHandler):
 
 
     def render_suggestions_compare(self, suggs, srclang):
-        cnt, total = reduce(lambda x, y: (x[0] + 1, x[1] + len(y.text)), suggs, (0, 0))
+        cnt, total = reduce(lambda x, y: (x[0] + 1, x[1] + len(y["text"])), suggs, (0, 0))
         result = ['<ol style="width: %dem">\n' % (total / cnt * 2 / 3)]
         for s in suggs:
-            fuzzy = reduce(lambda s, p: p.flags == 1 and s or '', s.projects, 'class="fuzzy"')
+            fuzzy = reduce(lambda s, p: p["flags"] == 1 and s or '', s["projects"], 'class="fuzzy"')
             for r in RENDERERS:
                 r.clear()
-            for p in s.projects:
+            for p in s["projects"]:
                 for r in RENDERERS:
                     r.feed(p)
             cnt = ''
@@ -395,7 +395,7 @@ class TranRequestHandler(PremiumRequestHandler):
                 cnt = r.render_count(False)
                 if cnt != None:
                     break
-            result.append('<li value="%d">%s<a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s.value, cnt, fuzzy, self.idx, _replace_html(s.text)))
+            result.append('<li value="%d">%s<a href="javascript:;" %s onclick="return visibility_switch(\'sug%d\')">%s</a>' % (s["value"], cnt, fuzzy, self.idx, _replace_html(s["text"])))
             result.append(self.render_div(self.idx, srclang))
             result.append('</li>\n')
             result.append('<script language="JavaScript">visibility_switch("sug%d");</script>' % self.idx)
@@ -430,10 +430,10 @@ class TranRequestHandler(PremiumRequestHandler):
         dic = {}
         def cmp_ps(x, y):
             if x[0] not in dic:
-                dic[x[0]] = sum([sum([p.count for p in e.projects])
+                dic[x[0]] = sum([sum([p["count"] for p in e["projects"]])
                                  for e in x[1]])
             if y[0] not in dic:
-                dic[y[0]] = sum([sum([p.count for p in e.projects])
+                dic[y[0]] = sum([sum([p["count"] for p in e["projects"]])
                                  for e in y[1]])
             return cmp(dic[x[0]], dic[y[0]])
             
@@ -450,7 +450,7 @@ class TranRequestHandler(PremiumRequestHandler):
 
 
     def suggest(self, text, srclang, dstlang):
-        suggs = self.server.storage.suggest2(text, srclang, dstlang)
+        suggs = self.server.suggest2(text, srclang, dstlang)
         return (text, suggs)
 
 
@@ -669,7 +669,7 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
     
     def send_words(self):
         offset = self.words_offset()
-        words = self.server.storage.words(self.srclang, offset)
+        words = self.server.words(self.srclang, offset)
         response = self.dump_words(offset, words)
         response = response.encode('utf-8')
         return self.embed_in_template(response)
@@ -679,7 +679,7 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
         query = self.get_query()
         if query == None:
             return self.shutdown(404)
-        suggs = self.server.storage.compare2(query, self.srclang, self.dstlang)
+        suggs = self.server.compare(query, self.srclang, self.dstlang)
         response = self.dump_compare(suggs, self.srclang).encode('utf-8')
         return self.embed_in_template(response)
 
@@ -706,6 +706,13 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
 
 
 class TranServer(PremiumServer):
+
+    def __proxy(self, srclang, dstlang):
+        for (pred, proxy) in self.shadows:
+            if pred(srclang, dstlang):
+                return proxy
+
+
     def supported(self, lang):
         """
 Checks if the service is capable of suggesting translations from or to
@@ -714,6 +721,7 @@ Checks if the service is capable of suggesting translations from or to
         logging.log(logging.DEBUG, 'supported(%s)' % lang)
         return lang in LANGUAGES
 
+
     def suggest3(self, text, srclang, dstlang, maxcount):
         '''
 Is equivalent to calling suggest2(text, srclang, dstlang) and limiting
@@ -721,7 +729,9 @@ the number of returned records to maxcount.
 '''
         logging.log(logging.DEBUG, 'suggest(%s, %s, %s, %d)'\
                         % (text, srclang, dstlang, maxcount))
-        return self.storage.suggest3(text, srclang, dstlang, maxcount)
+        proxy = self.__proxy(srclang, dstlang)
+        return proxy.suggest3(text, srclang, dstlang, maxcount)
+
 
     def suggest2(self, text, srclang, dstlang):
         '''
@@ -790,13 +800,25 @@ Is equivalent to calling suggest2(text, "en", dstlang)
 '''
         return self.suggest3(text, "en", dstlang, 100)
 
+
+    def compare2(self, text, src, dst):
+        '''
+Returns the same results as suggest2, but grouped by the projects.
+'''
+        logging.log(logging.DEBUG, 'compare(%s, %s, %s)' % (text, src, dst))
+        proxy = self.__proxy(src, dst)
+        return proxy.compare2(text, src, dst)
+
+
     def compare(self, text, lang):
         '''
 Returns the same results as suggest, but grouped by the projects.
 '''
         logging.log(logging.DEBUG, 'compare(%s, %s)' % (text, lang))
-        return self.storage.compare(text, lang)    
+        proxy = self.__proxy(lang, 'en')
+        return proxy.compare(text, lang)
     
+
     def words(self, lang, offset = 0, limit = 50):
         """
 Returns the list of most popular words for the given language.
@@ -806,7 +828,8 @@ most limit records.  Every record in the result set is a pair:
 word in the database.
 """
         logging.log(logging.DEBUG, 'words(%s, %d, %d)' % (lang, offset, limit))
-        return self.storage.words(lang, offset, limit)
+        proxy = self.__proxy(lang, 'en')
+        return proxy.words(lang, offset, limit)
 
     def __init__(self, addr):
         PremiumServer.__init__(self, addr, TranRequestHandler)
@@ -820,6 +843,13 @@ This server exports the following methods through the XML-RPC protocol.
         self.register_function(self.suggest2, 'suggest2')
         self.register_function(self.suggest, 'suggest')
         self.register_function(self.compare, 'compare')
+        self.register_function(self.compare2, 'compare2')
         self.register_function(self.words, 'words')
         self.register_function(self.supported, 'supported')
         self.register_introspection_functions()
+        self.shadows = [
+            (lambda src, dst: sorted((src, dst)) == ['en', 'et'],
+             xmlrpclib.ServerProxy("http://estobuntu.itcollege.ee:8081/RPC2")),
+            (lambda src, dst: True,
+             self.storage),
+            ]
