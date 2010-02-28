@@ -427,19 +427,28 @@ sf = open(sys.argv[1] + '/../import/step1.sql')
 schema = sf.read()
 sf.close()
 
-conn = sqlite.connect(sys.argv[1] + '/../data/ten.db')
+importer_buckets = {
+    'mo': (Mozilla_Importer, OO_Importer),
+    '2' : (DI_Importer, Gnome_Importer, Xfce_Importer, Fedora_Importer),
+    '5' : (Inkscape_Importer, KDE_Importer, Mandriva_Importer, Suse_Importer)
+    }
+
+if len(sys.argv) > 2:
+    fname = sys.argv[1] + '/../data/ten-' + sys.argv[2] + '.db'
+    imps = importer_buckets[sys.argv[2]]
+else:
+    fname = sys.argv[1] + '/../data/ten.db'
+    imps = ()
+
+conn = sqlite.connect(fname)
 cursor = conn.cursor()
 cursor.executescript(schema)
 conn.commit()
 
-mo = len(sys.argv) > 2 and sys.argv[2] == 'mo'
-
 from traceback import print_exc
 
 for icls, p in importers.iteritems():
-    if mo and icls not in (Mozilla_Importer, OO_Importer):
-        continue
-    if not mo and icls in (Mozilla_Importer, OO_Importer):
+    if icls not in imps:
         continue
     try:
         i = icls(conn)

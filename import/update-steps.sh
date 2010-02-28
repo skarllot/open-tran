@@ -27,22 +27,26 @@ rm -f $log $err $audit
 date > $log
 echo "importing" > $status
 
-update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
-update gnome
-update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
-update kde
-update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
-update xfce
-update fedora
-update mandriva
+dayofweek=`date +%u`
+if [[ $dayofweek < 3 ]]; then
+    update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
+    update gnome
+    update xfce
+    update fedora
+else
+    update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
+    update kde
+    update mandriva
+    update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
+fi
 
-rm -rf $data_root/../data/*
+rm -rf $data_root/../data/ten-$dayofweek.db*
 
 echo "processing" >> $status
 
 date >> $log
 
-import_step1.py $data_root >> $log 2>> $err
+import_step1.py $data_root $dayofweek >> $log 2>> $err
 
 date >> $log
 
