@@ -338,7 +338,7 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
 
 
 class PremiumServer(ForkingMixIn, DocXMLRPCServer):
-    max_children = 70
+    max_children = 30
     allow_reuse_address = True
 
 
