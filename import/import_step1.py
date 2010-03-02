@@ -429,8 +429,14 @@ sf.close()
 
 importer_buckets = {
     'mo': (Mozilla_Importer, OO_Importer),
+    '7' : (DI_Importer, Gnome_Importer, Xfce_Importer, Fedora_Importer),
+    '0' : (DI_Importer, Gnome_Importer, Xfce_Importer, Fedora_Importer),
+    '1' : (DI_Importer, Gnome_Importer, Xfce_Importer, Fedora_Importer),
     '2' : (DI_Importer, Gnome_Importer, Xfce_Importer, Fedora_Importer),
-    '5' : (Inkscape_Importer, KDE_Importer, Mandriva_Importer, Suse_Importer)
+    '3' : (Inkscape_Importer, KDE_Importer, Mandriva_Importer, Suse_Importer),
+    '4' : (Inkscape_Importer, KDE_Importer, Mandriva_Importer, Suse_Importer),
+    '5' : (Inkscape_Importer, KDE_Importer, Mandriva_Importer, Suse_Importer),
+    '6' : (Inkscape_Importer, KDE_Importer, Mandriva_Importer, Suse_Importer),
     }
 
 if len(sys.argv) > 2:
