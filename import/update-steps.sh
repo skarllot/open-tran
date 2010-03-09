@@ -28,17 +28,17 @@ date > $log
 echo "importing" > $status
 
 dayofweek=`date +%u`
-if [[ $dayofweek < 3 ]]; then
-    update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
-    update gnome
-    update xfce
-    update fedora
-else
-    update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
-    update kde
-    update mandriva
-    update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
-fi
+# if [[ $dayofweek < 3 ]]; then
+#     update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
+#     update gnome
+#     update xfce
+#     update fedora
+# else
+#     update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
+#     update kde
+#     update mandriva
+#     update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
+# fi
 
 rm -rf $data_root/../data/ten-$dayofweek.db*
 
