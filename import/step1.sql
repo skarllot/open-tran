@@ -27,3 +27,9 @@ create table phrases (
 	projectid int,
 	locationid int
 );
+
+create table last_id (
+       id int
+);
+
+insert into last_id values (1);
