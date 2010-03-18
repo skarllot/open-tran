@@ -42,6 +42,7 @@ SUGGESTIONS_TXT = {
     'csb': u'Sugerowóny dolmaczënczi',
     'da' : u'Oversćttelsesforslag',
     'de' : u'Übersetzungsvorschläge',
+    'el' : u'Προτεινόμενες μεταφράσεις',
     'en' : u'Translation suggestions',
     'es' : u'Sugerencias de traducción',
     'fi' : u'Käännös ehdotukset',
