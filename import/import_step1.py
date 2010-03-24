@@ -17,7 +17,7 @@
 
 from translate.storage import factory
 from phrase import Phrase
-from pysqlite2 import dbapi2 as sqlite
+from sqlite3 import dbapi2 as sqlite
 
 import dircache, sys, os, gc
 
