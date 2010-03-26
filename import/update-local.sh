@@ -45,6 +45,8 @@ echo -n "########## Moving phrases: " >> $logout
 date >> $logout
 $local_dir/import/import_step2.py $newdir >> $logout 2>> $errout
 
+rm $newdir/ten.db
+
 echo -n "########## Moving words: " >> $logout
 date >> $logout
 $local_dir/import/import_step3.py $newdir >> $logout 2>> $errout

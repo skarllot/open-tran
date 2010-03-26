@@ -69,7 +69,7 @@ update mandriva
 update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
 update xfce
 
-rm -rf $data_root/../data/ten.db*
+rm -rf $data_root/../data/ten*.db*
 sqlite3 $data_root/../data/ten.db < $data_root/../import/step1.sql
 
 echo "processing" >> $status
