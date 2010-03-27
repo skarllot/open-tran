@@ -69,6 +69,7 @@ values
 
 
     def load_file(self, fname, lang):
+        used_keys = set()
         store = factory.getclass('a.po').parsefile(fname)
         for unit in store.units:
             src = unit.source.encode('utf-8')
@@ -79,6 +80,8 @@ values
             dst = unit.target.encode('utf-8')
             key = (src, '::'.join(unit.getlocations())
                    + '::::' + unit.getcontext())
+            if key in used_keys:
+                continue
             if key in self.phrase_ids:
                 pid = self.phrase_ids[key]
             else:
@@ -87,6 +90,7 @@ values
                 self.phrase_ids[key] = pid
             self.store_phrase(self.project_id, pid,
                               dst, unit.isfuzzy(), lang)
+            used_keys.add(key)
         return len(store.units)
 
 
