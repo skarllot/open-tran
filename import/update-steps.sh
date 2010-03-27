@@ -58,15 +58,20 @@ import_by_fr_mix () {
 
 rm -f $log $err $audit
 date > $log
+echo -n "removing broken repos..." >> $log
+rm -rf $data_root/suse-i18n
+rm -rf $data_root/inkscape
+echo "done" >> $log
+
 echo "importing" > $status
 
 update svn debian-installer svn://svn.d-i.alioth.debian.org/svn/d-i/trunk/packages/po
 update fedora
 update gnome
-update svn inkscape https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
+update svn inkscape-i18n https://inkscape.svn.sourceforge.net/svnroot/inkscape/inkscape/trunk/po
 update kde
 update mandriva
-update svn suse-i18n https://forgesvn1.novell.com/svn/suse-i18n/trunk
+update svn opensuse-i18n svn://svn.berlios.de/opensuse-i18n/trunk
 update xfce
 
 rm -rf $data_root/../data/ten*.db*
@@ -79,10 +84,10 @@ date >> $log
 import_by_fr_po D debian-installer
 import_by_fr_po R fedora
 import_by_fr_po G gnome-po
-import_by_fr_po I inkscape
+import_by_fr_po I inkscape-i18n
 import_by_fr_dir K l10n-kde4
 import_by_fr_po A mandriva
-import_by_fr_mix S suse-i18n
+import_by_fr_mix S opensuse-i18n
 import_by_fr_po X xfce
 
 date >> $log
