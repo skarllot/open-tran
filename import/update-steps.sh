@@ -74,6 +74,10 @@ update mandriva
 update svn opensuse-i18n svn://svn.berlios.de/opensuse-i18n/trunk
 update xfce
 
+if [ ! -d $data_root/../data ]; then
+    mkdir $data_root/../data
+fi
+
 rm -rf $data_root/../data/ten*.db*
 sqlite3 $data_root/../data/ten.db < $data_root/../import/step1.sql
 
