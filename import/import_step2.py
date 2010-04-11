@@ -78,10 +78,9 @@ def move_phrases(oconn, ocur, lang):
 
     icur.execute("""
 SELECT phrase, projectid, locationid, flags
-FROM phrases
-WHERE lang = ?
+FROM phrases_%s
 ORDER BY phrase
-""", (lang,))
+""" % lang)
 
     for (nphrase, projectid, nlid, flags) in icur.fetchall():
         if cnt % 5000 == 0:
@@ -110,10 +109,6 @@ VALUES (?, ?, ?, ?)""", (nlid, lid, project_names[projectid], flags))
 
 
 move_projects()
-
-print "Creating index...",
-icur.execute("CREATE INDEX IF NOT EXISTS idx ON phrases(lang);")
-print "done."
 
 if len(sys.argv) > 2 and sys.argv[2] == 'local':
     langs = ['de', 'en', 'pl']

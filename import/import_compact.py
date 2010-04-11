@@ -61,11 +61,11 @@ class ImporterProject(object):
         else:
             flags = 0
         cursor.execute(u"""
-insert into phrases
+insert into phrases_%s
     (projectid, locationid, lang, length, phrase, flags)
 values
     (?, ?, ?, ?, ?, ?)
-""", (pid, lid, lang, length, sentence.decode('utf-8'), flags))
+""" % lang, (pid, lid, lang, length, sentence.decode('utf-8'), flags))
 
 
     def load_file(self, fname, lang):
