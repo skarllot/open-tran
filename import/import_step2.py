@@ -17,7 +17,7 @@
 
 import sys
 from phrase import Phrase
-from sqlite3 import dbapi2 as sqlite
+from pysqlite2 import dbapi2 as sqlite
 from common import LANGUAGES
 from traceback import print_exc
 
