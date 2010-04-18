@@ -57,6 +57,7 @@ SUGGESTIONS_TXT = {
     'pl' : u'Sugestie tłumaczeń',
     'pt_br': u'Sugestões de tradução',
     'sr' : u'Предлози превода',
+    'sr_latn' : u'Predlozi prevoda',
     'uk' : u'Запропоновані переклади'
     }
 
