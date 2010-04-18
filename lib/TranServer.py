@@ -489,7 +489,10 @@ class TranRequestHandler(PremiumRequestHandler):
 
 	
     def convert_iface_lang(self, lang):
-        for l in SUGGESTIONS_TXT.keys():
+        lang = lang.lower()
+        if lang in SUGGESTIONS_TXT:
+            return lang
+        for l in sorted(SUGGESTIONS_TXT.keys(), reverse = True):
             i = l.find('_')
 	    if i < 0:
 		i = len(l)
