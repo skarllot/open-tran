@@ -77,7 +77,7 @@ def move_phrases(oconn, ocur, lang):
     phrase = ""
 
     icur.execute("""
-SELECT phrase, projectid, locationid, flags
+SELECT DISTINCT phrase, projectid, locationid, flags
 FROM phrases_%s
 ORDER BY phrase
 """ % lang)
