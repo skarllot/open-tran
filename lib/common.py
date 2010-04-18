@@ -105,6 +105,7 @@ LANGUAGES = {
     'sl' : u'Slovenščina',
     'sq' : u'Shqip',
     'sr' : u'Српски',
+    'sr_latn' : u'Srpski',
     'ss' : u'SiSwati',
     'st' : u'Sesotho',
     'sv' : u'Svenska',
