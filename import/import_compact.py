@@ -174,6 +174,8 @@ def fname_iter(pattern, lang):
 
 ip = ImporterProject(project_id)
 for lang in sorted(LANGUAGES):
+    if lang == 'en':
+        continue
     print lang, "...",
     for fname in fname_iter(pattern, lang):
         if exists(fname):

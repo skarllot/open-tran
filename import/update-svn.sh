@@ -20,6 +20,6 @@ if test -d $svn_root; then
 else
     echo -n "co $proj_name..."
     cd $data_root
-    svn co $url $svn_root > /dev/null
+    echo "p" | svn co $url $svn_root > /dev/null
     echo "done."
 fi

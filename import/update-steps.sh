@@ -96,14 +96,4 @@ import_by_fr_mix S opensuse-i18n
 import_by_fr_po X xfce
 
 date >> $log
-echo "step 2" >> $status
-
-import_step2.py $data_root/../data >> $log 2>> $err
-
-date >> $log
-echo "step 3" >> $status
-
-import_step3.py $data_root/../data >> $log 2>> $err
-
-date >> $log
 rm $status
