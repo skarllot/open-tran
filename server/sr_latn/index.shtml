@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>Open-Tran.eu — doslednost je važna</title>
   <link rel="stylesheet" type="text/css" href="/opentran.css"/>
   <link rel="icon" type="image/x-ico" href="/favicon.ico" />
-<!--  <link rel="search" type="application/opensearchdescription+xml" title="Open-Tran.eu" href="/search.xml" /> -->
+  <premium:openSearchLink/>
   <script language="JavaScript" type="text/javascript" src="/script.js"></script>
 </head>
 
@@ -25,6 +25,9 @@
 	</ul>
       </div> <!-- lang_choice -->
     </div> <!-- locale -->
+  <script language="JavaScript">
+    visibility_switch('lang_choice');
+  </script>
 
 <div id="logo">
   <a href="/"><img src="/images/logo2-sr_latn.png" alt="open-tran // doslednost je važna"/></a>
