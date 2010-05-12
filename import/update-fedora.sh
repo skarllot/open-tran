@@ -3,6 +3,9 @@
 data_root="$1"
 fedora_root="$data_root/fedora"
 
+# This is a dummy run that should make wget avoid a refresh
+wget -o /dev/null -O /dev/null http://git.fedorahosted.org/git/?a=project_index
+
 modules=`wget -o /dev/null -O- http://git.fedorahosted.org/git/?a=project_index | sed 's/ .*//'`
 
 if [ ! -d $fedora_root ]; then
