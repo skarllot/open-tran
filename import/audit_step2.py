@@ -16,7 +16,7 @@
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
 import sys
-from pysqlite2 import dbapi2 as sqlite
+from sqlite3 import dbapi2 as sqlite
 from common import LANGUAGES, pretty_int
 
 
