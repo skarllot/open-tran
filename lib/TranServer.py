@@ -844,13 +844,13 @@ word in the database.
 This server exports the following methods through the XML-RPC protocol.
 ''')
         self.storage = TranDB('../data/')
-        self.register_function(self.suggest3, 'suggest3')
-        self.register_function(self.suggest2, 'suggest2')
-        self.register_function(self.suggest, 'suggest')
-        self.register_function(self.compare, 'compare')
-        self.register_function(self.compare2, 'compare2')
-        self.register_function(self.words, 'words')
-        self.register_function(self.supported, 'supported')
+        #self.register_function(self.suggest3, 'suggest3')
+        #self.register_function(self.suggest2, 'suggest2')
+        #self.register_function(self.suggest, 'suggest')
+        #self.register_function(self.compare, 'compare')
+        #self.register_function(self.compare2, 'compare2')
+        #self.register_function(self.words, 'words')
+        #self.register_function(self.supported, 'supported')
         self.register_introspection_functions()
         self.shadows = [
             (lambda src, dst: sorted((src, dst)) == ['en', 'et'],
