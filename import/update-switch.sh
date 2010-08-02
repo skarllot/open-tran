@@ -22,8 +22,7 @@ echo "Old directory: $olddir"
 echo "New directory: $newdir"
 
 rm -f $IMPORTDIR/../$newdir/failed.txt
-$IMPORTDIR/audit_step1.py $IMPORTDIR/../$newdir > /tmp/projects.html
-$IMPORTDIR/audit_step2.py $IMPORTDIR/../$newdir > /tmp/languages.html
+$IMPORTDIR/audit_compact.py $IMPORTDIR/../$newdir
 
 cd "$IMPORTDIR/.."
 mv /tmp/projects.html server
