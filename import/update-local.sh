@@ -38,6 +38,8 @@ select * from mo.projects;
 
 insert into phrases
 select * from mo.phrases;
+
+commit;
 EOF
 ) | sqlite3 $newdir/ten.db
 
