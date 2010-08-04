@@ -116,7 +116,7 @@ projects = {
                  "/images/mandriva-logo.png",
                  "trunk",
                  '<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>',
-                 25000)
+                 16000)
     }
 
 
