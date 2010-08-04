@@ -34,7 +34,7 @@ for lang in LANGUAGES:
 insert into phrases_%s
 select *
 from mo.phrases
-where lang = %s""" % (lang, lang))
+where lang = '%s'""" % (lang, lang))
 
 icur.close()
 iconn.close()
