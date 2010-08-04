@@ -24,25 +24,12 @@ fi
 echo -n "########## Downloading the database: " >> $logout
 date >> $logout
 
-rm -f $newdir/ten*.db
-wget -o /dev/null -O $newdir/ten.db http://ot.leonardof.org/data/ten.db
+#rm -f $newdir/ten*.db
+#wget -o /dev/null -O $newdir/ten.db http://ot.leonardof.org/data/ten.db
 
 echo -n "########## Copying Mozilla and OO.o phrases: " >> $logout
 date >> $logout
-
-(cat <<EOF
-attach database '$local_dir/dataa/mo.db' as 'mo';
-
-insert into projects
-select * from mo.projects;
-
-insert into phrases
-select * from mo.phrases;
-
-commit;
-EOF
-) | sqlite3 $newdir/ten.db
-
+$local_dir/import/import_step1a.py $newdir >> $logout 2>> $errout
 echo -n "########## Moving phrases: " >> $logout
 date >> $logout
 $local_dir/import/import_step2.py $newdir >> $logout 2>> $errout
