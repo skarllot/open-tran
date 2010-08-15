@@ -24,8 +24,8 @@ fi
 echo -n "########## Downloading the database: " >> $logout
 date >> $logout
 
-#rm -f $newdir/ten*.db
-#wget -o /dev/null -O $newdir/ten.db http://ot.leonardof.org/data/ten.db
+rm -f $newdir/ten*.db
+wget -o /dev/null -O $newdir/ten.db http://ot.leonardof.org/data/ten.db
 
 echo -n "########## Copying Mozilla and OO.o phrases: " >> $logout
 date >> $logout
