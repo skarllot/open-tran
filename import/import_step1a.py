@@ -30,11 +30,14 @@ icur.execute("attach database '%s/mo.db' as 'mo'" % datadir)
 icur.execute("insert into projects select * from mo.projects;")
 
 for lang in LANGUAGES:
+    print lang
     icur.execute("""
 insert into phrases_%s
 select *
 from mo.phrases
 where lang = '%s'""" % (lang, lang))
+
+iconn.commit()
 
 icur.close()
 iconn.close()
