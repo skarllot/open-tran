@@ -29,7 +29,7 @@ icur = iconn.cursor()
 icur.execute("attach database '%s/mo.db' as 'mo'" % datadir)
 icur.execute("insert into projects select * from mo.projects;")
 
-for lang in LANGUAGES:
+for lang in sorted(LANGUAGES):
     print lang
     icur.execute("""
 insert into phrases_%s

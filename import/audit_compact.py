@@ -74,7 +74,7 @@ projects = {
                  "/images/pompelyts.png",
                  "",
                  '<a href="http://www.gnu.org/copyleft">Copyleft</a>',
-                 224),
+                 0),
 
     'S': Project("openSUSE",
                  "http://www.opensuse.org",
