@@ -168,7 +168,7 @@ class TranDB:
         srclang = sanitize_language(srclang)
         dstlang = sanitize_language(dstlang)
         result = []
-        phrase = Phrase(text, srclang, False)
+        phrase = Phrase(text, srclang, sort=False, stem=True)
         if phrase.length() < 1:
             return result
         words = phrase.canonical_list()
