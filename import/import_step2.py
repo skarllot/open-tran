@@ -89,13 +89,13 @@ ORDER BY phrase
         cnt += 1
         if phrase != nphrase:
             p = Phrase(nphrase, lang[:2])
-            len = p.length()
-            if len < 1:
+            length = p.length()
+            if length < 1:
                 continue
             lid = nlid
             ocur.execute("""
 INSERT INTO phrases (id, phrase, length)
-VALUES (?, ?, ?)""", (nlid, nphrase, len))
+VALUES (?, ?, ?)""", (nlid, nphrase, length))
             store_words(oconn, ocur, nlid, p.canonical_list())
             phrase = nphrase
         if lang == "en":
