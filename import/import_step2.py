@@ -88,7 +88,7 @@ ORDER BY phrase
             sys.stdout.flush()
         cnt += 1
         if phrase != nphrase:
-            p = Phrase(nphrase, lang[:2])
+            p = Phrase(nphrase, lang[:2], stem=True)
             length = p.length()
             if length < 1:
                 continue

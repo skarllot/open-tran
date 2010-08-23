@@ -16,6 +16,25 @@
 #  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
 
 import re
+from stem import PorterStemmer, SnowballStemmer
+
+stemmers = {
+    'da' : SnowballStemmer('danish'),
+    'de' : SnowballStemmer('german'),
+    'en' : PorterStemmer(),
+    'es' : SnowballStemmer('spanish'),
+    'fi' : SnowballStemmer('finnish'),
+    'fr' : SnowballStemmer('french'),
+    'hu' : SnowballStemmer('hungarian'),
+    'it' : SnowballStemmer('italian'),
+    'nl' : SnowballStemmer('dutch'),
+    'no' : SnowballStemmer('norwegian'),
+    'pt' : SnowballStemmer('portuguese'),
+    'ro' : SnowballStemmer('romanian'),
+    'ru' : SnowballStemmer('russian'),
+    'sv' : SnowballStemmer('swedish'),
+    }
+
 
 class GenericHandler:
     def __init__(self, connectors):
@@ -100,12 +119,15 @@ class Phrase:
             and not re.match(self.xre, word) \
             and not handler.discard(word)
 
-    def __init__(self, phrase, lang, sort=True):
+    def __init__(self, phrase, lang, sort=True, stem=False):
         handler = self.__resolve (lang)
         self._phrase = phrase
         self._wordlist = filter(lambda x: self.__filterfun(x, handler), \
                                 map(lambda x: x.replace('_', '').lower(), \
                                     self.wre.findall(phrase)))[:10]
+        if stem and lang[:2] in stemmers:
+            stemmer = stemmers[lang[:2]]
+            self._wordlist = [stemmer.stem(word) for word in self._wordlist]
         if sort:
             self._wordlist.sort()
 
