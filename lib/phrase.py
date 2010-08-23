@@ -86,6 +86,10 @@ class PTHandler(GenericHandler):
     def __init__(self):
         GenericHandler.__init__(self, ["o", "os", "a", "as", "um", "uns", "uma", "umas"])
 
+class SVHandler(GenericHandler):
+    def __init__(self):
+        GenericHandler.__init__(self, ['de', 'den', 'det', 'en', 'ena', 'ett'])
+
 
 class Phrase:
     wre = re.compile("([\w'%<]/?(?:[&'_]?\w)*>?)", re.UNICODE)
@@ -103,7 +107,8 @@ class Phrase:
                    "it" : ITHandler (),
                    "nl" : NLHandler (),
                    "pl" : PLHandler (),
-                   "pt" : PTHandler () }
+                   "pt" : PTHandler (),
+                   "sv" : SVHandler ()}
     __def_handler = GenericHandler ([])
 
     def __resolve(self, lang):
