@@ -294,6 +294,8 @@ class TranRequestHandler(PremiumRequestHandler):
         request.write_search_template_url(f)
     PremiumRequestHandler.substitutes['openSearchLink'] = lambda request, f: \
         request.write_opensearch_link(f)
+    PremiumRequestHandler.substitutes['phrase'] = lambda request, f: \
+        f.write(_replace_html(request.query).replace('"', '&quot;').encode('utf-8'))
 
     PremiumRequestHandler.actions.append(PremiumActionRedirect([('^/index.html$', '/index.shtml'),
                                                                 ('^/API$', '/RPC2')]))
@@ -640,11 +642,11 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
 
 
     def send_search_head(self):
-        query = self.get_query()
-        if query == None:
+        self.query = self.get_query()
+        if self.query == None:
             return self.shutdown(404)
-        response = self.dump([self.suggest(query, self.srclang, self.dstlang)], self.srclang, self.dstlang).encode('utf-8')
-        response += self.dump([self.suggest(query, self.dstlang, self.srclang)], self.dstlang, self.srclang).encode('utf-8')
+        response = self.dump([self.suggest(self.query, self.srclang, self.dstlang)], self.srclang, self.dstlang).encode('utf-8')
+        response += self.dump([self.suggest(self.query, self.dstlang, self.srclang)], self.dstlang, self.srclang).encode('utf-8')
         return self.embed_in_template(response)
 
 
@@ -682,10 +684,10 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
     
     
     def send_compare_head(self):
-        query = self.get_query()
-        if query == None:
+        self.query = self.get_query()
+        if self.query == None:
             return self.shutdown(404)
-        suggs = self.server.compare(query, self.srclang, self.dstlang)
+        suggs = self.server.compare(self.query, self.srclang, self.dstlang)
         response = self.dump_compare(suggs, self.srclang).encode('utf-8')
         return self.embed_in_template(response)
 
@@ -696,10 +698,10 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
         
 
     def json_suggest(self):
-        query = self.get_query(13)
-        if query == None:
+        self.query = self.get_query(13)
+        if self.query == None:
             return self.shutdown(404)
-        return self.server.storage.suggest2(query, self.srclang, self.dstlang)
+        return self.server.storage.suggest2(self.query, self.srclang, self.dstlang)
 
 
     def json_supported(self):
@@ -707,6 +709,7 @@ title="Open-Tran.eu (%s/%s)" href="/search.xml" />'''
 
 
     def request_init(self):
+        self.query = ""
         self.get_languages()
 
 

@@ -183,7 +183,7 @@ class PremiumActionRedirect(PremiumAction):
 class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
     sys_version = ""
     server_version = "PremiumHTTP/" + __version__
-    premre = re.compile("<premium:(?P<action>[a-zA-Z0-9_]*) */ *>")
+    premre = re.compile("(?P<pre>^.*)<premium:(?P<action>[a-zA-Z0-9_]*) */ *>(?P<post>.*$)")
     substitutes = {}
     actions = []
 
@@ -241,8 +241,10 @@ class PremiumRequestHandler(SimpleHTTPRequestHandler, DocXMLRPCRequestHandler):
             m = re.search(PremiumRequestHandler.premre, line)
             if m:
                 subst = PremiumRequestHandler.substitutes.get(m.group('action'))
+                f.write(m.group('pre'))
                 if subst:
                     subst(self, f)
+                f.write(m.group('post'))
             else:
                 f.write(line)
         f.flush()
