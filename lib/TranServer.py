@@ -56,6 +56,7 @@ SUGGESTIONS_TXT = {
     'ko' : u'번역어 제안',
     'pl' : u'Sugestie tłumaczeń',
     'pt_br': u'Sugestões de tradução',
+    'sl' : u'Translation suggestions',
     'sr' : u'Предлози превода',
     'sr_latn' : u'Predlozi prevoda',
     'sv' : u'Översättningsförslag',
