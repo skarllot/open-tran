@@ -1612,7 +1612,7 @@ class HungarianStemmer(SnowballStemmer):
 
         """
         r1 = u""
-        if word[0] in vowels:
+        if word and word[0] in vowels:
             for digraph in digraphs:
                 if digraph in word[1:]:
                     r1 = word[word.index(digraph[-1])+1:]
