@@ -860,8 +860,6 @@ This server exports the following methods through the XML-RPC protocol.
         #self.register_function(self.supported, 'supported')
         self.register_introspection_functions()
         self.shadows = [
-            (lambda src, dst: sorted((src, dst)) == ['en', 'et'],
-             xmlrpclib.ServerProxy("http://estobuntu.itcollege.ee:8081/RPC2")),
             (lambda src, dst: True,
              self.storage),
             ]
