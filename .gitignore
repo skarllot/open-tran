@@ -1,0 +1,334 @@
+
+# /
+/*.pyc
+/config.mak
+/data
+/open-tran-*.tar.gz
+
+# /gui/
+/gui/*.pyc
+
+# /import/
+/import/update.conf
+
+# /lib/
+/lib/.deps
+/lib/tran.c
+/lib/tran.py
+/lib/tran
+/lib/*.so
+/lib/*.o
+/lib/*.pyc
+
+# /lib/stem/
+/lib/stem/*.pyc
+
+# /server/
+/server/server.pid
+
+# /server/ar/
+/server/ar/images
+/server/ar/idea.css
+/server/ar/dev.html
+/server/ar/hof.html
+/server/ar/languages.html
+/server/ar/projects.html
+/server/ar/words.html
+/server/ar/opentran.css
+/server/ar/opentran-rtl.css
+/server/ar/script.js
+/server/ar/favicon.ico
+
+# /server/be_latin/
+/server/be_latin/images
+/server/be_latin/idea.css
+/server/be_latin/dev.html
+/server/be_latin/hof.html
+/server/be_latin/languages.html
+/server/be_latin/projects.html
+/server/be_latin/words.html
+/server/be_latin/opentran.css
+/server/be_latin/script.js
+/server/be_latin/favicon.ico
+
+# /server/ca/
+/server/ca/images
+/server/ca/idea.css
+/server/ca/dev.html
+/server/ca/hof.html
+/server/ca/languages.html
+/server/ca/projects.html
+/server/ca/words.html
+/server/ca/opentran.css
+/server/ca/script.js
+/server/ca/favicon.ico
+
+# /server/csb/
+/server/csb/images
+/server/csb/idea.css
+/server/csb/dev.html
+/server/csb/hof.html
+/server/csb/languages.html
+/server/csb/projects.html
+/server/csb/words.html
+/server/csb/opentran.css
+/server/csb/script.js
+/server/csb/favicon.ico
+
+# /server/da/
+/server/da/images
+/server/da/idea.css
+/server/da/dev.html
+/server/da/hof.html
+/server/da/languages.html
+/server/da/projects.html
+/server/da/words.html
+/server/da/opentran.css
+/server/da/script.js
+/server/da/favicon.ico
+
+# /server/de/
+/server/de/images
+/server/de/idea.css
+/server/de/dev.html
+/server/de/hof.html
+/server/de/languages.html
+/server/de/projects.html
+/server/de/words.html
+/server/de/opentran.css
+/server/de/script.js
+/server/de/favicon.ico
+
+# /server/el/
+/server/el/*.js
+/server/el/*.css
+/server/el/*.ico
+/server/el/images
+
+# /server/en/
+/server/en/images
+/server/en/idea.css
+/server/en/dev.html
+/server/en/hof.html
+/server/en/languages.html
+/server/en/projects.html
+/server/en/words.html
+/server/en/opentran.css
+/server/en/script.js
+/server/en/favicon.ico
+
+# /server/es/
+/server/es/images
+/server/es/idea.css
+/server/es/dev.html
+/server/es/hof.html
+/server/es/languages.html
+/server/es/projects.html
+/server/es/words.html
+/server/es/opentran.css
+/server/es/script.js
+/server/es/favicon.ico
+
+# /server/fi/
+/server/fi/images
+/server/fi/idea.css
+/server/fi/dev.html
+/server/fi/hof.html
+/server/fi/languages.html
+/server/fi/projects.html
+/server/fi/words.html
+/server/fi/opentran.css
+/server/fi/script.js
+/server/fi/favicon.ico
+
+# /server/fr/
+/server/fr/images
+/server/fr/idea.css
+/server/fr/dev.html
+/server/fr/hof.html
+/server/fr/languages.html
+/server/fr/projects.html
+/server/fr/words.html
+/server/fr/opentran.css
+/server/fr/script.js
+/server/fr/favicon.ico
+
+# /server/fy/
+/server/fy/images
+/server/fy/idea.css
+/server/fy/dev.html
+/server/fy/hof.html
+/server/fy/languages.html
+/server/fy/projects.html
+/server/fy/words.html
+/server/fy/opentran.css
+/server/fy/script.js
+/server/fy/favicon.ico
+
+# /server/gl/
+/server/gl/images
+/server/gl/idea.css
+/server/gl/dev.html
+/server/gl/hof.html
+/server/gl/languages.html
+/server/gl/projects.html
+/server/gl/words.html
+/server/gl/opentran.css
+/server/gl/script.js
+/server/gl/favicon.ico
+
+# /server/he/
+/server/he/images
+/server/he/idea.css
+/server/he/dev.html
+/server/he/hof.html
+/server/he/languages.html
+/server/he/projects.html
+/server/he/words.html
+/server/he/opentran*.css
+/server/he/script.js
+/server/he/favicon.ico
+
+# /server/hu/
+/server/hu/images
+/server/hu/idea.css
+/server/hu/dev.html
+/server/hu/hof.html
+/server/hu/languages.html
+/server/hu/projects.html
+/server/hu/words.html
+/server/hu/opentran.css
+/server/hu/script.js
+/server/hu/favicon.ico
+
+# /server/it/
+/server/it/images
+/server/it/idea.css
+/server/it/dev.html
+/server/it/hof.html
+/server/it/languages.html
+/server/it/projects.html
+/server/it/words.html
+/server/it/opentran.css
+/server/it/script.js
+/server/it/favicon.ico
+
+# /server/ka/
+/server/ka/images
+/server/ka/idea.css
+/server/ka/dev.html
+/server/ka/hof.html
+/server/ka/languages.html
+/server/ka/projects.html
+/server/ka/words.html
+/server/ka/opentran.css
+/server/ka/script.js
+/server/ka/favicon.ico
+
+# /server/ko/
+/server/ko/images
+/server/ko/idea.css
+/server/ko/dev.html
+/server/ko/hof.html
+/server/ko/languages.html
+/server/ko/projects.html
+/server/ko/words.html
+/server/ko/opentran.css
+/server/ko/script.js
+/server/ko/favicon.ico
+
+# /server/pl/
+/server/pl/images
+/server/pl/idea.css
+/server/pl/dev.html
+/server/pl/hof.html
+/server/pl/languages.html
+/server/pl/projects.html
+/server/pl/words.html
+/server/pl/opentran.css
+/server/pl/script.js
+/server/pl/favicon.ico
+
+# /server/pt_br/
+/server/pt_br/images
+/server/pt_br/idea.css
+/server/pt_br/dev.html
+/server/pt_br/hof.html
+/server/pt_br/languages.html
+/server/pt_br/projects.html
+/server/pt_br/words.html
+/server/pt_br/opentran.css
+/server/pt_br/script.js
+/server/pt_br/favicon.ico
+
+# /server/sk/
+/server/sk/images
+/server/sk/idea.css
+/server/sk/dev.html
+/server/sk/hof.html
+/server/sk/languages.html
+/server/sk/projects.html
+/server/sk/words.html
+/server/sk/opentran.css
+/server/sk/script.js
+/server/sk/favicon.ico
+
+# /server/sl/
+/server/sl/images
+/server/sl/idea.css
+/server/sl/dev.html
+/server/sl/hof.html
+/server/sl/languages.html
+/server/sl/projects.html
+/server/sl/words.html
+/server/sl/opentran.css
+/server/sl/script.js
+/server/sl/favicon.ico
+
+# /server/sq/
+/server/sq/images
+/server/sq/idea.css
+/server/sq/dev.html
+/server/sq/hof.html
+/server/sq/languages.html
+/server/sq/projects.html
+/server/sq/words.html
+/server/sq/opentran.css
+/server/sq/script.js
+/server/sq/favicon.ico
+
+# /server/sr/
+/server/sr/images
+/server/sr/idea.css
+/server/sr/dev.html
+/server/sr/hof.html
+/server/sr/languages.html
+/server/sr/projects.html
+/server/sr/words.html
+/server/sr/opentran.css
+/server/sr/script.js
+/server/sr/favicon.ico
+
+# /server/sv/
+/server/sv/images
+/server/sv/idea.css
+/server/sv/dev.html
+/server/sv/hof.html
+/server/sv/languages.html
+/server/sv/projects.html
+/server/sv/words.html
+/server/sv/opentran.css
+/server/sv/script.js
+/server/sv/favicon.ico
+
+# /server/uk/
+/server/uk/images
+/server/uk/idea.css
+/server/uk/dev.html
+/server/uk/hof.html
+/server/uk/languages.html
+/server/uk/projects.html
+/server/uk/words.html
+/server/uk/opentran.css
+/server/uk/script.js
+/server/uk/favicon.ico
